@@ -1,5 +1,4 @@
-﻿#pragma execution_character_set("utf-8")
-#include "text_widget.h"
+﻿#include "text_widget.h"
 
 #include "framework.h"
 
@@ -29,7 +28,7 @@ QString TextWidget::GetText() const
 
 void TextWidget::InitUi()
 {
-	QHBoxLayout* layout = new QHBoxLayout(this);
+	QVBoxLayout* layout = new QVBoxLayout(this);
 	m_textEdit = new QTextEdit(this);
 	layout->addWidget(m_textEdit);
 	setLayout(layout);

@@ -1,5 +1,4 @@
-﻿#pragma execution_character_set("utf-8")
-#include "custom_tab_bar.h"
+﻿#include "custom_tab_bar.h"
 
 #include "framework.h"
 

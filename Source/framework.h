@@ -1,9 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include <QSet>
 #include <QFile>
 #include <QAction>
 #include <QString>
+#include <QProcess>
 #include <QVariant>
 #include <QMenuBar>
 #include <QToolBar>
@@ -20,4 +21,7 @@
 #include <QInputDialog>
 #include <QApplication>
 #include <QCoreApplication>
+#include <QDesktopServices>
+#include <QFileSystemModel>
 #include <QContextMenuEvent>
+

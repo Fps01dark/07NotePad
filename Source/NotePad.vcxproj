@@ -20,13 +20,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -36,12 +36,12 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>5.14.2_msvc2017_64</QtInstall>
+    <QtInstall>6.8.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>5.14.2_msvc2017_64</QtInstall>
+    <QtInstall>6.8.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -99,7 +99,7 @@
     <ClCompile Include="custom_tab_widget.cpp" />
     <ClCompile Include="custom_tab_bar.cpp" />
     <ClCompile Include="custom_tool_bar.cpp" />
-    <ClCompile Include="directory_dock_widget.cpp" />
+    <ClCompile Include="folder_workspace_dock_widget.cpp" />
     <ClCompile Include="main_core.cpp" />
     <ClCompile Include="main_window.cpp" />
     <ClCompile Include="main.cpp" />
@@ -113,7 +113,7 @@
     <QtMoc Include="custom_tab_widget.h" />
     <ClInclude Include="custom_tab_bar.h" />
     <ClInclude Include="custom_tool_bar.h" />
-    <ClInclude Include="directory_dock_widget.h" />
+    <QtMoc Include="folder_workspace_dock_widget.h" />
     <ClInclude Include="framework.h" />
     <QtMoc Include="main_core.h" />
     <ClInclude Include="message_bus.h" />
@@ -121,6 +121,7 @@
     <QtMoc Include="main_window.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="folder_workspace_dock_widget.ui" />
     <QtUic Include="main_window.ui" />
     <QtUic Include="text_widget.ui" />
   </ItemGroup>

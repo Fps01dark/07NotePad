@@ -43,5 +43,11 @@
         <file>standard/tabbar/saved_alt.ico</file>
         <file>standard/tabbar/unsaved.ico</file>
         <file>standard/tabbar/unsaved_alt.ico</file>
+        <file>standard/panels/toolbar/fb_expand_all.ico</file>
+        <file>standard/panels/toolbar/fb_fold_all.ico</file>
+        <file>standard/panels/toolbar/fb_select_current_file.ico</file>
+        <file>standard/panels/toolbar/funclstPreferences.ico</file>
+        <file>standard/panels/toolbar/funclstReload.ico</file>
+        <file>standard/panels/toolbar/funclstSort.ico</file>
     </qresource>
 </RCC>

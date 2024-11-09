@@ -1,5 +1,4 @@
-﻿#pragma execution_character_set("utf-8")
-#include "custom_tool_bar.h"
+﻿#include "custom_tool_bar.h"
 
 #include "framework.h"
 
@@ -20,7 +19,6 @@ CustomToolBar::~CustomToolBar()
 
 void CustomToolBar::InitUi()
 {
-
 	m_newAction = addAction(QIcon(":/NotePad/standard/toolbar/newFile.bmp"), tr("New"));
 	m_openAction = addAction(QIcon(":/NotePad/standard/toolbar/openFile.bmp"), tr("Open"));
 	m_saveAction = addAction(QIcon(":/NotePad/standard/toolbar/saveFile.bmp"), tr("Save"));
@@ -54,7 +52,7 @@ void CustomToolBar::InitConnect()
 		{
 			m_messageBus->Publish("Save All File");
 		});
-	connect(m_closeAllAction, &QAction::triggered, [=]() 
+	connect(m_closeAllAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Close All File");
 		});

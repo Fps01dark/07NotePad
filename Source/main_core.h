@@ -11,16 +11,14 @@ class CustomToolBar;
 class CustomTabBar;
 class TextWidget;
 class CustomTabWidget;
+class FolderWorkspaceDockWidget;
 
 class MainCore :public QObject
 {
 	Q_OBJECT
 public:
-	explicit MainCore(MainWindow* main_window, QObject* parent = nullptr);
+	explicit MainCore(MainWindow* main_window);
 	~MainCore();
-	CustomMenuBar* GetCustomMenuBar() const;
-	CustomToolBar* GetCustomToolBar() const;
-	CustomTabWidget* GetCustomTabWidget() const;
 
 private:
 	void InitUi();
@@ -29,7 +27,7 @@ private:
 	// 文件
 	void NewFile();
 	void OpenFile();
-	void OpenFile(const QString& file_path);
+	void OpenFile(const QStringList& file_path);
 	void SaveFile();
 	void SaveAsFile();
 	void SaveAllFile();
@@ -46,6 +44,7 @@ private:
 	CustomToolBar* m_toolBar = nullptr;
 	CustomTabBar* m_tabBar = nullptr;
 	CustomTabWidget* m_centralWidget = nullptr;
+	FolderWorkspaceDockWidget* m_dirWorkSpace = nullptr;
 	// 以下数量保持一致，下标为 m_centralWidget Tab下标
 	QList<QString> m_openedFileName;
 	QList<QString> m_openedFilePath;

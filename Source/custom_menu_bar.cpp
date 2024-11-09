@@ -1,5 +1,4 @@
-﻿#pragma execution_character_set("utf-8")
-#include "custom_menu_bar.h"
+﻿#include "custom_menu_bar.h"
 
 #include "framework.h"
 
@@ -151,6 +150,30 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Open File");
 		});
+	connect(m_explorerAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open Explorer");
+		});
+	connect(m_cmdAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open Cmd");
+		});
+	connect(m_defaultViewerAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open In Default Viewer");
+		});
+	connect(m_folderAsWorkspace, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open Directory Workspace");
+		});
+	connect(m_openFolderAsWorkspaceAction, &QAction::triggered, [=]()
+			{
+				m_messageBus->Publish("Open Directory As Directory Workspace");
+			});
+	connect(m_reloadAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Reload File");
+		});
 	connect(m_saveAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Save File");
@@ -171,10 +194,7 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Close All File");
 		});
-	connect(m_reloadAction, &QAction::triggered, [=]()
-		{
-			m_messageBus->Publish("Reload File");
-		});
+
 	connect(m_clearRecentAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Clear History Record");

@@ -56,7 +56,7 @@
     <ClCompile Include="message.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="directory_dock_widget.cpp">
+    <ClCompile Include="folder_workspace_dock_widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -79,15 +79,15 @@
     <ClInclude Include="message_bus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="directory_dock_widget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="text_widget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="main_window.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="folder_workspace_dock_widget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -102,6 +102,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="main_core.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="folder_workspace_dock_widget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

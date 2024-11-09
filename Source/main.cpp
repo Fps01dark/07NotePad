@@ -1,6 +1,4 @@
-#pragma execution_character_set("utf-8")
-
-#include <QtWidgets/QApplication>
+﻿#include <QtWidgets/QApplication>
 
 #include "main_window.h"
 
