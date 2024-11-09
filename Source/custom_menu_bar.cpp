@@ -1,0 +1,186 @@
+﻿#pragma execution_character_set("utf-8")
+#include "custom_menu_bar.h"
+
+#include "framework.h"
+
+#include "message_bus.h"
+
+namespace
+{
+	const int MAX_HISTORY_FILE_SIZE = 10;
+}
+
+CustomMenuBar::CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+	:m_messageBus(message_bus),
+	QMenuBar(parent)
+{
+	InitUi();
+	InitValue();
+	InitConnect();
+}
+
+CustomMenuBar::~CustomMenuBar()
+{
+}
+
+QStringList CustomMenuBar::GetHistoryRecord() const
+{
+	QStringList history_list;
+	for (int i = 0; i < m_recentFileMenu->actions().size(); ++i)
+	{
+		history_list.append(m_recentFileMenu->actions()[i]->text());
+	}
+	return history_list;
+}
+
+void CustomMenuBar::AddHistoryRecord(const QStringList& history_list)
+{
+	for (int i = 0; i < history_list.size(); ++i)
+	{
+		// 查找是否已存在
+		QAction* action = nullptr;
+		for (int j = 0; j < m_recentFileMenu->actions().size(); ++j)
+		{
+			if (history_list[i] == m_recentFileMenu->actions()[j]->text())
+			{
+				action = m_recentFileMenu->actions()[j];
+			}
+		}
+
+		if (action != nullptr)
+		{
+			// 已存在-替换
+			m_recentFileMenu->removeAction(action);
+		}
+		else
+		{
+			// 不存在-新增
+			if (m_recentFileMenu->actions().size() == MAX_HISTORY_FILE_SIZE)
+			{
+				m_recentFileMenu->removeAction(m_recentFileMenu->actions()[m_recentFileMenu->actions().size() - 1]);
+			}
+			action = new QAction(history_list[i], m_recentFileMenu);
+			connect(action, &QAction::triggered, [=]()
+				{
+					m_messageBus->Publish("Open File", history_list[i]);
+				});
+		}
+
+		// 添加
+		if (m_recentFileMenu->actions().isEmpty())
+		{
+			m_recentFileMenu->addAction(action);
+		}
+		else
+		{
+			m_recentFileMenu->insertAction(m_recentFileMenu->actions()[0], action);
+		}
+	}
+}
+
+void CustomMenuBar::ClearHistoryRecord()
+{
+	m_recentFileMenu->clear();
+}
+
+void CustomMenuBar::InitUi()
+{
+	// 菜单栏-文件
+	QMenu* file_menu = this->addMenu(tr("File"));
+	m_newAction = file_menu->addAction(tr("New"));
+	m_openAction = file_menu->addAction(tr("Open..."));
+	m_openFolderMenu = file_menu->addMenu(tr("Open Contanining Folder"));
+	m_explorerAction = m_openFolderMenu->addAction(tr("Explorer"));
+	m_cmdAction = m_openFolderMenu->addAction(tr("Cmd"));
+	m_openFolderMenu->addSeparator();
+	m_folderAsWorkspace = m_openFolderMenu->addAction(tr("Folder As Workspace"));
+	m_defaultViewerAction = file_menu->addAction(tr("Open In Default Viewer"));
+	m_openFolderAsWorkspaceAction = file_menu->addAction(tr("Open Folder As Workspace..."));
+	m_reloadAction = file_menu->addAction(tr("Reload From Disk"));
+	m_saveAction = file_menu->addAction(tr("Save"));
+	m_saveAsAction = file_menu->addAction(tr("Save As..."));
+	m_copySaveAsAction = file_menu->addAction(tr("Save A Copy As..."));
+	m_saveAllAction = file_menu->addAction(tr("Save All"));
+	m_renameAction = file_menu->addAction(tr("Rename..."));
+	m_closeAction = file_menu->addAction(tr("Close"));
+	m_closeAllAction = file_menu->addAction(tr("Close All"));
+	m_closeMenu = file_menu->addMenu(tr("Close Multiple File"));
+	m_closeAllButCurrentAction = m_closeMenu->addAction(tr("Close All But Current File"));
+	m_closeLeftAction = m_closeMenu->addAction(tr("Close All To The Left"));
+	m_closeRightAction = m_closeMenu->addAction(tr("Close All To The Right"));
+	m_closeAllUnchangeAction = m_closeMenu->addAction(tr("Close All Unchanged"));
+	m_deleteAction = file_menu->addAction(tr("Move To Recycle Bin"));
+	file_menu->addSeparator();
+	m_loadSessionAction = file_menu->addAction(tr("Load Session..."));
+	m_saveSessionAction = file_menu->addAction(tr("Save Session..."));
+	file_menu->addSeparator();
+	m_printAction = file_menu->addAction(tr("Print..."));
+	m_printNowAction = file_menu->addAction(tr("Print Now"));
+	file_menu->addSeparator();
+	m_recentFileMenu = file_menu->addMenu(tr("Recent File"));
+	m_openAllRecentAction = file_menu->addAction(tr("Open All Recent Files"));
+	m_clearRecentAction = file_menu->addAction(tr("Clear Recent Files Record"));
+	file_menu->addSeparator();
+	m_exitSotfwareAction = file_menu->addAction(tr("Exit"));
+	// 菜单栏-编辑
+
+	// 菜单栏-查找
+
+	// 菜单栏-视图
+
+	// 菜单栏-编码
+
+	// 菜单栏-语言
+
+	// 菜单栏-设置
+
+	// 菜单栏-关于
+}
+
+void CustomMenuBar::InitValue()
+{
+}
+
+void CustomMenuBar::InitConnect()
+{
+	connect(m_newAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("New File");
+		});
+	connect(m_openAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open File");
+		});
+	connect(m_saveAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Save File");
+		});
+	connect(m_saveAsAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Save As File");
+		});
+	connect(m_copySaveAsAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Save As Clipboard");
+		});
+	connect(m_closeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close File");
+		});
+	connect(m_closeAllAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close All File");
+		});
+	connect(m_reloadAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Reload File");
+		});
+	connect(m_clearRecentAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Clear History Record");
+		});
+	connect(m_exitSotfwareAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Exit Software");
+		});
+}

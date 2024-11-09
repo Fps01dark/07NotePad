@@ -1,0 +1,47 @@
+<RCC>
+    <qresource prefix="/NotePad">
+        <file>standard/toolbar/allChars.bmp</file>
+        <file>standard/toolbar/closeAll.bmp</file>
+        <file>standard/toolbar/closeFile.bmp</file>
+        <file>standard/toolbar/copy.bmp</file>
+        <file>standard/toolbar/cut.bmp</file>
+        <file>standard/toolbar/docList.bmp</file>
+        <file>standard/toolbar/docMap.bmp</file>
+        <file>standard/toolbar/fileBrowser.bmp</file>
+        <file>standard/toolbar/find.bmp</file>
+        <file>standard/toolbar/findReplace.bmp</file>
+        <file>standard/toolbar/funcList.bmp</file>
+        <file>standard/toolbar/indentGuide.bmp</file>
+        <file>standard/toolbar/monitoring.bmp</file>
+        <file>standard/toolbar/newFile.bmp</file>
+        <file>standard/toolbar/openFile.bmp</file>
+        <file>standard/toolbar/paste.bmp</file>
+        <file>standard/toolbar/playRecord.bmp</file>
+        <file>standard/toolbar/playRecord_m.bmp</file>
+        <file>standard/toolbar/print.bmp</file>
+        <file>standard/toolbar/redo.bmp</file>
+        <file>standard/toolbar/saveAll.bmp</file>
+        <file>standard/toolbar/saveFile.bmp</file>
+        <file>standard/toolbar/saveRecord.bmp</file>
+        <file>standard/toolbar/startRecord.bmp</file>
+        <file>standard/toolbar/stopRecord.bmp</file>
+        <file>standard/toolbar/syncH.bmp</file>
+        <file>standard/toolbar/syncV.bmp</file>
+        <file>standard/toolbar/udl.bmp</file>
+        <file>standard/toolbar/undo.bmp</file>
+        <file>standard/toolbar/wrap.bmp</file>
+        <file>standard/toolbar/zoomIn.bmp</file>
+        <file>standard/toolbar/zoomOut.bmp</file>
+        <file>standard/tabbar/closeTabButton.ico</file>
+        <file>standard/tabbar/closeTabButton_hover.ico</file>
+        <file>standard/tabbar/closeTabButton_inact.ico</file>
+        <file>standard/tabbar/closeTabButton_push.ico</file>
+        <file>standard/tabbar/monitoring.ico</file>
+        <file>standard/tabbar/readonly.ico</file>
+        <file>standard/tabbar/readonly_alt.ico</file>
+        <file>standard/tabbar/saved.ico</file>
+        <file>standard/tabbar/saved_alt.ico</file>
+        <file>standard/tabbar/unsaved.ico</file>
+        <file>standard/tabbar/unsaved_alt.ico</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,23 @@
+#pragma once
+
+#include <QSet>
+#include <QFile>
+#include <QAction>
+#include <QString>
+#include <QVariant>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QClipboard>
+#include <QTabWidget>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QFileDialog>
+#include <QTableWidget>
+#include <QInputDialog>
+#include <QApplication>
+#include <QCoreApplication>
+#include <QContextMenuEvent>
