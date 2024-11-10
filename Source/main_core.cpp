@@ -9,7 +9,7 @@
 #include "custom_tab_bar.h"
 #include "custom_tab_widget.h"
 #include "text_widget.h"
-#include "folder_workspace_dock_widget.h"
+#include "directory_workspace_dock.h"
 
 MainCore::MainCore(MainWindow* main_window)
 	:m_mainWindow(main_window),
@@ -20,7 +20,7 @@ MainCore::MainCore(MainWindow* main_window)
 	m_toolBar = new CustomToolBar(m_messageBus, m_mainWindow);
 	m_centralWidget = new CustomTabWidget(m_messageBus, m_mainWindow);
 	m_tabBar = new CustomTabBar(m_messageBus, m_mainWindow);
-	m_dirWorkSpace = new FolderWorkspaceDockWidget(m_messageBus, m_mainWindow);
+	m_dirWorkSpace = new DirectoryWorkspaceDock(m_messageBus, m_mainWindow);
 
 	InitUi();
 	InitValue();
@@ -60,7 +60,7 @@ void MainCore::InitUi()
 
 void MainCore::InitValue()
 {
-	//std::function<void(const std::string&)> handler
+	// Base
 	m_messageBus->Subscribe("Update Window Title", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
@@ -89,6 +89,10 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Open File", [=]()
 		{
 			OpenFile();
+		});
+	m_messageBus->Subscribe("Open File", [=](const QStringList& data)
+		{
+			OpenFile(data);
 		});
 	m_messageBus->Subscribe("Open Explorer", [=]()
 		{
@@ -148,16 +152,13 @@ void MainCore::InitValue()
 				{
 					file_path = m_openedFilePath[index];
 					QFileInfo file_info(file_path);
-					m_dirWorkSpace->SetRootDir(file_info.absolutePath());
+					if (!file_path.isEmpty())
+					{
+						m_dirWorkSpace->SetRootDir(file_info.absolutePath());
+					}
 					m_dirWorkSpace->show();
 				}
 			}
-		});
-	m_messageBus->Subscribe("Open Directory As Directory Workspace", [=]()
-		{
-			QString file_dir = QFileDialog::getExistingDirectory(m_mainWindow, tr("Open Directory As Directory Workspace"), qApp->applicationDirPath());
-			m_dirWorkSpace->SetRootDir(file_dir);
-			m_dirWorkSpace->show();
 		});
 	m_messageBus->Subscribe("Open In Default Viewer", [=]()
 		{
@@ -176,9 +177,15 @@ void MainCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Open File", [=](const QStringList& data)
+	m_messageBus->Subscribe("Open Directory As Directory Workspace", [=]()
 		{
-			OpenFile(data);
+			QString file_dir = QFileDialog::getExistingDirectory(m_mainWindow, tr("Open Directory As Directory Workspace"), qApp->applicationDirPath());
+			m_dirWorkSpace->SetRootDir(file_dir);
+			m_dirWorkSpace->show();
+		});
+	m_messageBus->Subscribe("Reload File", [=]()
+		{
+			ReloadFile();
 		});
 	m_messageBus->Subscribe("Save File", [=]()
 		{
@@ -188,13 +195,13 @@ void MainCore::InitValue()
 		{
 			SaveAsFile();
 		});
-	m_messageBus->Subscribe("Save All File", [=]()
-		{
-			SaveAllFile();
-		});
 	m_messageBus->Subscribe("Save As Clipboard", [=]()
 		{
 			SaveAsClipboard();
+		});
+	m_messageBus->Subscribe("Save All File", [=]()
+		{
+			SaveAllFile();
 		});
 	m_messageBus->Subscribe("Close File", [=]()
 		{
@@ -208,10 +215,6 @@ void MainCore::InitValue()
 		{
 			CloseAllFile();
 		});
-	m_messageBus->Subscribe("Reload File", [=]()
-		{
-			ReloadFile();
-		});
 	m_messageBus->Subscribe("Clear History Record", [=]()
 		{
 			m_menuBar->ClearHistoryRecord();
@@ -221,6 +224,7 @@ void MainCore::InitValue()
 			m_mainWindow->close();
 		});
 
+	// Directory
 	m_messageBus->Subscribe("Expand All", [=]()
 		{
 			m_dirWorkSpace->ExpandAll();
@@ -246,6 +250,14 @@ void MainCore::InitValue()
 				}
 			}
 		});
+
+	// QTabWidget
+	m_messageBus->Subscribe("Tab Moved",[=](int data1,int data2)
+		{
+			m_openedFileName.swapItemsAt(data1, data2);
+			m_openedFilePath.swapItemsAt(data1, data2);
+			m_textWidget.swapItemsAt(data1, data2);
+		});
 }
 
 void MainCore::InitConnect()
@@ -257,6 +269,10 @@ void MainCore::InitConnect()
 	connect(m_centralWidget, &CustomTabWidget::tabCloseRequested, [=](int index)
 		{
 			m_messageBus->Publish("Close File", index);
+		});
+	connect(m_tabBar, &CustomTabBar::tabMoved, [=](int from, int to)
+		{
+			m_messageBus->Publish("Tab Moved", from, to);
 		});
 }
 
@@ -286,12 +302,11 @@ void MainCore::OpenFile(const QStringList& file_paths)
 {
 	for (const QString& file_path : file_paths)
 	{
-		if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+		QFileInfo file_info(file_path);
+		if (file_path.isEmpty() || !file_info.exists() || file_info.isDir())
 		{
 			continue;
 		}
-
-		QFileInfo file_info(file_path);
 		QString abs_file_path = file_info.absoluteFilePath();
 		int index = m_openedFilePath.indexOf(abs_file_path);
 		if (index != -1)

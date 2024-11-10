@@ -17,6 +17,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QMouseEvent>
 #include <QTableWidget>
 #include <QInputDialog>
 #include <QApplication>
@@ -24,4 +25,3 @@
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QContextMenuEvent>
-

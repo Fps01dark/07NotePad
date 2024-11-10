@@ -21,6 +21,11 @@ public:
 		m_voidIntsubscribers[messageType].push_back(handler);
 	}
 	// 注册消息类型的订阅者
+	void Subscribe(const QString& messageType, std::function<void(int,int)> handler)
+	{
+		m_voidIntIntsubscribers[messageType].push_back(handler);
+	}
+	// 注册消息类型的订阅者
 	void Subscribe(const QString& messageType, std::function<void(const QString&)> handler)
 	{
 		m_voidQStringSubscribers[messageType].push_back(handler);
@@ -55,6 +60,17 @@ public:
 		}
 	}
 	// 发布消息到消息总线
+	void Publish(const QString& messageType, const int& data1,const int& data2)
+	{
+		if (m_voidIntIntsubscribers.find(messageType) != m_voidIntIntsubscribers.end())
+		{
+			for (auto& handler : m_voidIntIntsubscribers[messageType])
+			{
+				handler(data1, data2); // 执行订阅者的回调
+			}
+		}
+	}
+	// 发布消息到消息总线
 	void Publish(const QString& messageType, const QString& data)
 	{
 		if (m_voidQStringSubscribers.find(messageType) != m_voidQStringSubscribers.end())
@@ -81,6 +97,7 @@ private:
 	// 存储每种消息类型对应的所有订阅者回调
 	QMap<QString, QList<std::function<void()>>> m_voidVoidsubscribers;
 	QMap<QString, QList<std::function<void(int)>>> m_voidIntsubscribers;
+	QMap<QString, QList<std::function<void(int, int)>>> m_voidIntIntsubscribers;
 	QMap<QString, QList<std::function<void(const QString&)>>> m_voidQStringSubscribers;
 	QMap<QString, QList<std::function<void(const QStringList&)>>> m_voidQStringListSubscribers;
 };

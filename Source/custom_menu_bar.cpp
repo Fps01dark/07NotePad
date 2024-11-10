@@ -61,7 +61,7 @@ void CustomMenuBar::AddHistoryRecord(const QStringList& history_list)
 			action = new QAction(history_list[i], m_recentFileMenu);
 			connect(action, &QAction::triggered, [=]()
 				{
-					m_messageBus->Publish("Open File", history_list[i]);
+					m_messageBus->Publish("Open File", QStringList() << history_list[i]);
 				});
 		}
 
@@ -167,9 +167,9 @@ void CustomMenuBar::InitConnect()
 			m_messageBus->Publish("Open Directory Workspace");
 		});
 	connect(m_openFolderAsWorkspaceAction, &QAction::triggered, [=]()
-			{
-				m_messageBus->Publish("Open Directory As Directory Workspace");
-			});
+		{
+			m_messageBus->Publish("Open Directory As Directory Workspace");
+		});
 	connect(m_reloadAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Reload File");
@@ -186,6 +186,14 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Save As Clipboard");
 		});
+	connect(m_saveAllAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Save All File");
+		});
+	connect(m_renameAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Save As File");
+		});
 	connect(m_closeAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Close File");
@@ -194,7 +202,6 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Close All File");
 		});
-
 	connect(m_clearRecentAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Clear History Record");

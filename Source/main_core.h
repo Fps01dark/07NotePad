@@ -4,6 +4,7 @@
 #include <QSet>
 
 class QString;
+
 class MessageBus;
 class MainWindow;
 class CustomMenuBar;
@@ -11,7 +12,7 @@ class CustomToolBar;
 class CustomTabBar;
 class TextWidget;
 class CustomTabWidget;
-class FolderWorkspaceDockWidget;
+class DirectoryWorkspaceDock;
 
 class MainCore :public QObject
 {
@@ -44,7 +45,7 @@ private:
 	CustomToolBar* m_toolBar = nullptr;
 	CustomTabBar* m_tabBar = nullptr;
 	CustomTabWidget* m_centralWidget = nullptr;
-	FolderWorkspaceDockWidget* m_dirWorkSpace = nullptr;
+	DirectoryWorkspaceDock* m_dirWorkSpace = nullptr;
 	// 以下数量保持一致，下标为 m_centralWidget Tab下标
 	QList<QString> m_openedFileName;
 	QList<QString> m_openedFilePath;

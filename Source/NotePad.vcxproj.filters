@@ -56,18 +56,15 @@
     <ClCompile Include="message.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="folder_workspace_dock_widget.cpp">
+    <ClCompile Include="directory_workspace_dock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="directory_workspace_tree_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="text_widget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="custom_tab_bar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="custom_tool_bar.h">
@@ -104,7 +101,16 @@
     <QtMoc Include="main_core.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="folder_workspace_dock_widget.h">
+    <QtMoc Include="directory_workspace_dock.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="custom_tab_bar.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="directory_workspace_tree_view.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="text_widget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -5,15 +5,16 @@
 
 class QAction;
 class QToolBar;
-class MessageBus;
 class QFileSystemModel;
+class MessageBus;
+class DirectoryWorkspaceTreeView;
 
-class FolderWorkspaceDockWidget :public QDockWidget
+class DirectoryWorkspaceDock :public QDockWidget
 {
 	Q_OBJECT
 public:
-	explicit FolderWorkspaceDockWidget(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
-	~FolderWorkspaceDockWidget();
+	explicit DirectoryWorkspaceDock(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
+	~DirectoryWorkspaceDock();
 	void SetRootDir(const QString& root_dir);
 	QString GetRootDir() const;
 	void ExpandAll();
@@ -33,5 +34,5 @@ private:
 	QAction* m_collapseAllAction = nullptr;
 	QAction* m_locationAction = nullptr;
 	QFileSystemModel* m_fileSystemModel = nullptr;
-	QTreeView* m_treeView = nullptr;
+	DirectoryWorkspaceTreeView* m_treeView = nullptr;
 };

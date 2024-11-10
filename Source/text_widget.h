@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QWidget>
 
@@ -8,8 +8,9 @@ class QTextEdit;
 
 class TextWidget :public QWidget
 {
+	Q_OBJECT
 public:
-	TextWidget(QWidget* parent = nullptr);
+	explicit TextWidget(QWidget* parent = nullptr);
 	~TextWidget();
 	void SetText(const QString& text);
 	QString GetText() const;

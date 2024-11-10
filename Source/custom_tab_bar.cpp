@@ -17,10 +17,6 @@ CustomTabBar::~CustomTabBar()
 {
 }
 
-void CustomTabBar::contextMenuEvent(QContextMenuEvent* event)
-{
-}
-
 void CustomTabBar::InitUi()
 {
 }
