@@ -32,7 +32,7 @@
     <ClCompile Include="main_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="text_widget.cpp">
+    <ClCompile Include="custom_text_edit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="custom_tab_widget.cpp">
@@ -78,13 +78,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="text_widget.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="main_window.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="folder_workspace_dock_widget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -110,7 +104,7 @@
     <QtMoc Include="directory_workspace_tree_view.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="text_widget.h">
+    <QtMoc Include="custom_text_edit.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

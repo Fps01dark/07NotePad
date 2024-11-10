@@ -106,7 +106,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="message.h" />
     <ClCompile Include="message_bus.cpp" />
-    <ClCompile Include="text_widget.cpp" />
+    <ClCompile Include="custom_text_edit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="custom_menu_bar.h" />
@@ -119,13 +119,11 @@
     <ClInclude Include="framework.h" />
     <QtMoc Include="main_core.h" />
     <ClInclude Include="message_bus.h" />
-    <QtMoc Include="text_widget.h" />
+    <QtMoc Include="custom_text_edit.h" />
     <QtMoc Include="main_window.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="folder_workspace_dock_widget.ui" />
     <QtUic Include="main_window.ui" />
-    <QtUic Include="text_widget.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="..\Resources\note_pad.qrc" />

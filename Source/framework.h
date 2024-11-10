@@ -14,6 +14,7 @@
 #include <QTabWidget>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QMessageBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>

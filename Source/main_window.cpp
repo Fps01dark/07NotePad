@@ -2,9 +2,9 @@
 
 #include "framework.h"
 
-#include "text_widget.h"
 #include "custom_menu_bar.h"
 #include "custom_tool_bar.h"
+#include "custom_text_edit.h"
 #include "custom_tab_widget.h"
 #include "main_core.h"
 
@@ -26,6 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+	m_mainCore->ExitSoftware();
 }
 
 void MainWindow::InitUi()

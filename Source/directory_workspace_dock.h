@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <QDockWidget>
-#include "ui_folder_workspace_dock_widget.h"
 
 class QAction;
 class QToolBar;

@@ -15,7 +15,7 @@ DirectoryWorkspaceDock::DirectoryWorkspaceDock(std::shared_ptr<MessageBus> messa
 	m_collapseAllAction = m_toolBar->addAction(QIcon(":/NotePad/standard/panels/toolbar/fb_fold_all.ico"), tr("Collapse All"));
 	m_locationAction = m_toolBar->addAction(QIcon(":/NotePad/standard/panels/toolbar/fb_select_current_file.ico"), tr("Locate The Current File"));
 	m_fileSystemModel = new QFileSystemModel(this);
-	m_treeView = new DirectoryWorkspaceTreeView(m_messageBus, this);
+	m_treeView = new DirectoryWorkspaceTreeView(m_messageBus, m_fileSystemModel, this);
 
 	InitUi();
 	InitValue();
@@ -96,7 +96,7 @@ void DirectoryWorkspaceDock::InitConnect()
 		{
 			m_messageBus->Publish("Locate The Current File");
 		});
-	connect(m_treeView, &QTreeView::doubleClicked, this, [=](const QModelIndex& index) 
+	connect(m_treeView, &QTreeView::doubleClicked, this, [=](const QModelIndex& index)
 		{
 			m_messageBus->Publish("Open File", QStringList() << m_fileSystemModel->filePath(index));
 		});

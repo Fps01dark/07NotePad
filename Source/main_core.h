@@ -10,7 +10,7 @@ class MainWindow;
 class CustomMenuBar;
 class CustomToolBar;
 class CustomTabBar;
-class TextWidget;
+class CustomTextEdit;
 class CustomTabWidget;
 class DirectoryWorkspaceDock;
 
@@ -20,6 +20,7 @@ class MainCore :public QObject
 public:
 	explicit MainCore(MainWindow* main_window);
 	~MainCore();
+	void ExitSoftware();
 
 private:
 	void InitUi();
@@ -27,16 +28,14 @@ private:
 	void InitConnect();
 	// 文件
 	void NewFile();
-	void OpenFile();
 	void OpenFile(const QStringList& file_path);
-	void SaveFile();
-	void SaveAsFile();
-	void SaveAllFile();
-	void SaveAsClipboard();
-	void CloseFile();
+	void SaveFile(int index, const QString& file_path);
 	void CloseFile(int index);
-	void CloseAllFile();
+	void DeleteFile(int index);
 	void ReloadFile();
+	void OpenExplorer(const QString& file_dir);
+	void OpenCmd(const QString& file_dir);
+	void OpenInDefaultViewer(const QString& file_path);
 
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;
@@ -49,5 +48,6 @@ private:
 	// 以下数量保持一致，下标为 m_centralWidget Tab下标
 	QList<QString> m_openedFileName;
 	QList<QString> m_openedFilePath;
-	QList<TextWidget*> m_textWidget;
+	QList<bool> m_savedFile;
+	QList<CustomTextEdit*> m_textWidget;
 };

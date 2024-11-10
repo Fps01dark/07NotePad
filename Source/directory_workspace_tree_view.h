@@ -2,17 +2,22 @@
 
 #include <QTreeView>
 
+class QMouseEvent;
+class QFileSystemModel;
 class MessageBus;
 
 class DirectoryWorkspaceTreeView : public QTreeView
 {
 	Q_OBJECT
 public:
-	explicit DirectoryWorkspaceTreeView(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
+	explicit DirectoryWorkspaceTreeView(std::shared_ptr<MessageBus> message_bus, QFileSystemModel* model, QWidget* parent = nullptr);
 	~DirectoryWorkspaceTreeView();
+	void SetMenu(const QMenu* menu);
+	QMenu* GetMenu() const;
 
 protected:
-	void mouseMoveEvent(QMouseEvent* event) override;
+	// 重写 contextMenuEvent 来显示右键菜单
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
 	void InitUi();
@@ -21,4 +26,12 @@ private:
 
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;
+	QFileSystemModel* m_fileSystemModel = nullptr;
+	QMenu* m_itemMenu = nullptr;
+	QAction* m_openAction = nullptr;
+	QAction* m_copyPathAction = nullptr;
+	QAction* m_copyNameAction = nullptr;
+	QAction* m_runBySystemAction = nullptr;
+	QAction* m_explorerHereAction = nullptr;
+	QAction* m_cmdHereAction = nullptr;
 };

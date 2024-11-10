@@ -30,4 +30,5 @@ void CustomTabWidget::InitValue()
 
 void CustomTabWidget::InitConnect()
 {
+
 }

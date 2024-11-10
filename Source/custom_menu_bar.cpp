@@ -108,7 +108,7 @@ void CustomMenuBar::InitUi()
 	m_closeLeftAction = m_closeMenu->addAction(tr("Close All To The Left"));
 	m_closeRightAction = m_closeMenu->addAction(tr("Close All To The Right"));
 	m_closeAllUnchangeAction = m_closeMenu->addAction(tr("Close All Unchanged"));
-	m_deleteAction = file_menu->addAction(tr("Move To Recycle Bin"));
+	m_deleteAction = file_menu->addAction(tr("Delete File"));
 	file_menu->addSeparator();
 	m_loadSessionAction = file_menu->addAction(tr("Load Session..."));
 	m_saveSessionAction = file_menu->addAction(tr("Save Session..."));
@@ -202,9 +202,38 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Close All File");
 		});
+	connect(m_closeAllButCurrentAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close All But Current File");
+		});
+	connect(m_closeLeftAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close Left File");
+		});
+	connect(m_closeRightAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close Right File");
+		});
+	connect(m_closeAllUnchangeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close All Unchanged File");
+		});
+	connect(m_deleteAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Delete File");
+		});
+	connect(m_openAllRecentAction, &QAction::triggered, [=]()
+		{
+			QStringList file_paths;
+			for (int i = 0; i < m_recentFileMenu->actions().size(); ++i)
+			{
+				file_paths.append(m_recentFileMenu->actions()[i]->text());
+			}
+			m_messageBus->Publish("Open File", file_paths);
+		});
 	connect(m_clearRecentAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Clear History Record");
+			m_messageBus->Publish("Clear Recent Record");
 		});
 	connect(m_exitSotfwareAction, &QAction::triggered, [=]()
 		{

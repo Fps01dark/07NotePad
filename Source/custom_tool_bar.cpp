@@ -52,6 +52,10 @@ void CustomToolBar::InitConnect()
 		{
 			m_messageBus->Publish("Save All File");
 		});
+	connect(m_closeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close File");
+		});
 	connect(m_closeAllAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Close All File");
