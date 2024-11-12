@@ -6,12 +6,12 @@ class QMouseEvent;
 class QFileSystemModel;
 class MessageBus;
 
-class DirectoryWorkspaceTreeView : public QTreeView
+class DirWorkspaceTreeView : public QTreeView
 {
 	Q_OBJECT
 public:
-	explicit DirectoryWorkspaceTreeView(std::shared_ptr<MessageBus> message_bus, QFileSystemModel* model, QWidget* parent = nullptr);
-	~DirectoryWorkspaceTreeView();
+	explicit DirWorkspaceTreeView(std::shared_ptr<MessageBus> message_bus, QFileSystemModel* model, QWidget* parent = nullptr);
+	~DirWorkspaceTreeView();
 	void SetMenu(const QMenu* menu);
 	QMenu* GetMenu() const;
 

@@ -8,6 +8,7 @@
 #include <QVariant>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QSettings>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QClipboard>
@@ -22,6 +23,7 @@
 #include <QTableWidget>
 #include <QInputDialog>
 #include <QApplication>
+#include <QStandardPaths>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QFileSystemModel>

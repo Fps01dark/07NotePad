@@ -1,11 +1,11 @@
-﻿#include "directory_workspace_dock.h"
+﻿#include "dir_workspace_dock.h"
 
 #include "framework.h"
 
 #include "message_bus.h"
-#include "directory_workspace_tree_view.h"
+#include "dir_workspace_tree_view.h"
 
-DirectoryWorkspaceDock::DirectoryWorkspaceDock(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+DirWorkspaceDock::DirWorkspaceDock(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	:m_messageBus(message_bus),
 	QDockWidget(parent)
 {
@@ -15,39 +15,39 @@ DirectoryWorkspaceDock::DirectoryWorkspaceDock(std::shared_ptr<MessageBus> messa
 	m_collapseAllAction = m_toolBar->addAction(QIcon(":/NotePad/standard/panels/toolbar/fb_fold_all.ico"), tr("Collapse All"));
 	m_locationAction = m_toolBar->addAction(QIcon(":/NotePad/standard/panels/toolbar/fb_select_current_file.ico"), tr("Locate The Current File"));
 	m_fileSystemModel = new QFileSystemModel(this);
-	m_treeView = new DirectoryWorkspaceTreeView(m_messageBus, m_fileSystemModel, this);
+	m_treeView = new DirWorkspaceTreeView(m_messageBus, m_fileSystemModel, this);
 
 	InitUi();
 	InitValue();
 	InitConnect();
 }
 
-DirectoryWorkspaceDock::~DirectoryWorkspaceDock()
+DirWorkspaceDock::~DirWorkspaceDock()
 {
 }
 
-void DirectoryWorkspaceDock::SetRootDir(const QString& root_dir)
+void DirWorkspaceDock::SetRootDir(const QString& root_dir)
 {
 	m_fileSystemModel->setRootPath(root_dir);
 	m_treeView->setRootIndex(m_fileSystemModel->index(root_dir));
 }
 
-QString DirectoryWorkspaceDock::GetRootDir() const
+QString DirWorkspaceDock::GetRootDir() const
 {
 	return m_fileSystemModel->rootPath();
 }
 
-void DirectoryWorkspaceDock::ExpandAll()
+void DirWorkspaceDock::ExpandAll()
 {
 	m_treeView->expandAll();
 }
 
-void DirectoryWorkspaceDock::CollapseAll()
+void DirWorkspaceDock::CollapseAll()
 {
 	m_treeView->collapseAll();
 }
 
-void DirectoryWorkspaceDock::LocationFile(const QString& file_path)
+void DirWorkspaceDock::LocationFile(const QString& file_path)
 {
 	// 取消选择之前的
 	QModelIndexList select_indexs = m_treeView->selectionModel()->selectedIndexes();
@@ -66,7 +66,7 @@ void DirectoryWorkspaceDock::LocationFile(const QString& file_path)
 	}
 }
 
-void DirectoryWorkspaceDock::InitUi()
+void DirWorkspaceDock::InitUi()
 {
 	// 文件视图
 	m_treeView->setModel(m_fileSystemModel);
@@ -78,11 +78,11 @@ void DirectoryWorkspaceDock::InitUi()
 	setWidget(m_widget);
 }
 
-void DirectoryWorkspaceDock::InitValue()
+void DirWorkspaceDock::InitValue()
 {
 }
 
-void DirectoryWorkspaceDock::InitConnect()
+void DirWorkspaceDock::InitConnect()
 {
 	connect(m_expandAllAction, &QAction::triggered, [=]()
 		{

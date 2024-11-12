@@ -9,7 +9,12 @@
 #include "custom_tab_bar.h"
 #include "custom_tab_widget.h"
 #include "custom_text_edit.h"
-#include "directory_workspace_dock.h"
+#include "dir_workspace_dock.h"
+
+namespace
+{
+	const QString RECENT_FILE_INI_PATH = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/NotePad/Setting/recent_file.ini";
+}
 
 MainCore::MainCore(MainWindow* main_window)
 	:m_mainWindow(main_window),
@@ -20,7 +25,7 @@ MainCore::MainCore(MainWindow* main_window)
 	m_toolBar = new CustomToolBar(m_messageBus, m_mainWindow);
 	m_centralWidget = new CustomTabWidget(m_messageBus, m_mainWindow);
 	m_tabBar = new CustomTabBar(m_messageBus, m_mainWindow);
-	m_dirWorkSpace = new DirectoryWorkspaceDock(m_messageBus, m_mainWindow);
+	m_dirWorkSpace = new DirWorkspaceDock(m_messageBus, m_mainWindow);
 
 	InitUi();
 	InitValue();
@@ -45,9 +50,9 @@ void MainCore::InitUi()
 	m_tabBar->setTabsClosable(true);
 	m_tabBar->setMovable(true);
 	m_tabBar->setStyleSheet(
-		"QTabBar::close-button { image: url(../Resources/standard/tabbar/closeTabButton.ico); }"
-		"QTabBar::close-button:hover { image: url(../Resources/standard/tabbar/closeTabButton_hover.ico); }"
-		"QTabBar::close-button:pressed { image: url(../Resources/standard/tabbar/closeTabButton_push.ico); }"
+		"QTabBar::close-button { image: url(:/NotePad/standard/tabbar/closeTabButton.ico); }"
+		"QTabBar::close-button:hover { image: url(:/NotePad/standard/tabbar/closeTabButton_hover.ico); }"
+		"QTabBar::close-button:pressed { image: url(:/NotePad/standard/tabbar/closeTabButton_push.ico); }"
 	);
 	// 中心区域
 	m_centralWidget->SetTabBar(m_tabBar);
@@ -61,6 +66,11 @@ void MainCore::InitUi()
 	m_mainWindow->addToolBar(Qt::TopToolBarArea, m_toolBar);
 	m_mainWindow->setCentralWidget(m_centralWidget);
 	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, m_dirWorkSpace);
+
+	// 加载最近文件记录
+	QSettings recent_file_ini(RECENT_FILE_INI_PATH, QSettings::IniFormat);
+	QStringList&& recent_paths = recent_file_ini.value("RecentFilePaths").toStringList();
+	m_menuBar->AddHistoryRecord(recent_paths);
 }
 
 void MainCore::InitValue()
@@ -377,10 +387,44 @@ void MainCore::InitValue()
 			m_savedFile[index] = false;
 			m_centralWidget->setTabIcon(index, QIcon(":/NotePad/standard/tabbar/unsaved.ico"));
 		});
+	m_messageBus->Subscribe("Copy Path", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index < 0)
+			{
+				return;
+			}
+			QClipboard* clipboard = QApplication::clipboard();
+			clipboard->setText(m_openedFilePath[index]);
+		});
+	m_messageBus->Subscribe("Copy Name", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index < 0)
+			{
+				return;
+			}
+			QClipboard* clipboard = QApplication::clipboard();
+			clipboard->setText(m_openedFileName[index]);
+		});
+	m_messageBus->Subscribe("Copy Directory", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index < 0)
+			{
+				return;
+			}
+			QClipboard* clipboard = QApplication::clipboard();
+			QFileInfo file_info(m_openedFilePath[index]);
+			clipboard->setText(file_info.absolutePath());
+		});
 
 	// MainWindow
 	m_messageBus->Subscribe("Exit Software", [=]()
 		{
+			// 保存最近文件
+			QSettings recent_file_ini(RECENT_FILE_INI_PATH, QSettings::IniFormat);
+			recent_file_ini.setValue("RecentFilePaths", m_menuBar->GetHistoryRecord());
 		});
 }
 
@@ -462,57 +506,64 @@ void MainCore::OpenFile(const QStringList& file_paths)
 	}
 }
 
-void MainCore::SaveFile(int index, const QString& file_path)
+bool MainCore::SaveFile(int index, const QString& file_path)
 {
+	bool save_success = false;
 	if (index < 0)
 	{
-		return;
+		return save_success;
 	}
 	if (file_path.isEmpty() || !QFileInfo::exists(file_path))
 	{
 		QString select_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
 		if (!select_path.isEmpty())
-
 		{
-			// 保存
+			// 打开文件
 			QFile file(select_path);
 			if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 			{
+				// 保存
 				QTextStream in(&file);
 				in.setEncoding(QStringConverter::Utf8);
 				in << m_textWidget[index]->GetText();
 				file.close();
+
+				// 保存后处理
+				QFileInfo file_info(select_path);
+				m_openedFileName[index] = file_info.fileName();
+				m_openedFilePath[index] = file_info.absoluteFilePath();
+				m_savedFile[index] = true;
+				m_centralWidget->setTabIcon(index, QIcon(":/NotePad/standard/tabbar/saved.ico"));
+				m_centralWidget->setTabText(index, file_info.fileName());
+				m_messageBus->Publish("Update Window Title");
+				save_success = true;
 			}
+		}
+	}
+	else
+	{
+		// 打开文件
+		QFile file(file_path);
+		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+		{
+			// 保存
+			QTextStream in(&file);
+			in.setEncoding(QStringConverter::Utf8);
+			in << m_textWidget[index]->GetText();
+			file.close();
+
 			// 保存后处理
-			QFileInfo file_info(select_path);
+			QFileInfo file_info(file_path);
 			m_openedFileName[index] = file_info.fileName();
 			m_openedFilePath[index] = file_info.absoluteFilePath();
 			m_savedFile[index] = true;
 			m_centralWidget->setTabIcon(index, QIcon(":/NotePad/standard/tabbar/saved.ico"));
 			m_centralWidget->setTabText(index, file_info.fileName());
 			m_messageBus->Publish("Update Window Title");
+			save_success = true;
 		}
 	}
-	else
-	{
-		// 保存
-		QFile file(file_path);
-		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-		{
-			QTextStream in(&file);
-			in.setEncoding(QStringConverter::Utf8);
-			in << m_textWidget[index]->GetText();
-			file.close();
-		}
-		// 保存后处理
-		QFileInfo file_info(file_path);
-		m_openedFileName[index] = file_info.fileName();
-		m_openedFilePath[index] = file_info.absoluteFilePath();
-		m_savedFile[index] = true;
-		m_centralWidget->setTabIcon(index, QIcon(":/NotePad/standard/tabbar/saved.ico"));
-		m_centralWidget->setTabText(index, file_info.fileName());
-		m_messageBus->Publish("Update Window Title");
-	}
+	return save_success;
 }
 
 void MainCore::CloseFile(int index)
@@ -577,14 +628,16 @@ void MainCore::CloseFile(int index)
 	}
 }
 
-void MainCore::DeleteFile(int index)
+bool MainCore::DeleteFile(int index)
 {
+	bool delete_success = false;
 	if (index < 0)
 	{
-		return;
+		return delete_success;
 	}
 	QFile file(m_openedFilePath[index]);
-	file.remove();
+	delete_success = file.remove();
+	return delete_success;
 }
 
 void MainCore::ReloadFile()

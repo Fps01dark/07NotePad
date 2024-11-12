@@ -8,6 +8,11 @@
 #include "custom_tab_widget.h"
 #include "main_core.h"
 
+namespace
+{
+	const QString MAIN_WINDOW_INI_PATH = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/NotePad/Setting/main_window.ini";
+}
+
 MainWindow::MainWindow(QWidget* parent)
 	:QMainWindow(parent)
 {
@@ -24,6 +29,14 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+	QSize new_size = event->size();
+	QSettings settings(MAIN_WINDOW_INI_PATH, QSettings::IniFormat);
+	settings.setValue("window/width", new_size.width());
+	settings.setValue("window/height", new_size.height());
+}
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
 	m_mainCore->ExitSoftware();
@@ -31,6 +44,10 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::InitUi()
 {
+	QSettings settings(MAIN_WINDOW_INI_PATH, QSettings::IniFormat);
+	int width = settings.value("window/width", 1920).toInt();
+	int height = settings.value("window/height", 1080).toInt();
+	resize(width, height);
 }
 void MainWindow::InitValue()
 {

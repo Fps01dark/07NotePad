@@ -1,10 +1,10 @@
-﻿#include "directory_workspace_tree_view.h"
+﻿#include "dir_workspace_tree_view.h"
 
 #include "framework.h"
 
 #include "message_bus.h"
 
-DirectoryWorkspaceTreeView::DirectoryWorkspaceTreeView(std::shared_ptr<MessageBus> message_bus, QFileSystemModel* model, QWidget* parent)
+DirWorkspaceTreeView::DirWorkspaceTreeView(std::shared_ptr<MessageBus> message_bus, QFileSystemModel* model, QWidget* parent)
 	:m_messageBus(message_bus),
 	m_fileSystemModel(model),
 	QTreeView(parent)
@@ -14,20 +14,20 @@ DirectoryWorkspaceTreeView::DirectoryWorkspaceTreeView(std::shared_ptr<MessageBu
 	InitConnect();
 }
 
-DirectoryWorkspaceTreeView::~DirectoryWorkspaceTreeView()
+DirWorkspaceTreeView::~DirWorkspaceTreeView()
 {
 }
 
-void DirectoryWorkspaceTreeView::SetMenu(const QMenu* menu)
+void DirWorkspaceTreeView::SetMenu(const QMenu* menu)
 {
 }
 
-QMenu* DirectoryWorkspaceTreeView::GetMenu() const
+QMenu* DirWorkspaceTreeView::GetMenu() const
 {
 	return nullptr;
 }
 
-void DirectoryWorkspaceTreeView::contextMenuEvent(QContextMenuEvent* event)
+void DirWorkspaceTreeView::contextMenuEvent(QContextMenuEvent* event)
 {
 	QModelIndex index = indexAt(event->pos());
 	if (index.isValid())
@@ -37,7 +37,7 @@ void DirectoryWorkspaceTreeView::contextMenuEvent(QContextMenuEvent* event)
 	}
 }
 
-void DirectoryWorkspaceTreeView::InitUi()
+void DirWorkspaceTreeView::InitUi()
 {
 	m_itemMenu = new QMenu(this);
 	m_openAction = m_itemMenu->addAction(tr("Open"));
@@ -50,11 +50,11 @@ void DirectoryWorkspaceTreeView::InitUi()
 	m_cmdHereAction = m_itemMenu->addAction(tr("Cmd Here"));
 }
 
-void DirectoryWorkspaceTreeView::InitValue()
+void DirWorkspaceTreeView::InitValue()
 {
 }
 
-void DirectoryWorkspaceTreeView::InitConnect()
+void DirWorkspaceTreeView::InitConnect()
 {
 	connect(m_openAction, &QAction::triggered, [=]()
 		{

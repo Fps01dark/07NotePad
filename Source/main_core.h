@@ -12,7 +12,7 @@ class CustomToolBar;
 class CustomTabBar;
 class CustomTextEdit;
 class CustomTabWidget;
-class DirectoryWorkspaceDock;
+class DirWorkspaceDock;
 
 class MainCore :public QObject
 {
@@ -29,9 +29,9 @@ private:
 	// 文件
 	void NewFile();
 	void OpenFile(const QStringList& file_path);
-	void SaveFile(int index, const QString& file_path);
+	bool SaveFile(int index, const QString& file_path);
 	void CloseFile(int index);
-	void DeleteFile(int index);
+	bool DeleteFile(int index);
 	void ReloadFile();
 	void OpenExplorer(const QString& file_dir);
 	void OpenCmd(const QString& file_dir);
@@ -44,7 +44,7 @@ private:
 	CustomToolBar* m_toolBar = nullptr;
 	CustomTabBar* m_tabBar = nullptr;
 	CustomTabWidget* m_centralWidget = nullptr;
-	DirectoryWorkspaceDock* m_dirWorkSpace = nullptr;
+	DirWorkspaceDock* m_dirWorkSpace = nullptr;
 	// 以下数量保持一致，下标为 m_centralWidget Tab下标
 	QList<QString> m_openedFileName;
 	QList<QString> m_openedFilePath;

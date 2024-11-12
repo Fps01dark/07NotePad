@@ -25,7 +25,7 @@ CustomMenuBar::~CustomMenuBar()
 QStringList CustomMenuBar::GetHistoryRecord() const
 {
 	QStringList history_list;
-	for (int i = 0; i < m_recentFileMenu->actions().size(); ++i)
+	for (int i = m_recentFileMenu->actions().size() - 1; i >= 0; --i)
 	{
 		history_list.append(m_recentFileMenu->actions()[i]->text());
 	}
@@ -224,12 +224,7 @@ void CustomMenuBar::InitConnect()
 		});
 	connect(m_openAllRecentAction, &QAction::triggered, [=]()
 		{
-			QStringList file_paths;
-			for (int i = 0; i < m_recentFileMenu->actions().size(); ++i)
-			{
-				file_paths.append(m_recentFileMenu->actions()[i]->text());
-			}
-			m_messageBus->Publish("Open File", file_paths);
+			m_messageBus->Publish("Open File", GetHistoryRecord());
 		});
 	connect(m_clearRecentAction, &QAction::triggered, [=]()
 		{
