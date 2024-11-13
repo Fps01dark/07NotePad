@@ -12,9 +12,7 @@ class CustomMenuBar : public QMenuBar
 public:
 	explicit CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
 	~CustomMenuBar();
-	QStringList GetHistoryRecord() const;
-	void AddHistoryRecord(const QStringList& history_list);
-	void ClearHistoryRecord();
+	void SetRecentFiles(const QStringList& recent_list);
 
 private:
 	void InitUi();

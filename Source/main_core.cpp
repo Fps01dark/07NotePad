@@ -3,6 +3,8 @@
 #include "framework.h"
 
 #include "message_bus.h"
+#include "custom_settings.h"
+#include "recent_files_manager.h"
 #include "main_window.h"
 #include "custom_menu_bar.h"
 #include "custom_tool_bar.h"
@@ -13,14 +15,15 @@
 
 namespace
 {
-	const QString RECENT_FILE_INI_PATH = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/NotePad/Setting/recent_file.ini";
+	const QString FILE_BACK_UP_DIR = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
 }
-
 MainCore::MainCore(MainWindow* main_window)
 	:m_mainWindow(main_window),
 	QObject(main_window)
 {
 	m_messageBus = std::make_shared<MessageBus>();
+	m_settings = new CustomSettings(m_mainWindow);
+	m_recentFilesMgr = new RecentFilesManager(m_mainWindow);
 	m_menuBar = new CustomMenuBar(m_messageBus, m_mainWindow);
 	m_toolBar = new CustomToolBar(m_messageBus, m_mainWindow);
 	m_centralWidget = new CustomTabWidget(m_messageBus, m_mainWindow);
@@ -50,9 +53,9 @@ void MainCore::InitUi()
 	m_tabBar->setTabsClosable(true);
 	m_tabBar->setMovable(true);
 	m_tabBar->setStyleSheet(
-		"QTabBar::close-button { image: url(:/NotePad/standard/tabbar/closeTabButton.ico); }"
-		"QTabBar::close-button:hover { image: url(:/NotePad/standard/tabbar/closeTabButton_hover.ico); }"
-		"QTabBar::close-button:pressed { image: url(:/NotePad/standard/tabbar/closeTabButton_push.ico); }"
+		"QTabBar::close-button { image: url(:/OneNotePad/standard/tabbar/closeTabButton.ico); }"
+		"QTabBar::close-button:hover { image: url(:/OneNotePad/standard/tabbar/closeTabButton_hover.ico); }"
+		"QTabBar::close-button:pressed { image: url(:/OneNotePad/standard/tabbar/closeTabButton_push.ico); }"
 	);
 	// 中心区域
 	m_centralWidget->SetTabBar(m_tabBar);
@@ -61,16 +64,25 @@ void MainCore::InitUi()
 	m_dirWorkSpace->hide();
 
 	// 主界面
-	m_mainWindow->setWindowTitle("NotePad");
+	int width = m_settings->value("MainWindow/Width", 1920).toInt();
+	int height = m_settings->value("MainWindow/Height", 1080).toInt();
+	m_mainWindow->resize(width, height);
+	m_mainWindow->setWindowTitle("OneNotePad");
 	m_mainWindow->setMenuBar(m_menuBar);
 	m_mainWindow->addToolBar(Qt::TopToolBarArea, m_toolBar);
 	m_mainWindow->setCentralWidget(m_centralWidget);
 	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, m_dirWorkSpace);
 
 	// 加载最近文件记录
-	QSettings recent_file_ini(RECENT_FILE_INI_PATH, QSettings::IniFormat);
-	QStringList&& recent_paths = recent_file_ini.value("RecentFilePaths").toStringList();
-	m_menuBar->AddHistoryRecord(recent_paths);
+	QStringList&& recent_paths = m_settings->value("MainCore/RecentFilePaths").toStringList();
+	m_menuBar->SetRecentFiles(recent_paths);
+
+	// 加载上次打开的文件
+	QStringList&& file_paths = m_settings->value("MainCore/OpenedFilePaths").toStringList();
+	QStringList&& file_names = m_settings->value("MainCore/OpenedFileNames").toStringList();
+	QList<bool>&& save_files = m_settings->BoolList("MainCore/SavedFile");
+	int current_index = m_settings->value("MainCore/CurrentIndex").toInt();
+	OpenLastFile(file_paths, file_names, save_files, current_index);
 }
 
 void MainCore::InitValue()
@@ -81,7 +93,7 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index < 0)
 			{
-				m_mainWindow->setWindowTitle("NotePad");
+				m_mainWindow->setWindowTitle("OneNotePad");
 			}
 			else
 			{
@@ -94,7 +106,7 @@ void MainCore::InitValue()
 				{
 					win_title = m_openedFileName[index];
 				}
-				m_mainWindow->setWindowTitle(win_title + " - NotePad");
+				m_mainWindow->setWindowTitle(win_title + " - OneNotePad");
 			}
 		});
 	m_messageBus->Subscribe("New File", [=]()
@@ -325,7 +337,7 @@ void MainCore::InitValue()
 		});
 	m_messageBus->Subscribe("Clear Recent Record", [=]()
 		{
-			m_menuBar->ClearHistoryRecord();
+			m_menuBar->SetRecentFiles(QStringList());
 		});
 	m_messageBus->Subscribe("Exit Software", [=]()
 		{
@@ -385,7 +397,7 @@ void MainCore::InitValue()
 				return;
 			}
 			m_savedFile[index] = false;
-			m_centralWidget->setTabIcon(index, QIcon(":/NotePad/standard/tabbar/unsaved.ico"));
+			m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"));
 		});
 	m_messageBus->Subscribe("Copy Path", [=]()
 		{
@@ -422,9 +434,17 @@ void MainCore::InitValue()
 	// MainWindow
 	m_messageBus->Subscribe("Exit Software", [=]()
 		{
+			// 保存主窗口大小
+			QSize main_window_size = m_mainWindow->size();
+			m_settings->setValue("MainWindow/Width", main_window_size.width());
+			m_settings->setValue("MainWindow/Height", main_window_size.height());
 			// 保存最近文件
-			QSettings recent_file_ini(RECENT_FILE_INI_PATH, QSettings::IniFormat);
-			recent_file_ini.setValue("RecentFilePaths", m_menuBar->GetHistoryRecord());
+			m_settings->setValue("MainCore/RecentFilePaths", m_recentFilesMgr->GetRecentFiles());
+			// 保存上次打开文件
+			m_settings->setValue("MainCore/OpenedFilePaths", m_openedFilePath);
+			m_settings->setValue("MainCore/OpenedFileNames", m_openedFileName);
+			m_settings->SetBoolList("MainCore/SavedFile", m_savedFile);
+			m_settings->setValue("MainCore/CurrentIndex", m_centralWidget->currentIndex());
 		});
 }
 
@@ -462,7 +482,7 @@ void MainCore::NewFile()
 	m_openedFilePath.append("");
 	m_savedFile.append(true);
 	m_textWidget.append(text_widget);
-	m_centralWidget->addTab(text_widget, QIcon(":/NotePad/standard/tabbar/saved.ico"), new_file_name);
+	m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), new_file_name);
 	m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
 }
 
@@ -498,11 +518,63 @@ void MainCore::OpenFile(const QStringList& file_paths)
 				m_openedFilePath.append(abs_file_path);
 				m_savedFile.append(true);
 				m_textWidget.append(text_widget);
-				m_centralWidget->addTab(text_widget, QIcon(":/NotePad/standard/tabbar/saved.ico"), file_info.fileName());
+				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_info.fileName());
 				m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
 				file.close();
 			}
 		}
+	}
+}
+
+void MainCore::OpenLastFile(const QStringList& file_paths, const QStringList& file_names, const QList<bool>& saved_files, int current_index)
+{
+	if (file_paths.size() != file_names.size() || file_paths.size() != saved_files.size() || file_names.size() != saved_files.size())
+	{
+		return;
+	}
+	for (int i = 0; i < file_paths.size(); ++i)
+	{
+		QString file_path = file_paths[i];
+		if (file_path.isEmpty())
+		{
+			file_path = FILE_BACK_UP_DIR + "/" + file_names[i];
+		}
+		// 打开的文件
+		QFile file(file_path);
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QTextStream in(&file);
+			in.setEncoding(QStringConverter::Utf8);
+			CustomTextEdit* text_widget = new CustomTextEdit(m_mainWindow);
+			text_widget->SetText(in.readAll());
+			connect(text_widget, &CustomTextEdit::textChanged, [=]()
+				{
+					m_messageBus->Publish("Text Changed");
+				});
+			m_openedFileName.append(file_names[i]);
+			m_openedFilePath.append(file_paths[i]);
+			m_savedFile.append(saved_files[i]);
+			m_textWidget.append(text_widget);
+			if (saved_files[i] == true)
+			{
+				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_names[i]);
+			}
+			else
+			{
+				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"), file_names[i]);
+			}
+
+			file.close();
+		}
+	}
+	// 设置当前文件
+	if (current_index < m_centralWidget->count())
+	{
+		m_centralWidget->setCurrentIndex(current_index);
+	}
+	else
+	{
+		m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
 	}
 }
 
@@ -533,7 +605,7 @@ bool MainCore::SaveFile(int index, const QString& file_path)
 				m_openedFileName[index] = file_info.fileName();
 				m_openedFilePath[index] = file_info.absoluteFilePath();
 				m_savedFile[index] = true;
-				m_centralWidget->setTabIcon(index, QIcon(":/NotePad/standard/tabbar/saved.ico"));
+				m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/saved.ico"));
 				m_centralWidget->setTabText(index, file_info.fileName());
 				m_messageBus->Publish("Update Window Title");
 				save_success = true;
@@ -557,7 +629,7 @@ bool MainCore::SaveFile(int index, const QString& file_path)
 			m_openedFileName[index] = file_info.fileName();
 			m_openedFilePath[index] = file_info.absoluteFilePath();
 			m_savedFile[index] = true;
-			m_centralWidget->setTabIcon(index, QIcon(":/NotePad/standard/tabbar/saved.ico"));
+			m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/saved.ico"));
 			m_centralWidget->setTabText(index, file_info.fileName());
 			m_messageBus->Publish("Update Window Title");
 			save_success = true;
@@ -578,7 +650,8 @@ void MainCore::CloseFile(int index)
 		// 最近文件
 		if (!m_openedFilePath[index].isEmpty())
 		{
-			m_menuBar->AddHistoryRecord(QStringList() << m_openedFilePath[index]);
+			m_recentFilesMgr->AddFile(m_openedFilePath[index]);
+			m_menuBar->SetRecentFiles(m_recentFilesMgr->GetRecentFiles());
 		}
 		// 关闭
 		m_openedFileName.removeAt(index);
@@ -599,7 +672,8 @@ void MainCore::CloseFile(int index)
 			// 最近文件
 			if (!m_openedFilePath[index].isEmpty())
 			{
-				m_menuBar->AddHistoryRecord(QStringList() << m_openedFilePath[index]);
+				m_recentFilesMgr->AddFile(m_openedFilePath[index]);
+				m_menuBar->SetRecentFiles(m_recentFilesMgr->GetRecentFiles());
 			}
 			// 关闭
 			m_openedFileName.removeAt(index);
@@ -613,7 +687,8 @@ void MainCore::CloseFile(int index)
 			// 最近文件
 			if (!m_openedFilePath[index].isEmpty())
 			{
-				m_menuBar->AddHistoryRecord(QStringList() << m_openedFilePath[index]);
+				m_recentFilesMgr->AddFile(m_openedFilePath[index]);
+				m_menuBar->SetRecentFiles(m_recentFilesMgr->GetRecentFiles());
 			}
 			// 关闭
 			m_openedFileName.removeAt(index);

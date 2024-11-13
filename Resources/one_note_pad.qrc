@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/NotePad">
+    <qresource prefix="/OneNotePad">
         <file>standard/toolbar/allChars.bmp</file>
         <file>standard/toolbar/closeAll.bmp</file>
         <file>standard/toolbar/closeFile.bmp</file>

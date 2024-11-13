@@ -16,7 +16,7 @@
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
-    <ProjectName>NotePad</ProjectName>
+    <ProjectName>OneNotePad</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -74,7 +74,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -96,6 +96,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="custom_menu_bar.cpp" />
+    <ClCompile Include="custom_settings.cpp" />
     <ClCompile Include="custom_status_bar.cpp" />
     <ClCompile Include="custom_tab_widget.cpp" />
     <ClCompile Include="custom_tab_bar.cpp" />
@@ -108,9 +109,12 @@
     <ClCompile Include="message.h" />
     <ClCompile Include="message_bus.cpp" />
     <ClCompile Include="custom_text_edit.cpp" />
+    <ClCompile Include="recent_files_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="recent_files_manager.h" />
     <QtMoc Include="custom_menu_bar.h" />
+    <QtMoc Include="custom_settings.h" />
     <ClInclude Include="custom_status_bar.h" />
     <QtMoc Include="custom_tab_widget.h" />
     <QtMoc Include="custom_tab_bar.h" />
@@ -127,7 +131,7 @@
     <QtUic Include="main_window.ui" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="..\Resources\note_pad.qrc" />
+    <QtRcc Include="..\Resources\one_note_pad.qrc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

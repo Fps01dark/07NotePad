@@ -8,6 +8,7 @@
 #include <QVariant>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QBitArray>
 #include <QSettings>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -20,6 +21,7 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QTableWidget>
 #include <QInputDialog>
 #include <QApplication>

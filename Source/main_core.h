@@ -6,6 +6,8 @@
 class QString;
 
 class MessageBus;
+class CustomSettings;
+class RecentFilesManager;
 class MainWindow;
 class CustomMenuBar;
 class CustomToolBar;
@@ -28,7 +30,8 @@ private:
 	void InitConnect();
 	// 文件
 	void NewFile();
-	void OpenFile(const QStringList& file_path);
+	void OpenFile(const QStringList& file_paths);
+	void OpenLastFile(const QStringList& file_paths, const QStringList& file_names, const QList<bool>& saved_files, int current_index);
 	bool SaveFile(int index, const QString& file_path);
 	void CloseFile(int index);
 	bool DeleteFile(int index);
@@ -39,12 +42,15 @@ private:
 
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;
+	CustomSettings* m_settings = nullptr;
+	RecentFilesManager* m_recentFilesMgr = nullptr;
 	MainWindow* m_mainWindow = nullptr;
 	CustomMenuBar* m_menuBar = nullptr;
 	CustomToolBar* m_toolBar = nullptr;
 	CustomTabBar* m_tabBar = nullptr;
 	CustomTabWidget* m_centralWidget = nullptr;
 	DirWorkspaceDock* m_dirWorkSpace = nullptr;
+	int m_fontSize = 9;
 	// 以下数量保持一致，下标为 m_centralWidget Tab下标
 	QList<QString> m_openedFileName;
 	QList<QString> m_openedFilePath;

@@ -2,8 +2,8 @@
 
 #include <QTextEdit>
 
-
 class QWidget;
+class QWheelEvent;
 
 class CustomTextEdit :public QTextEdit
 {
@@ -13,6 +13,9 @@ public:
 	~CustomTextEdit();
 	void SetText(const QString& text);
 	QString GetText() const;
+
+protected:
+	void wheelEvent(QWheelEvent* event) override;
 
 private:
 	void InitUi();

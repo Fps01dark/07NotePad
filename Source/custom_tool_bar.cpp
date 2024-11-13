@@ -19,13 +19,13 @@ CustomToolBar::~CustomToolBar()
 
 void CustomToolBar::InitUi()
 {
-	m_newAction = addAction(QIcon(":/NotePad/standard/toolbar/newFile.bmp"), tr("New"));
-	m_openAction = addAction(QIcon(":/NotePad/standard/toolbar/openFile.bmp"), tr("Open"));
-	m_saveAction = addAction(QIcon(":/NotePad/standard/toolbar/saveFile.bmp"), tr("Save"));
-	m_saveAllAction = addAction(QIcon(":/NotePad/standard/toolbar/saveAll.bmp"), tr("Save All"));
-	m_closeAction = addAction(QIcon(":/NotePad/standard/toolbar/closeFile.bmp"), tr("Close"));
-	m_closeAllAction = addAction(QIcon(":/NotePad/standard/toolbar/closeAll.bmp"), tr("Close All"));
-	m_printAction = addAction(QIcon(":/NotePad/standard/toolbar/print.bmp"), tr("Print"));
+	m_newAction = addAction(QIcon(":/OneNotePad/standard/toolbar/newFile.bmp"), tr("New"));
+	m_openAction = addAction(QIcon(":/OneNotePad/standard/toolbar/openFile.bmp"), tr("Open"));
+	m_saveAction = addAction(QIcon(":/OneNotePad/standard/toolbar/saveFile.bmp"), tr("Save"));
+	m_saveAllAction = addAction(QIcon(":/OneNotePad/standard/toolbar/saveAll.bmp"), tr("Save All"));
+	m_closeAction = addAction(QIcon(":/OneNotePad/standard/toolbar/closeFile.bmp"), tr("Close"));
+	m_closeAllAction = addAction(QIcon(":/OneNotePad/standard/toolbar/closeAll.bmp"), tr("Close All"));
+	m_printAction = addAction(QIcon(":/OneNotePad/standard/toolbar/print.bmp"), tr("Print"));
 	addSeparator();
 }
 

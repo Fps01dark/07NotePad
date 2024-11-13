@@ -4,11 +4,6 @@
 
 #include "message_bus.h"
 
-namespace
-{
-	const int MAX_HISTORY_FILE_SIZE = 10;
-}
-
 CustomMenuBar::CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	:m_messageBus(message_bus),
 	QMenuBar(parent)
@@ -22,64 +17,25 @@ CustomMenuBar::~CustomMenuBar()
 {
 }
 
-QStringList CustomMenuBar::GetHistoryRecord() const
-{
-	QStringList history_list;
-	for (int i = m_recentFileMenu->actions().size() - 1; i >= 0; --i)
-	{
-		history_list.append(m_recentFileMenu->actions()[i]->text());
-	}
-	return history_list;
-}
-
-void CustomMenuBar::AddHistoryRecord(const QStringList& history_list)
-{
-	for (int i = 0; i < history_list.size(); ++i)
-	{
-		// 查找是否已存在
-		QAction* action = nullptr;
-		for (int j = 0; j < m_recentFileMenu->actions().size(); ++j)
-		{
-			if (history_list[i] == m_recentFileMenu->actions()[j]->text())
-			{
-				action = m_recentFileMenu->actions()[j];
-			}
-		}
-
-		if (action != nullptr)
-		{
-			// 已存在-替换
-			m_recentFileMenu->removeAction(action);
-		}
-		else
-		{
-			// 不存在-新增
-			if (m_recentFileMenu->actions().size() == MAX_HISTORY_FILE_SIZE)
-			{
-				m_recentFileMenu->removeAction(m_recentFileMenu->actions()[m_recentFileMenu->actions().size() - 1]);
-			}
-			action = new QAction(history_list[i], m_recentFileMenu);
-			connect(action, &QAction::triggered, [=]()
-				{
-					m_messageBus->Publish("Open File", QStringList() << history_list[i]);
-				});
-		}
-
-		// 添加
-		if (m_recentFileMenu->actions().isEmpty())
-		{
-			m_recentFileMenu->addAction(action);
-		}
-		else
-		{
-			m_recentFileMenu->insertAction(m_recentFileMenu->actions()[0], action);
-		}
-	}
-}
-
-void CustomMenuBar::ClearHistoryRecord()
+void CustomMenuBar::SetRecentFiles(const QStringList& recent_list)
 {
 	m_recentFileMenu->clear();
+	for (int i = 0; i < recent_list.size(); ++i)
+	{
+		// 新增
+		QAction* action = new QAction(recent_list[i], m_recentFileMenu);
+		connect(action, &QAction::triggered, [=]()
+			{
+				QFileInfo file_info(recent_list[i]);
+				if (recent_list[i].isEmpty() || !file_info.exists() || file_info.isDir())
+				{
+					m_recentFileMenu->removeAction(action);
+				}
+				m_messageBus->Publish("Open File", QStringList() << recent_list[i]);
+			});
+		// 添加
+		m_recentFileMenu->addAction(action);
+	}
 }
 
 void CustomMenuBar::InitUi()
@@ -224,11 +180,14 @@ void CustomMenuBar::InitConnect()
 		});
 	connect(m_openAllRecentAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Open File", GetHistoryRecord());
+			for (auto action : m_recentFileMenu->actions())
+			{
+				action->triggered();
+			}
 		});
 	connect(m_clearRecentAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Clear Recent Record");
+			m_messageBus->Publish("Clear Recent File");
 		});
 	connect(m_exitSotfwareAction, &QAction::triggered, [=]()
 		{

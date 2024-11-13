@@ -11,9 +11,9 @@ DirWorkspaceDock::DirWorkspaceDock(std::shared_ptr<MessageBus> message_bus, QWid
 {
 	m_widget = new QWidget(this);
 	m_toolBar = new QToolBar(m_widget);
-	m_expandAllAction = m_toolBar->addAction(QIcon(":/NotePad/standard/panels/toolbar/fb_expand_all.ico"), tr("Expand All"));
-	m_collapseAllAction = m_toolBar->addAction(QIcon(":/NotePad/standard/panels/toolbar/fb_fold_all.ico"), tr("Collapse All"));
-	m_locationAction = m_toolBar->addAction(QIcon(":/NotePad/standard/panels/toolbar/fb_select_current_file.ico"), tr("Locate The Current File"));
+	m_expandAllAction = m_toolBar->addAction(QIcon(":/OneNotePad/standard/panels/toolbar/fb_expand_all.ico"), tr("Expand All"));
+	m_collapseAllAction = m_toolBar->addAction(QIcon(":/OneNotePad/standard/panels/toolbar/fb_fold_all.ico"), tr("Collapse All"));
+	m_locationAction = m_toolBar->addAction(QIcon(":/OneNotePad/standard/panels/toolbar/fb_select_current_file.ico"), tr("Locate The Current File"));
 	m_fileSystemModel = new QFileSystemModel(this);
 	m_treeView = new DirWorkspaceTreeView(m_messageBus, m_fileSystemModel, this);
 
