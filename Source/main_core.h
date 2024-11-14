@@ -29,16 +29,13 @@ private:
 	void InitValue();
 	void InitConnect();
 	// 文件
-	void NewFile();
-	void OpenFile(const QStringList& file_paths);
-	void OpenLastFile(const QStringList& file_paths, const QStringList& file_names, const QList<bool>& saved_files, int current_index);
+	bool NewFile(const QString& new_file_name);
+	bool OpenFile(const QString& file_path);
 	bool SaveFile(int index, const QString& file_path);
-	void CloseFile(int index);
-	bool DeleteFile(int index);
-	void ReloadFile();
-	void OpenExplorer(const QString& file_dir);
-	void OpenCmd(const QString& file_dir);
-	void OpenInDefaultViewer(const QString& file_path);
+	bool CloseFile(int index);
+	// 加载上次退出文件及状态
+	bool LoadLastFile(const QStringList& opened_file_name,const QStringList& opened_file_path,const QList<bool> saved_file,int current_index);
+	bool SaveLastFile();
 
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;

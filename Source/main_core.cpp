@@ -17,6 +17,7 @@ namespace
 {
 	const QString FILE_BACK_UP_DIR = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
 }
+
 MainCore::MainCore(MainWindow* main_window)
 	:m_mainWindow(main_window),
 	QObject(main_window)
@@ -76,13 +77,13 @@ void MainCore::InitUi()
 	// 加载最近文件记录
 	QStringList&& recent_paths = m_settings->value("MainCore/RecentFilePaths").toStringList();
 	m_menuBar->SetRecentFiles(recent_paths);
-
 	// 加载上次打开的文件
-	QStringList&& file_paths = m_settings->value("MainCore/OpenedFilePaths").toStringList();
 	QStringList&& file_names = m_settings->value("MainCore/OpenedFileNames").toStringList();
-	QList<bool>&& save_files = m_settings->BoolList("MainCore/SavedFile");
+	QStringList&& file_paths = m_settings->value("MainCore/OpenedFilePaths").toStringList();
+	QList<bool>&& saved_files = m_settings->BoolList("MainCore/SavedFile");
 	int current_index = m_settings->value("MainCore/CurrentIndex").toInt();
-	OpenLastFile(file_paths, file_names, save_files, current_index);
+	LoadLastFile(file_names, file_paths, saved_files, current_index);
+
 }
 
 void MainCore::InitValue()
@@ -111,131 +112,167 @@ void MainCore::InitValue()
 		});
 	m_messageBus->Subscribe("New File", [=]()
 		{
-			NewFile();
+			int index = 0;
+			QString new_file_name = tr("new ") + QString::number(index);
+			while (m_openedFileName.contains(new_file_name))
+			{
+				index++;
+				new_file_name = tr("new ") + QString::number(index);
+			}
+			NewFile(new_file_name);
+
 		});
 	m_messageBus->Subscribe("Open File", [=]()
 		{
 			QStringList&& file_paths = QFileDialog::getOpenFileNames(m_mainWindow, tr("Open"), qApp->applicationDirPath(), "All types(*.*)");
-			OpenFile(file_paths);
+			for (const QString& file_path : file_paths)
+			{
+				OpenFile(file_path);
+			}
 		});
-	m_messageBus->Subscribe("Open File", [=](const QStringList& data)
+	m_messageBus->Subscribe("Open File", [=](const QString& data)
 		{
 			OpenFile(data);
 		});
 	m_messageBus->Subscribe("Open Explorer", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-			}
-			else
-			{
-				QString file_path;
-				if (index < m_openedFilePath.size())
-				{
-					file_path = m_openedFilePath[index];
-					QFileInfo file_info(file_path);
-					OpenExplorer(file_info.absolutePath());
-				}
+				QString file_path = m_openedFilePath[index];
+				QDesktopServices::openUrl(QUrl::fromLocalFile(file_path));
 			}
 		});
 	m_messageBus->Subscribe("Open Explorer", [=](const QString& data)
 		{
-			OpenExplorer(data);
+			QDesktopServices::openUrl(QUrl::fromLocalFile(data));
 		});
 	m_messageBus->Subscribe("Open Cmd", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-			}
-			else
-			{
-				QString file_path;
-				if (index < m_openedFilePath.size())
-				{
-					file_path = m_openedFilePath[index];
-					QFileInfo file_info(file_path);
-					OpenCmd(file_info.absolutePath());
-				}
+				QString file_path = m_openedFilePath[index];
+				QFileInfo file_info(file_path);
+				QString file_dir = file_info.absolutePath();
+				// 启动命令行窗口并进入文件所在目录
+				QProcess::startDetached("cmd.exe", QStringList() << "/K" << "cd" << file_dir);
 			}
 		});
 	m_messageBus->Subscribe("Open Cmd", [=](const QString& data)
 		{
-			OpenCmd(data);
+			// 启动命令行窗口并进入文件所在目录
+			QProcess::startDetached("cmd.exe", QStringList() << "/K" << "cd" << data);
 		});
 	m_messageBus->Subscribe("Open Directory Workspace", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-			}
-			else
-			{
-				QString file_path;
-				if (index < m_openedFilePath.size())
+				QString file_path = m_openedFilePath[index];
+				QFileInfo file_info(file_path);
+				if (!file_path.isEmpty())
 				{
-					file_path = m_openedFilePath[index];
-					QFileInfo file_info(file_path);
-					if (!file_path.isEmpty())
-					{
-						m_dirWorkSpace->SetRootDir(file_info.absolutePath());
-					}
+					m_dirWorkSpace->SetRootDir(file_info.absolutePath());
 					m_dirWorkSpace->show();
 				}
 			}
 		});
-	m_messageBus->Subscribe("Open In Default Viewer", [=]()
+	m_messageBus->Subscribe("Open Directory As Workspace", [=]()
 		{
-			int index = m_centralWidget->currentIndex();
-			if (index < 0)
-			{
-			}
-			else
-			{
-				QString file_path;
-				if (index < m_openedFilePath.size())
-				{
-					file_path = m_openedFilePath[index];
-					QFileInfo file_info(file_path);
-					OpenInDefaultViewer(file_info.absoluteFilePath());
-				}
-			}
-		});
-	m_messageBus->Subscribe("Open In Default Viewer", [=](const QString& data)
-		{
-			OpenInDefaultViewer(data);
-		});
-	m_messageBus->Subscribe("Open Directory As Directory Workspace", [=]()
-		{
-			QString file_dir = QFileDialog::getExistingDirectory(m_mainWindow, tr("Open Directory As Directory Workspace"), qApp->applicationDirPath());
+			QString file_dir = QFileDialog::getExistingDirectory(m_mainWindow, tr("Open Directory As Workspace"), qApp->applicationDirPath());
 			if (!file_dir.isEmpty())
 			{
 				m_dirWorkSpace->SetRootDir(file_dir);
 				m_dirWorkSpace->show();
 			}
 		});
+	m_messageBus->Subscribe("Open In Default Viewer", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				QString file_path = m_openedFilePath[index];
+				QDesktopServices::openUrl(QUrl::fromLocalFile(file_path));
+			}
+		});
+	m_messageBus->Subscribe("Open In Default Viewer", [=](const QString& data)
+		{
+			QDesktopServices::openUrl(QUrl::fromLocalFile(data));
+		});
 	m_messageBus->Subscribe("Reload File", [=]()
 		{
-			ReloadFile();
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				QString file_path = m_openedFilePath[index];
+				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+				{
+
+				}
+				else
+				{
+					QFile file(file_path);
+					if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+					{
+						QTextStream in(&file);
+						in.setEncoding(QStringConverter::Utf8);
+						m_textWidget[index]->SetText(in.readAll());
+						file.close();
+					}
+				}
+			}
 		});
 	m_messageBus->Subscribe("Save File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
+				QString file_path = m_openedFilePath[index];
+				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+				{
+					file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+					if (!file_path.isEmpty())
+					{
+						SaveFile(index, file_path);
+					}
+				}
+				else
+				{
+					SaveFile(index, file_path);
+				}
 			}
-			SaveFile(index, m_openedFilePath[index]);
 		});
 	m_messageBus->Subscribe("Save As File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
+				QString file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save As File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+				if (!file_path.isEmpty())
+				{
+					SaveFile(index, file_path);
+				}
 			}
-			SaveFile(index, "");
+		});
+	m_messageBus->Subscribe("Save All File", [=]()
+		{
+			for (int index = 0; index < m_centralWidget->count(); ++index)
+			{
+				QString file_path = m_openedFilePath[index];
+				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+				{
+					file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+					if (!file_path.isEmpty())
+					{
+						SaveFile(index, file_path);
+					}
+				}
+				else
+				{
+					SaveFile(index, file_path);
+				}
+			}
 		});
 	m_messageBus->Subscribe("Save As Clipboard", [=]()
 		{
@@ -254,31 +291,131 @@ void MainCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Save All File", [=]()
-		{
-			for (int index = 0; index < m_centralWidget->count(); ++index)
-			{
-				SaveFile(index, m_openedFilePath[index]);
-			}
-		});
 	m_messageBus->Subscribe("Close File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
+				if (m_savedFile[index] == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"), tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString file_path = m_openedFilePath[index];
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty())
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else
+						{
+							SaveFile(index, file_path);
+							CloseFile(index);
+						}
+					}
+					else if (ret == QMessageBox::No)
+					{
+						CloseFile(index);
+					}
+					else if (ret == QMessageBox::Cancel)
+					{
+					}
+				}
 			}
-			CloseFile(index);
 		});
 	m_messageBus->Subscribe("Close File", [=](int index)
 		{
-			CloseFile(index);
+			if (index >= 0 && index < m_centralWidget->count())
+			{
+				if (m_savedFile[index] == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"), tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString file_path = m_openedFilePath[index];
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty())
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else
+						{
+							SaveFile(index, file_path);
+							CloseFile(index);
+						}
+					}
+					else if (ret == QMessageBox::No)
+					{
+						CloseFile(index);
+					}
+					else if (ret == QMessageBox::Cancel)
+					{
+					}
+				}
+			}
 		});
 	m_messageBus->Subscribe("Close All File", [=]()
 		{
 			for (int index = m_centralWidget->count() - 1; index >= 0; --index)
 			{
-				CloseFile(index);
+				if (m_savedFile[index] == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"), tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString file_path = m_openedFilePath[index];
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty())
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else
+						{
+							SaveFile(index, file_path);
+							CloseFile(index);
+						}
+					}
+					else if (ret == QMessageBox::No)
+					{
+						CloseFile(index);
+					}
+					else if (ret == QMessageBox::Cancel)
+					{
+					}
+				}
 			}
 		});
 	m_messageBus->Subscribe("Close All But Current File", [=]()
@@ -287,7 +424,42 @@ void MainCore::InitValue()
 			{
 				if (index != m_centralWidget->currentIndex())
 				{
-					CloseFile(index);
+					if (m_savedFile[index] == true)
+					{
+						CloseFile(index);
+					}
+					else
+					{
+						QMessageBox question_box(QMessageBox::Question, tr("Save File"), tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok, m_mainWindow);
+						question_box.addButton(QMessageBox::No);
+						question_box.addButton(QMessageBox::Cancel);
+						int ret = question_box.exec();
+						if (ret == QMessageBox::Ok)
+						{
+							QString file_path = m_openedFilePath[index];
+							if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+							{
+								file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+								if (!file_path.isEmpty())
+								{
+									SaveFile(index, file_path);
+									CloseFile(index);
+								}
+							}
+							else
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else if (ret == QMessageBox::No)
+						{
+							CloseFile(index);
+						}
+						else if (ret == QMessageBox::Cancel)
+						{
+						}
+					}
 				}
 			}
 		});
@@ -296,7 +468,42 @@ void MainCore::InitValue()
 			int current_index = m_centralWidget->currentIndex();
 			for (int index = current_index - 1; index >= 0; --index)
 			{
-				CloseFile(index);
+				if (m_savedFile[index] == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"), tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString file_path = m_openedFilePath[index];
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty())
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else
+						{
+							SaveFile(index, file_path);
+							CloseFile(index);
+						}
+					}
+					else if (ret == QMessageBox::No)
+					{
+						CloseFile(index);
+					}
+					else if (ret == QMessageBox::Cancel)
+					{
+					}
+				}
 			}
 		});
 	m_messageBus->Subscribe("Close Right File", [=]()
@@ -304,7 +511,42 @@ void MainCore::InitValue()
 			int current_index = m_centralWidget->currentIndex();
 			for (int index = m_centralWidget->count() - 1; index >= current_index + 1; --index)
 			{
-				CloseFile(index);
+				if (m_savedFile[index] == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"), tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString file_path = m_openedFilePath[index];
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty())
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else
+						{
+							SaveFile(index, file_path);
+							CloseFile(index);
+						}
+					}
+					else if (ret == QMessageBox::No)
+					{
+						CloseFile(index);
+					}
+					else if (ret == QMessageBox::Cancel)
+					{
+					}
+				}
 			}
 		});
 	m_messageBus->Subscribe("Close All Unchanged File", [=]()
@@ -320,21 +562,21 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Delete File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
-			}
-			QString file_path = m_openedFilePath[index];
-			if (!file_path.isEmpty() && QFileInfo::exists(file_path))
-			{
-				if (QMessageBox::Ok == QMessageBox::question(m_mainWindow, tr("Delete File"),
-					tr("The file") + "\"" + file_path + "\"" + tr("will be removed and this file will be closed.Continue?"), QMessageBox::Ok, QMessageBox::No))
+				QString file_path = m_openedFilePath[index];
+				if (!file_path.isEmpty() && QFileInfo::exists(file_path))
 				{
-					DeleteFile(index);
-					CloseFile(index);
+					if (QMessageBox::Ok == QMessageBox::question(m_mainWindow, tr("Delete File"),
+						tr("The file") + "\"" + file_path + "\"" + tr("will be removed and this file will be closed.Continue?"), QMessageBox::Ok, QMessageBox::No))
+					{
+						QFile file(file_path);
+						file.remove();
+						CloseFile(index);
+					}
 				}
 			}
-		});
+	});
 	m_messageBus->Subscribe("Clear Recent Record", [=]()
 		{
 			m_menuBar->SetRecentFiles(QStringList());
@@ -356,18 +598,10 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Locate The Current File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-			}
-			else
-			{
-				QString file_path;
-				if (index < m_openedFilePath.size())
-				{
-					file_path = m_openedFilePath[index];
-					QFileInfo file_info(file_path);
-					m_dirWorkSpace->LocationFile(file_info.absoluteFilePath());
-				}
+				QString file_path = m_openedFilePath[index];
+				m_dirWorkSpace->LocationFile(file_path);
 			}
 		});
 	m_messageBus->Subscribe("Copy Path", [=](const QString& data)
@@ -392,43 +626,39 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Text Changed", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
+				m_savedFile[index] = false;
+				m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"));
 			}
-			m_savedFile[index] = false;
-			m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"));
 		});
 	m_messageBus->Subscribe("Copy Path", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
+				QClipboard* clipboard = QApplication::clipboard();
+				clipboard->setText(m_openedFilePath[index]);
 			}
-			QClipboard* clipboard = QApplication::clipboard();
-			clipboard->setText(m_openedFilePath[index]);
 		});
 	m_messageBus->Subscribe("Copy Name", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
+				QClipboard* clipboard = QApplication::clipboard();
+				clipboard->setText(m_openedFileName[index]);
 			}
-			QClipboard* clipboard = QApplication::clipboard();
-			clipboard->setText(m_openedFileName[index]);
 		});
 	m_messageBus->Subscribe("Copy Directory", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index < 0)
+			if (index >= 0)
 			{
-				return;
+				QClipboard* clipboard = QApplication::clipboard();
+				QFileInfo file_info(m_openedFilePath[index]);
+				clipboard->setText(file_info.absolutePath());
 			}
-			QClipboard* clipboard = QApplication::clipboard();
-			QFileInfo file_info(m_openedFilePath[index]);
-			clipboard->setText(file_info.absolutePath());
 		});
 
 	// MainWindow
@@ -441,11 +671,10 @@ void MainCore::InitValue()
 			// 保存最近文件
 			m_settings->setValue("MainCore/RecentFilePaths", m_recentFilesMgr->GetRecentFiles());
 			// 保存上次打开文件
-			m_settings->setValue("MainCore/OpenedFilePaths", m_openedFilePath);
-			m_settings->setValue("MainCore/OpenedFileNames", m_openedFileName);
-			m_settings->SetBoolList("MainCore/SavedFile", m_savedFile);
-			m_settings->setValue("MainCore/CurrentIndex", m_centralWidget->currentIndex());
+			SaveLastFile();
 		});
+
+
 }
 
 void MainCore::InitConnect()
@@ -464,16 +693,9 @@ void MainCore::InitConnect()
 		});
 }
 
-void MainCore::NewFile()
+bool MainCore::NewFile(const QString& new_file_name)
 {
-	int index = 0;
-	QString new_file_name = tr("new ") + QString::number(index);
-	while (m_openedFileName.contains(new_file_name))
-	{
-		index++;
-		new_file_name = tr("new ") + QString::number(index);
-	}
-	CustomTextEdit* text_widget = new CustomTextEdit(m_mainWindow);
+	CustomTextEdit* text_widget = new CustomTextEdit(m_centralWidget);
 	connect(text_widget, &CustomTextEdit::textChanged, [=]()
 		{
 			m_messageBus->Publish("Text Changed");
@@ -484,60 +706,117 @@ void MainCore::NewFile()
 	m_textWidget.append(text_widget);
 	m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), new_file_name);
 	m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
+	return true;
 }
 
-void MainCore::OpenFile(const QStringList& file_paths)
+bool MainCore::OpenFile(const QString& file_path)
 {
-	for (const QString& file_path : file_paths)
+	QFileInfo file_info(file_path);
+	if (file_path.isEmpty() || !file_info.exists())
 	{
-		QFileInfo file_info(file_path);
-		if (file_path.isEmpty() || !file_info.exists() || file_info.isDir())
+		return false;
+	}
+	QString abs_file_path = file_info.absoluteFilePath();
+	int index = m_openedFilePath.indexOf(abs_file_path);
+	if (index != -1)
+	{
+		// 打开过
+		m_centralWidget->setCurrentIndex(index);
+	}
+	else
+	{
+		// 未打开过
+		QFile file(file_path);
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
 		{
-			continue;
-		}
-		QString abs_file_path = file_info.absoluteFilePath();
-		int index = m_openedFilePath.indexOf(abs_file_path);
-		if (index != -1)
-		{
-			m_centralWidget->setCurrentIndex(index);
-		}
-		else
-		{
-			QFile file(file_path);
-			if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-			{
-				QTextStream in(&file);
-				in.setEncoding(QStringConverter::Utf8);
-				CustomTextEdit* text_widget = new CustomTextEdit(m_mainWindow);
-				text_widget->SetText(in.readAll());
-				connect(text_widget, &CustomTextEdit::textChanged, [=]()
-					{
-						m_messageBus->Publish("Text Changed");
-					});
-				m_openedFileName.append(file_info.fileName());
-				m_openedFilePath.append(abs_file_path);
-				m_savedFile.append(true);
-				m_textWidget.append(text_widget);
-				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_info.fileName());
-				m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
-				file.close();
-			}
+			QTextStream in(&file);
+			in.setEncoding(QStringConverter::Utf8);
+			CustomTextEdit* text_widget = new CustomTextEdit(m_centralWidget);
+			text_widget->SetText(in.readAll());
+			file.close();
+
+			// 打开后处理
+			connect(text_widget, &CustomTextEdit::textChanged, [=]()
+				{
+					m_messageBus->Publish("Text Changed");
+				});
+			m_openedFileName.append(file_info.fileName());
+			m_openedFilePath.append(abs_file_path);
+			m_savedFile.append(true);
+			m_textWidget.append(text_widget);
+			m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_info.fileName());
+			m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
 		}
 	}
+	return true;
 }
 
-void MainCore::OpenLastFile(const QStringList& file_paths, const QStringList& file_names, const QList<bool>& saved_files, int current_index)
+bool MainCore::SaveFile(int index, const QString& file_path)
 {
-	if (file_paths.size() != file_names.size() || file_paths.size() != saved_files.size() || file_names.size() != saved_files.size())
+	if (index < 0 || index >= m_centralWidget->count())
 	{
-		return;
+		return false;
 	}
-	for (int i = 0; i < file_paths.size(); ++i)
+	QFileInfo file_info(file_path);
+	if (file_path.isEmpty())
 	{
-		QString file_path = file_paths[i];
-		if (file_path.isEmpty())
+		return false;
+	}
+	// 打开文件
+	QFile file(file_path);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		// 保存
+		QTextStream in(&file);
+		in.setEncoding(QStringConverter::Utf8);
+		in << m_textWidget[index]->GetText();
+		file.close();
+
+		// 保存后处理
+		m_openedFileName[index] = file_info.fileName();
+		m_openedFilePath[index] = file_info.absoluteFilePath();
+		m_savedFile[index] = true;
+		m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/saved.ico"));
+		m_centralWidget->setTabText(index, file_info.fileName());
+		m_messageBus->Publish("Update Window Title");
+	}
+	return true;
+}
+
+bool MainCore::CloseFile(int index)
+{
+	if (index < 0 || index >= m_centralWidget->count())
+	{
+		return false;
+	}
+
+	// 最近文件
+	if (!m_openedFilePath[index].isEmpty())
+	{
+		m_recentFilesMgr->AddFile(m_openedFilePath[index]);
+		m_menuBar->SetRecentFiles(m_recentFilesMgr->GetRecentFiles());
+	}
+	// 关闭
+	m_openedFileName.removeAt(index);
+	m_openedFilePath.removeAt(index);
+	m_savedFile.removeAt(index);
+	m_textWidget.removeAt(index);
+	m_centralWidget->removeTab(index);
+	return true;
+}
+
+bool MainCore::LoadLastFile(const QStringList& opened_file_name, const QStringList& opened_file_path, const QList<bool> saved_file, int current_index)
+{
+	if (opened_file_name.size() != opened_file_path.size() || opened_file_path.size() != saved_file.size() || current_index < 0)
+	{
+		return false;
+	}
+	for (int index = 0; index < opened_file_path.size(); ++index)
+	{
+		QString file_path = opened_file_path[index];
+		if (saved_file[index] == false)
 		{
-			file_path = FILE_BACK_UP_DIR + "/" + file_names[i];
+			file_path = FILE_BACK_UP_DIR + "/" + opened_file_name[index];
 		}
 		// 打开的文件
 		QFile file(file_path);
@@ -551,19 +830,18 @@ void MainCore::OpenLastFile(const QStringList& file_paths, const QStringList& fi
 				{
 					m_messageBus->Publish("Text Changed");
 				});
-			m_openedFileName.append(file_names[i]);
-			m_openedFilePath.append(file_paths[i]);
-			m_savedFile.append(saved_files[i]);
+			m_openedFileName.append(opened_file_name[index]);
+			m_openedFilePath.append(opened_file_path[index]);
+			m_savedFile.append(saved_file[index]);
 			m_textWidget.append(text_widget);
-			if (saved_files[i] == true)
+			if (saved_file[index] == true)
 			{
-				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_names[i]);
+				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), opened_file_name[index]);
 			}
 			else
 			{
-				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"), file_names[i]);
+				m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"), opened_file_name[index]);
 			}
-
 			file.close();
 		}
 	}
@@ -576,190 +854,38 @@ void MainCore::OpenLastFile(const QStringList& file_paths, const QStringList& fi
 	{
 		m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
 	}
+	return true;
 }
 
-bool MainCore::SaveFile(int index, const QString& file_path)
+bool MainCore::SaveLastFile()
 {
-	bool save_success = false;
-	if (index < 0)
+	// 保存上次打开文件
+	m_settings->setValue("MainCore/OpenedFilePaths", m_openedFilePath);
+	m_settings->setValue("MainCore/OpenedFileNames", m_openedFileName);
+	m_settings->SetBoolList("MainCore/SavedFile", m_savedFile);
+	m_settings->setValue("MainCore/CurrentIndex", m_centralWidget->currentIndex());
+
+	// 保存无路径文件
+	for (int index = 0; index < m_centralWidget->count(); ++index)
 	{
-		return save_success;
-	}
-	if (file_path.isEmpty() || !QFileInfo::exists(file_path))
-	{
-		QString select_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"", qApp->applicationDirPath() + "/" + m_openedFileName[index], "Text files(*.txt);;All types(*.*)");
-		if (!select_path.isEmpty())
+		if (m_savedFile[index] == false)
 		{
-			// 打开文件
-			QFile file(select_path);
+			QDir file_dir(FILE_BACK_UP_DIR);
+			if (!file_dir.exists())
+			{
+				// 不存在 创建路径
+				bool mk_success = file_dir.mkpath(FILE_BACK_UP_DIR);
+			}
+			QFile file(FILE_BACK_UP_DIR + "/" + m_openedFileName[index]);
 			if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 			{
-				// 保存
 				QTextStream in(&file);
 				in.setEncoding(QStringConverter::Utf8);
 				in << m_textWidget[index]->GetText();
 				file.close();
-
-				// 保存后处理
-				QFileInfo file_info(select_path);
-				m_openedFileName[index] = file_info.fileName();
-				m_openedFilePath[index] = file_info.absoluteFilePath();
-				m_savedFile[index] = true;
-				m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/saved.ico"));
-				m_centralWidget->setTabText(index, file_info.fileName());
-				m_messageBus->Publish("Update Window Title");
-				save_success = true;
 			}
 		}
 	}
-	else
-	{
-		// 打开文件
-		QFile file(file_path);
-		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-		{
-			// 保存
-			QTextStream in(&file);
-			in.setEncoding(QStringConverter::Utf8);
-			in << m_textWidget[index]->GetText();
-			file.close();
-
-			// 保存后处理
-			QFileInfo file_info(file_path);
-			m_openedFileName[index] = file_info.fileName();
-			m_openedFilePath[index] = file_info.absoluteFilePath();
-			m_savedFile[index] = true;
-			m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/saved.ico"));
-			m_centralWidget->setTabText(index, file_info.fileName());
-			m_messageBus->Publish("Update Window Title");
-			save_success = true;
-		}
-	}
-	return save_success;
+	return true;
 }
 
-void MainCore::CloseFile(int index)
-{
-	if (index < 0)
-	{
-		return;
-	}
-
-	if (m_savedFile[index] == true)
-	{
-		// 最近文件
-		if (!m_openedFilePath[index].isEmpty())
-		{
-			m_recentFilesMgr->AddFile(m_openedFilePath[index]);
-			m_menuBar->SetRecentFiles(m_recentFilesMgr->GetRecentFiles());
-		}
-		// 关闭
-		m_openedFileName.removeAt(index);
-		m_openedFilePath.removeAt(index);
-		m_savedFile.removeAt(index);
-		m_textWidget.removeAt(index);
-		m_centralWidget->removeTab(index);
-	}
-	else
-	{
-		QMessageBox question_box(QMessageBox::Question, tr("Save File"), tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok, m_mainWindow);
-		question_box.addButton(QMessageBox::No);
-		question_box.addButton(QMessageBox::Cancel);
-		int ret = question_box.exec();
-		if (ret == QMessageBox::Ok)
-		{
-			SaveFile(index, m_openedFilePath[index]);
-			// 最近文件
-			if (!m_openedFilePath[index].isEmpty())
-			{
-				m_recentFilesMgr->AddFile(m_openedFilePath[index]);
-				m_menuBar->SetRecentFiles(m_recentFilesMgr->GetRecentFiles());
-			}
-			// 关闭
-			m_openedFileName.removeAt(index);
-			m_openedFilePath.removeAt(index);
-			m_savedFile.removeAt(index);
-			m_textWidget.removeAt(index);
-			m_centralWidget->removeTab(index);
-		}
-		else if (ret == QMessageBox::No)
-		{
-			// 最近文件
-			if (!m_openedFilePath[index].isEmpty())
-			{
-				m_recentFilesMgr->AddFile(m_openedFilePath[index]);
-				m_menuBar->SetRecentFiles(m_recentFilesMgr->GetRecentFiles());
-			}
-			// 关闭
-			m_openedFileName.removeAt(index);
-			m_openedFilePath.removeAt(index);
-			m_savedFile.removeAt(index);
-			m_textWidget.removeAt(index);
-			m_centralWidget->removeTab(index);
-		}
-		else if (ret == QMessageBox::Cancel)
-		{
-		}
-	}
-}
-
-bool MainCore::DeleteFile(int index)
-{
-	bool delete_success = false;
-	if (index < 0)
-	{
-		return delete_success;
-	}
-	QFile file(m_openedFilePath[index]);
-	delete_success = file.remove();
-	return delete_success;
-}
-
-void MainCore::ReloadFile()
-{
-	int index = m_centralWidget->currentIndex();
-	if (index < 0)
-	{
-		return;
-	}
-	QString file_path = m_openedFilePath[index];
-	if (file_path.isEmpty() || !QFileInfo::exists(file_path))
-	{
-	}
-	else
-	{
-		QFile file(file_path);
-		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-		{
-			QTextStream in(&file);
-			in.setEncoding(QStringConverter::Utf8);
-			m_textWidget[index]->SetText(in.readAll());
-			file.close();
-		}
-	}
-}
-
-void MainCore::OpenExplorer(const QString& file_dir)
-{
-	QDesktopServices::openUrl(QUrl::fromLocalFile(file_dir));
-}
-
-void MainCore::OpenCmd(const QString& file_dir)
-{
-	// 启动命令行窗口并进入文件所在目录
-#ifdef Q_OS_WIN
-	// Windows: 使用 cmd 打开并切换到指定目录
-	QProcess::startDetached("cmd.exe", QStringList() << "/K" << "cd" << file_dir);
-#elif defined(Q_OS_MAC)
-	// macOS: 使用 Terminal 打开并切换到指定目录
-	QProcess::startDetached("open", QStringList() << "-a" << "Terminal" << file_dir);
-#elif defined(Q_OS_LINUX)
-	// Linux: 使用终端打开并切换到指定目录
-	QProcess::startDetached("gnome-terminal", QStringList() << "--working-directory=" + file_dir);
-#endif
-}
-
-void MainCore::OpenInDefaultViewer(const QString& file_path)
-{
-	QDesktopServices::openUrl(QUrl::fromLocalFile(file_path));
-}

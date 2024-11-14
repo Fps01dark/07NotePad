@@ -124,7 +124,7 @@ void CustomMenuBar::InitConnect()
 		});
 	connect(m_openFolderAsWorkspaceAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Open Directory As Directory Workspace");
+			m_messageBus->Publish("Open Directory As Workspace");
 		});
 	connect(m_reloadAction, &QAction::triggered, [=]()
 		{
