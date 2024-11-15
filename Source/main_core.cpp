@@ -78,11 +78,8 @@ void MainCore::InitUi()
 	QStringList&& recent_paths = m_settings->value("MainCore/RecentFilePaths").toStringList();
 	m_menuBar->SetRecentFiles(recent_paths);
 	// 加载上次打开的文件
-	QStringList&& file_names = m_settings->value("MainCore/OpenedFileNames").toStringList();
-	QStringList&& file_paths = m_settings->value("MainCore/OpenedFilePaths").toStringList();
-	QList<bool>&& saved_files = m_settings->BoolList("MainCore/SavedFile");
-	int current_index = m_settings->value("MainCore/CurrentIndex").toInt();
-	LoadLastFile(file_names, file_paths, saved_files, current_index);
+
+	LoadSettings();
 
 }
 
@@ -660,6 +657,16 @@ void MainCore::InitValue()
 				clipboard->setText(file_info.absolutePath());
 			}
 		});
+	m_messageBus->Subscribe("Change Zoom",[=](int data)
+		{
+			m_fontSize = data;
+			for (int i = 0; i < m_textWidget.size(); ++i)
+			{
+				QFont font = m_textWidget[i]->font();
+				font.setPointSize(m_fontSize);
+				m_textWidget[i]->setFont(font);
+			}
+		});
 
 	// MainWindow
 	m_messageBus->Subscribe("Exit Software", [=]()
@@ -671,7 +678,7 @@ void MainCore::InitValue()
 			// 保存最近文件
 			m_settings->setValue("MainCore/RecentFilePaths", m_recentFilesMgr->GetRecentFiles());
 			// 保存上次打开文件
-			SaveLastFile();
+			SaveSettings();
 		});
 
 
@@ -695,7 +702,10 @@ void MainCore::InitConnect()
 
 bool MainCore::NewFile(const QString& new_file_name)
 {
-	CustomTextEdit* text_widget = new CustomTextEdit(m_centralWidget);
+	CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus,m_centralWidget);
+	QFont font = text_widget->font();
+	font.setPointSize(m_fontSize);
+	text_widget->setFont(font);
 	connect(text_widget, &CustomTextEdit::textChanged, [=]()
 		{
 			m_messageBus->Publish("Text Changed");
@@ -731,7 +741,10 @@ bool MainCore::OpenFile(const QString& file_path)
 		{
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
-			CustomTextEdit* text_widget = new CustomTextEdit(m_centralWidget);
+			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus,m_centralWidget);
+			QFont font = text_widget->font();
+			font.setPointSize(m_fontSize);
+			text_widget->setFont(font);
 			text_widget->SetText(in.readAll());
 			file.close();
 
@@ -805,12 +818,13 @@ bool MainCore::CloseFile(int index)
 	return true;
 }
 
-bool MainCore::LoadLastFile(const QStringList& opened_file_name, const QStringList& opened_file_path, const QList<bool> saved_file, int current_index)
+bool MainCore::LoadSettings()
 {
-	if (opened_file_name.size() != opened_file_path.size() || opened_file_path.size() != saved_file.size() || current_index < 0)
-	{
-		return false;
-	}
+	QStringList&& opened_file_name = m_settings->value("MainCore/OpenedFileNames").toStringList();
+	QStringList&& opened_file_path = m_settings->value("MainCore/OpenedFilePaths").toStringList();
+	QList<bool>&& saved_file = m_settings->BoolList("MainCore/SavedFile");
+	int current_index = m_settings->value("MainCore/CurrentIndex").toInt();
+	m_fontSize = m_settings->value("CustomTextEdit/FontSize").toInt();
 	for (int index = 0; index < opened_file_path.size(); ++index)
 	{
 		QString file_path = opened_file_path[index];
@@ -824,7 +838,10 @@ bool MainCore::LoadLastFile(const QStringList& opened_file_name, const QStringLi
 		{
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
-			CustomTextEdit* text_widget = new CustomTextEdit(m_mainWindow);
+			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
+			QFont font = text_widget->font();
+			font.setPointSize(m_fontSize);
+			text_widget->setFont(font);
 			text_widget->SetText(in.readAll());
 			connect(text_widget, &CustomTextEdit::textChanged, [=]()
 				{
@@ -857,7 +874,7 @@ bool MainCore::LoadLastFile(const QStringList& opened_file_name, const QStringLi
 	return true;
 }
 
-bool MainCore::SaveLastFile()
+bool MainCore::SaveSettings()
 {
 	// 保存上次打开文件
 	m_settings->setValue("MainCore/OpenedFilePaths", m_openedFilePath);
@@ -886,6 +903,9 @@ bool MainCore::SaveLastFile()
 			}
 		}
 	}
+
+	// 保存字体大小
+	m_settings->setValue("CustomTextEdit/FontSize",m_fontSize);
 	return true;
 }
 

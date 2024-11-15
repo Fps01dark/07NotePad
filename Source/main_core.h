@@ -34,8 +34,8 @@ private:
 	bool SaveFile(int index, const QString& file_path);
 	bool CloseFile(int index);
 	// 加载上次退出文件及状态
-	bool LoadLastFile(const QStringList& opened_file_name,const QStringList& opened_file_path,const QList<bool> saved_file,int current_index);
-	bool SaveLastFile();
+	bool LoadSettings();
+	bool SaveSettings();
 
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;

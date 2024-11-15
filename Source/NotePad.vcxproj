@@ -101,8 +101,8 @@
     <ClCompile Include="custom_tab_widget.cpp" />
     <ClCompile Include="custom_tab_bar.cpp" />
     <ClCompile Include="custom_tool_bar.cpp" />
-    <ClCompile Include="directory_workspace_dock.cpp" />
-    <ClCompile Include="directory_workspace_tree_view.cpp" />
+    <ClCompile Include="dir_workspace_dock.cpp" />
+    <ClCompile Include="dir_workspace_tree_view.cpp" />
     <ClCompile Include="main_core.cpp" />
     <ClCompile Include="main_window.cpp" />
     <ClCompile Include="main.cpp" />

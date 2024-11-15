@@ -2,13 +2,17 @@
 
 #include "framework.h"
 
-CustomTextEdit::CustomTextEdit(QWidget* parent)
-	:QTextEdit(parent)
+#include "message_bus.h"
+
+CustomTextEdit::CustomTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+	:m_messageBus(message_bus),
+	QTextEdit(parent)
 {
 	InitUi();
 	InitValue();
 	InitConnect();
 }
+
 
 CustomTextEdit::~CustomTextEdit()
 {
@@ -33,13 +37,12 @@ void CustomTextEdit::wheelEvent(QWheelEvent* event)
 		int current_size = font.pointSize();
 		if (delta > 0)
 		{
-			font.setPointSize(current_size + 1);  // 放大
+			m_messageBus->Publish("Change Zoom", current_size + 1);
 		}
 		else
 		{
-			font.setPointSize(current_size - 1);  // 缩小
+			m_messageBus->Publish("Change Zoom", current_size - 1);
 		}
-		this->setFont(font);
 	}
 	else
 	{

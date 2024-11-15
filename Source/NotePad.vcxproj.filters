@@ -56,10 +56,10 @@
     <ClCompile Include="message.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="directory_workspace_dock.cpp">
+    <ClCompile Include="dir_workspace_dock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="directory_workspace_tree_view.cpp">
+    <ClCompile Include="dir_workspace_tree_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="custom_settings.cpp">

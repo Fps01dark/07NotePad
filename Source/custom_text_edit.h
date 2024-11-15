@@ -4,12 +4,13 @@
 
 class QWidget;
 class QWheelEvent;
+class MessageBus;
 
 class CustomTextEdit :public QTextEdit
 {
 	Q_OBJECT
 public:
-	explicit CustomTextEdit(QWidget* parent = nullptr);
+	explicit CustomTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
 	~CustomTextEdit();
 	void SetText(const QString& text);
 	QString GetText() const;
@@ -23,4 +24,6 @@ private:
 	void InitConnect();
 
 private:
+	std::shared_ptr<MessageBus> m_messageBus = nullptr;
+
 };

@@ -58,7 +58,7 @@ void DirWorkspaceTreeView::InitConnect()
 {
 	connect(m_openAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Open File", QStringList() << m_fileSystemModel->filePath(currentIndex()));
+			m_messageBus->Publish("Open File", m_fileSystemModel->filePath(currentIndex()));
 		});
 	connect(m_copyPathAction, &QAction::triggered, [=]()
 		{

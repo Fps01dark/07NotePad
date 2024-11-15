@@ -52,4 +52,6 @@ private:
 	QAction* m_openAllRecentAction = nullptr;
 	QAction* m_clearRecentAction = nullptr;
 	QAction* m_exitSotfwareAction = nullptr;
+	// 菜单栏-编辑
+
 };

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <QSet>
+#include <QFont>
 #include <QFile>
 #include <QAction>
 #include <QString>

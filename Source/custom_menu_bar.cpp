@@ -31,7 +31,7 @@ void CustomMenuBar::SetRecentFiles(const QStringList& recent_list)
 				{
 					m_recentFileMenu->removeAction(action);
 				}
-				m_messageBus->Publish("Open File", QStringList() << recent_list[i]);
+				m_messageBus->Publish("Open File", recent_list[i]);
 			});
 		// 添加
 		m_recentFileMenu->addAction(action);

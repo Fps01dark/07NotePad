@@ -98,6 +98,6 @@ void DirWorkspaceDock::InitConnect()
 		});
 	connect(m_treeView, &QTreeView::doubleClicked, this, [=](const QModelIndex& index)
 		{
-			m_messageBus->Publish("Open File", QStringList() << m_fileSystemModel->filePath(index));
+			m_messageBus->Publish("Open File",m_fileSystemModel->filePath(index));
 		});
 }
