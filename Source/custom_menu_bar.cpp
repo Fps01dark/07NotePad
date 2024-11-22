@@ -78,7 +78,23 @@ void CustomMenuBar::InitUi()
 	file_menu->addSeparator();
 	m_exitSotfwareAction = file_menu->addAction(tr("Exit"));
 	// 菜单栏-编辑
-
+	QMenu* edit_menu = this->addMenu(tr("Edit"));
+	m_undoAction = edit_menu->addAction(tr("Undo"));
+	m_redoAction = edit_menu->addAction(tr("Redo"));
+	edit_menu->addSeparator();
+	m_cutAction = edit_menu->addAction(tr("Cut"));
+	m_copyAction = edit_menu->addAction(tr("Copy"));
+	m_pasteAction = edit_menu->addAction(tr("Paste"));
+	m_deleteAction = edit_menu->addAction(tr("Delete"));
+	m_selectAllAction = edit_menu->addAction(tr("Select All"));
+	edit_menu->addSeparator();
+	m_insertMenu = edit_menu->addMenu(tr("Insert"));
+	m_shortTimeAction = m_insertMenu->addAction(tr("Short Date Time"));
+	m_longTimeAction = m_insertMenu->addAction(tr("Long Data Time"));
+	m_customTimeAction = m_insertMenu->addAction(tr("Custom Date Time"));
+	m_copyToClipboardMenu = edit_menu->addMenu(tr("Copy To Clipboard"));
+	m_copyFilePathAction=m_copyToClipboardMenu->addAction(tr("Copy Current File Path"));
+	m_copyToClipboardMenu->addAction(tr("Copy Current File Name"));
 	// 菜单栏-查找
 
 	// 菜单栏-视图

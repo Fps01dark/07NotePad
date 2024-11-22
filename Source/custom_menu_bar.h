@@ -53,5 +53,25 @@ private:
 	QAction* m_clearRecentAction = nullptr;
 	QAction* m_exitSotfwareAction = nullptr;
 	// 菜单栏-编辑
-
+	QAction* m_undoAction = nullptr;
+	QAction* m_redoAction = nullptr;
+	QAction* m_cutAction = nullptr;
+	QAction* m_copyAction = nullptr;
+	QAction* m_pasteAction = nullptr;
+	QAction* m_deleteAction = nullptr;
+	QAction* m_selectAllAction = nullptr;
+	QMenu* m_insertMenu = nullptr;
+	QAction* m_shortTimeAction = nullptr;
+	QAction* m_longTimeAction = nullptr;
+	QAction* m_customTimeAction = nullptr;
+	QMenu* m_copyToClipboardMenu = nullptr;
+	QAction* m_copyFilePathAction = nullptr;
+	QAction* m_copyFileNameAction = nullptr;
+	QAction* m_copyFileDirAction = nullptr;
+	QAction* m_copyAllFileNameAction = nullptr;
+	QAction* m_copyAllFilePathAction = nullptr;
+	QMenu* m_indentMenu = nullptr;
+	QAction* m_insertLineIndentAction = nullptr;
+	QAction* m_deleteLineIndentAction = nullptr;
+	// ... 
 };
