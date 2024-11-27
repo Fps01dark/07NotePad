@@ -43,7 +43,7 @@ private:
 	QAction* m_closeLeftAction = nullptr;
 	QAction* m_closeRightAction = nullptr;
 	QAction* m_closeAllUnchangeAction = nullptr;
-	QAction* m_deleteAction = nullptr;
+	QAction* m_deleteFileAction = nullptr;
 	QAction* m_loadSessionAction = nullptr;
 	QAction* m_saveSessionAction = nullptr;
 	QAction* m_printAction = nullptr;
@@ -58,7 +58,7 @@ private:
 	QAction* m_cutAction = nullptr;
 	QAction* m_copyAction = nullptr;
 	QAction* m_pasteAction = nullptr;
-	QAction* m_deleteAction = nullptr;
+	QAction* m_deleteTextAction = nullptr;
 	QAction* m_selectAllAction = nullptr;
 	QMenu* m_insertMenu = nullptr;
 	QAction* m_shortTimeAction = nullptr;
@@ -73,5 +73,5 @@ private:
 	QMenu* m_indentMenu = nullptr;
 	QAction* m_insertLineIndentAction = nullptr;
 	QAction* m_deleteLineIndentAction = nullptr;
-	// ... 
+	// ...
 };

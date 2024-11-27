@@ -64,7 +64,7 @@ void CustomMenuBar::InitUi()
 	m_closeLeftAction = m_closeMenu->addAction(tr("Close All To The Left"));
 	m_closeRightAction = m_closeMenu->addAction(tr("Close All To The Right"));
 	m_closeAllUnchangeAction = m_closeMenu->addAction(tr("Close All Unchanged"));
-	m_deleteAction = file_menu->addAction(tr("Delete File"));
+	m_deleteFileAction = file_menu->addAction(tr("Delete File"));
 	file_menu->addSeparator();
 	m_loadSessionAction = file_menu->addAction(tr("Load Session..."));
 	m_saveSessionAction = file_menu->addAction(tr("Save Session..."));
@@ -85,7 +85,7 @@ void CustomMenuBar::InitUi()
 	m_cutAction = edit_menu->addAction(tr("Cut"));
 	m_copyAction = edit_menu->addAction(tr("Copy"));
 	m_pasteAction = edit_menu->addAction(tr("Paste"));
-	m_deleteAction = edit_menu->addAction(tr("Delete"));
+	m_deleteTextAction = edit_menu->addAction(tr("Delete"));
 	m_selectAllAction = edit_menu->addAction(tr("Select All"));
 	edit_menu->addSeparator();
 	m_insertMenu = edit_menu->addMenu(tr("Insert"));
@@ -93,7 +93,7 @@ void CustomMenuBar::InitUi()
 	m_longTimeAction = m_insertMenu->addAction(tr("Long Data Time"));
 	m_customTimeAction = m_insertMenu->addAction(tr("Custom Date Time"));
 	m_copyToClipboardMenu = edit_menu->addMenu(tr("Copy To Clipboard"));
-	m_copyFilePathAction=m_copyToClipboardMenu->addAction(tr("Copy Current File Path"));
+	m_copyFilePathAction = m_copyToClipboardMenu->addAction(tr("Copy Current File Path"));
 	m_copyToClipboardMenu->addAction(tr("Copy Current File Name"));
 	// 菜单栏-查找
 
@@ -114,6 +114,7 @@ void CustomMenuBar::InitValue()
 
 void CustomMenuBar::InitConnect()
 {
+	// 文件
 	connect(m_newAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("New File");
@@ -190,7 +191,7 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Close All Unchanged File");
 		});
-	connect(m_deleteAction, &QAction::triggered, [=]()
+	connect(m_deleteFileAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Delete File");
 		});
@@ -208,5 +209,14 @@ void CustomMenuBar::InitConnect()
 	connect(m_exitSotfwareAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Exit Software");
+		});
+	// 编辑
+	connect(m_undoAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Undo");
+		});
+	connect(m_redoAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Redo");
 		});
 }

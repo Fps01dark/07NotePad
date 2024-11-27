@@ -80,7 +80,6 @@ void MainCore::InitUi()
 	// 加载上次打开的文件
 
 	LoadSettings();
-
 }
 
 void MainCore::InitValue()
@@ -117,7 +116,6 @@ void MainCore::InitValue()
 				new_file_name = tr("new ") + QString::number(index);
 			}
 			NewFile(new_file_name);
-
 		});
 	m_messageBus->Subscribe("Open File", [=]()
 		{
@@ -205,7 +203,6 @@ void MainCore::InitValue()
 				QString file_path = m_openedFilePath[index];
 				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
 				{
-
 				}
 				else
 				{
@@ -573,7 +570,7 @@ void MainCore::InitValue()
 					}
 				}
 			}
-	});
+		});
 	m_messageBus->Subscribe("Clear Recent Record", [=]()
 		{
 			m_menuBar->SetRecentFiles(QStringList());
@@ -581,6 +578,22 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Exit Software", [=]()
 		{
 			m_mainWindow->close();
+		});
+	m_messageBus->Subscribe("Undo", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->undo();
+			}
+		});
+	m_messageBus->Subscribe("Redo", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->redo();
+			}
 		});
 
 	// Directory
@@ -657,7 +670,7 @@ void MainCore::InitValue()
 				clipboard->setText(file_info.absolutePath());
 			}
 		});
-	m_messageBus->Subscribe("Change Zoom",[=](int data)
+	m_messageBus->Subscribe("Change Zoom", [=](int data)
 		{
 			m_fontSize = data;
 			for (int i = 0; i < m_textWidget.size(); ++i)
@@ -680,8 +693,6 @@ void MainCore::InitValue()
 			// 保存上次打开文件
 			SaveSettings();
 		});
-
-
 }
 
 void MainCore::InitConnect()
@@ -702,7 +713,7 @@ void MainCore::InitConnect()
 
 bool MainCore::NewFile(const QString& new_file_name)
 {
-	CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus,m_centralWidget);
+	CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
 	QFont font = text_widget->font();
 	font.setPointSize(m_fontSize);
 	text_widget->setFont(font);
@@ -741,7 +752,7 @@ bool MainCore::OpenFile(const QString& file_path)
 		{
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
-			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus,m_centralWidget);
+			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
 			QFont font = text_widget->font();
 			font.setPointSize(m_fontSize);
 			text_widget->setFont(font);
@@ -905,7 +916,6 @@ bool MainCore::SaveSettings()
 	}
 
 	// 保存字体大小
-	m_settings->setValue("CustomTextEdit/FontSize",m_fontSize);
+	m_settings->setValue("CustomTextEdit/FontSize", m_fontSize);
 	return true;
 }
-
