@@ -135,7 +135,8 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				QString file_path = m_openedFilePath[index];
-				QDesktopServices::openUrl(QUrl::fromLocalFile(file_path));
+				QFileInfo file_info(file_path);
+				QDesktopServices::openUrl(QUrl::fromLocalFile(file_info.absolutePath()));
 			}
 		});
 	m_messageBus->Subscribe("Open Explorer", [=](const QString& data)
