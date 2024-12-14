@@ -1,35 +1,27 @@
-#include "custom_settings.h"
+Ôªø#include "custom_settings.h"
 
 #include "framework.h"
 
-CustomSettings::CustomSettings(QObject* parent)
-{
+CustomSettings::CustomSettings(QObject* parent) {}
+
+CustomSettings::~CustomSettings() {}
+
+void CustomSettings::SetBoolList(const QString& key, const QList<bool>& boolList) {
+    // ‰ΩøÁî® QBitArray Êù•Ë°®Á§∫Â∏ÉÂ∞îÂàóË°®
+    QBitArray bitArray(boolList.size());
+    for (int i = 0; i < boolList.size(); ++i) {
+        bitArray.setBit(i, boolList[i]);
+    }
+
+    setValue(key, bitArray);
 }
 
-CustomSettings::~CustomSettings()
-{
-}
-
-void CustomSettings::SetBoolList(const QString& key, const QList<bool>& boolList)
-{
-	//  π”√ QBitArray ¿¥±Ì æ≤º∂˚¡–±Ì
-	QBitArray bitArray(boolList.size());
-	for (int i = 0; i < boolList.size(); ++i)
-	{
-		bitArray.setBit(i, boolList[i]);
-	}
-
-	setValue(key, bitArray);
-}
-
-QList<bool> CustomSettings::BoolList(const QString& key)
-{
-	// ¥” QSettings ÷–º”‘ÿ QBitArray
-	QBitArray bitArray = value(key).value<QBitArray>();
-	QList<bool> boolList;
-	for (int i = 0; i < bitArray.size(); ++i)
-	{
-		boolList.append(bitArray.testBit(i));
-	}
-	return boolList;
+QList<bool> CustomSettings::BoolList(const QString& key) {
+    // ‰ªé QSettings ‰∏≠Âä†ËΩΩ QBitArray
+    QBitArray   bitArray = value(key).value<QBitArray>();
+    QList<bool> boolList;
+    for (int i = 0; i < bitArray.size(); ++i) {
+        boolList.append(bitArray.testBit(i));
+    }
+    return boolList;
 }

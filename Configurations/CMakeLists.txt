@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 3.16)
 # 项目名称和版本
 project(OneNotePad VERSION 1.0.0 LANGUAGES CXX DESCRIPTION "A NotePad")
 
+message(STATUS "Project Name: ${PROJECT_NAME}")
+message(STATUS "Project Version: ${PROJECT_VERSION}")
+message(STATUS "Source Directory: ${PROJECT_SOURCE_DIR}")
+message(STATUS "Binary Directory: ${PROJECT_BINARY_DIR}")
+
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,6 +22,7 @@ set(CMAKE_PREFIX_PATH "D:/Qt/Qt6/6.8.0/msvc2022_64/lib/cmake/Qt6;" CACHE STRING 
 # 自动收集 Source 目录中的所有 .cpp 文件
 file(GLOB SOURCES "../Source/*.cpp")
 list(APPEND SOURCES "../Resources/one_note_pad.qrc")
+
 # 创建可执行文件
 add_executable(${PROJECT_NAME} ${SOURCES})
 # 如果有自定义的头文件路径，可以通过 target_include_directories 添加
