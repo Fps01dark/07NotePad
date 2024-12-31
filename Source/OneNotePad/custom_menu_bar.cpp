@@ -157,6 +157,7 @@ void CustomMenuBar::InitConnect() {
             [=]() { m_messageBus->Publish("Close All Unchanged File"); });
     connect(m_deleteFileAction, &QAction::triggered,
             [=]() { m_messageBus->Publish("Delete File"); });
+    connect(m_printAction, &QAction::triggered, [=]() { m_messageBus->Publish("Print"); });
     connect(m_openAllRecentAction, &QAction::triggered, [=]() {
         for (auto action : m_recentFileMenu->actions()) {
             action->triggered();

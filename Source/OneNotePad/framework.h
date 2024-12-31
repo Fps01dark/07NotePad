@@ -17,6 +17,9 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QPrinter>
 #include <QProcess>
 #include <QSet>
 #include <QSettings>

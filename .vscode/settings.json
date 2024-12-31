@@ -1,9 +1,0 @@
-{
-    "cmake.sourceDirectory": "E:/01Person/07NotePad/Configurations",
-    "files.associations": {
-        "qsettings": "cpp",
-        "qmenubar": "cpp"
-    },
-    "cmake.options.statusBarVisibility": "visible",
-    "editor.formatOnSave": true
-}
