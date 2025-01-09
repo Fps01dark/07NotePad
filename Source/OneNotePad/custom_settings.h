@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 
 #include <QSettings>
 
-class CustomSettings : public QSettings {
+class CustomSettings : public QSettings 
+{
     Q_OBJECT
    public:
     explicit CustomSettings(QObject* parent = nullptr);

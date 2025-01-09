@@ -16,14 +16,18 @@ CustomMenuBar::CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget *p
 
 CustomMenuBar::~CustomMenuBar() {}
 
-void CustomMenuBar::SetRecentFiles(const QStringList &recent_list) {
+void CustomMenuBar::SetRecentFiles(const QStringList &recent_list) 
+{
     m_recentFileMenu->clear();
-    for (int i = 0; i < recent_list.size(); ++i) {
+    for (int i = 0; i < recent_list.size(); ++i) 
+    {
         // 新增
         QAction *action = new QAction(recent_list[i], m_recentFileMenu);
-        connect(action, &QAction::triggered, [=]() {
+        connect(action, &QAction::triggered, [=]() 
+            {
             QFileInfo file_info(recent_list[i]);
-            if (recent_list[i].isEmpty() || !file_info.exists() || file_info.isDir()) {
+            if (recent_list[i].isEmpty() || !file_info.exists() || file_info.isDir()) 
+            {
                 m_recentFileMenu->removeAction(action);
             }
             m_messageBus->Publish("Open File", recent_list[i]);
@@ -33,10 +37,12 @@ void CustomMenuBar::SetRecentFiles(const QStringList &recent_list) {
     }
 }
 
-QStringList CustomMenuBar::GetRecentFiles() const {
+QStringList CustomMenuBar::GetRecentFiles() const 
+{
     QStringList             recent_files;
     const QList<QAction *> &actions = m_recentFileMenu->actions();
-    for (int i = 0; i < actions.size(); ++i) {
+    for (int i = 0; i < actions.size(); ++i) 
+    {
         recent_files.append(actions[i]->text());
     }
     return recent_files;

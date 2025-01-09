@@ -9,7 +9,8 @@ class QString;
 class QCloseEvent;
 class MainCore;
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow 
+{
     Q_OBJECT
    public:
     explicit MainWindow(QWidget* parent = nullptr);

@@ -7,7 +7,8 @@
 #include "framework.h"
 #include "main_core.h"
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) 
+{
     ui.setupUi(this);
 
     m_mainCore = new MainCore(this);

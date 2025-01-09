@@ -6,7 +6,8 @@ class QMenu;
 class QAction;
 class MessageBus;
 
-class CustomMenuBar : public QMenuBar {
+class CustomMenuBar : public QMenuBar 
+{
     Q_OBJECT
    public:
     explicit CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);

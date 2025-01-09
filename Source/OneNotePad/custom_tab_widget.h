@@ -5,7 +5,8 @@
 
 class MessageBus;
 
-class CustomTabWidget : public QTabWidget {
+class CustomTabWidget : public QTabWidget 
+{
     Q_OBJECT
    public:
     explicit CustomTabWidget(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);

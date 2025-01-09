@@ -4,7 +4,8 @@
 
 class MessageBus;
 
-class CustomToolBar : public QToolBar {
+class CustomToolBar : public QToolBar 
+{
    public:
     explicit CustomToolBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
     ~CustomToolBar();

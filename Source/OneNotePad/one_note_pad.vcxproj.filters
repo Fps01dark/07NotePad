@@ -21,84 +21,81 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="Ui">
+      <UniqueIdentifier>{27db1a03-4c15-4e91-963c-a2c2d06a268c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="custom_menu_bar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="custom_settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="custom_status_bar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="custom_tab_bar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="custom_tab_widget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="custom_text_edit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="custom_tool_bar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dir_workspace_dock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dir_workspace_tree_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main_window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="message_bus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="custom_menu_bar.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="custom_status_bar.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="custom_tab_bar.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="custom_tab_widget.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="custom_text_edit.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="custom_tool_bar.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="dir_workspace_dock.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="dir_workspace_tree_view.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="main_window.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="custom_menu_bar.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="custom_settings.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="custom_tab_bar.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="custom_tab_widget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="custom_text_edit.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="dir_workspace_dock.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="dir_workspace_tree_view.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="main_core.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="custom_menu_bar.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+    <QtMoc Include="custom_tab_bar.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+    <QtMoc Include="custom_tab_widget.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+    <QtMoc Include="custom_text_edit.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+    <QtMoc Include="dir_workspace_dock.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+    <QtMoc Include="dir_workspace_tree_view.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
     <QtMoc Include="main_window.h">
-      <Filter>Header Files</Filter>
+      <Filter>Ui</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="custom_status_bar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="custom_tool_bar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -107,6 +104,12 @@
     </ClInclude>
     <ClInclude Include="message_bus.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="custom_status_bar.h">
+      <Filter>Ui</Filter>
+    </ClInclude>
+    <ClInclude Include="custom_tool_bar.h">
+      <Filter>Ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

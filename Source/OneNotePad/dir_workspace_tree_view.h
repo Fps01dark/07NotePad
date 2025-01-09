@@ -6,7 +6,8 @@ class QMouseEvent;
 class QFileSystemModel;
 class MessageBus;
 
-class DirWorkspaceTreeView : public QTreeView {
+class DirWorkspaceTreeView : public QTreeView 
+{
     Q_OBJECT
    public:
     explicit DirWorkspaceTreeView(std::shared_ptr<MessageBus> message_bus, QFileSystemModel* model,

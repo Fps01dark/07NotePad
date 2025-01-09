@@ -8,7 +8,8 @@ class QFileSystemModel;
 class MessageBus;
 class DirWorkspaceTreeView;
 
-class DirWorkspaceDock : public QDockWidget {
+class DirWorkspaceDock : public QDockWidget 
+{
     Q_OBJECT
    public:
     explicit DirWorkspaceDock(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
