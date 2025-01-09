@@ -6,7 +6,8 @@
 
 #include "main_window.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     qSetMessagePattern(
         "[%{time process}] "
         "%{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-"
