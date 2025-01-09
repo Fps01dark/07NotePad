@@ -33,3 +33,4 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWheelEvent>
+#include <QHeaderView>

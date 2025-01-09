@@ -11,7 +11,8 @@
 #include "main_window.h"
 #include "message_bus.h"
 
-namespace {
+namespace
+{
 	const QString FILE_BACK_UP_DIR =
 		QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
 }
@@ -206,7 +207,8 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Save File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
+			if (index >= 0)
+			{
 				QString file_path = m_openedFilePath[index];
 				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
 				{
@@ -214,11 +216,13 @@ void MainCore::InitValue()
 						m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
 						qApp->applicationDirPath() + "/" + m_openedFileName[index],
 						"Text files(*.txt);;All types(*.*)");
-					if (!file_path.isEmpty()) {
+					if (!file_path.isEmpty())
+					{
 						SaveFile(index, file_path);
 					}
 				}
-				else {
+				else
+				{
 					SaveFile(index, file_path);
 				}
 			}
@@ -571,7 +575,8 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Undo", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
+			if (index >= 0)
+			{
 				m_textWidget[index]->undo();
 			}
 		});
@@ -673,6 +678,15 @@ void MainCore::InitValue()
 			m_settings->setValue("MainCore/RecentFilePaths", m_menuBar->GetRecentFiles());
 			SaveSettings();
 		});
+
+	// Debug
+	m_messageBus->Subscribe("Debug", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+			}
+		});
 }
 
 void MainCore::InitConnect()
@@ -697,9 +711,10 @@ bool MainCore::NewFile(const QString& new_file_name)
 	//QFont           font = editor->font();
 	//font.setPointSize(m_fontSize);
 	//text_widget->setFont(font);
-	// TODO
-	//connect(text_widget, &CustomTextEdit::textChanged,
-	//	[=]() { m_messageBus->Publish("Text Changed"); });
+	connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
+		{
+			m_messageBus->Publish("Text Changed");
+		});
 	m_openedFileName.append(new_file_name);
 	m_openedFilePath.append("");
 	m_savedFile.append(true);
@@ -738,9 +753,10 @@ bool MainCore::OpenFile(const QString& file_path)
 			file.close();
 
 			// 打开后处理
-			// TODO
-			//connect(text_widget, &CustomTextEdit::textChanged,
-			//	[=]() { m_messageBus->Publish("Text Changed"); });
+			connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
+				{
+					m_messageBus->Publish("Text Changed");
+				});
 			m_openedFileName.append(file_info.fileName());
 			m_openedFilePath.append(abs_file_path);
 			m_savedFile.append(true);
@@ -786,12 +802,14 @@ bool MainCore::SaveFile(int index, const QString& file_path)
 }
 
 bool MainCore::CloseFile(int index) {
-	if (index < 0 || index >= m_centralWidget->count()) {
+	if (index < 0 || index >= m_centralWidget->count())
+	{
 		return false;
 	}
 
 	// 最近文件
-	if (!m_openedFilePath[index].isEmpty()) {
+	if (!m_openedFilePath[index].isEmpty())
+	{
 		m_messageBus->Publish("Add Recent File", m_openedFilePath[index]);
 	}
 	// 关闭
@@ -828,9 +846,10 @@ bool MainCore::LoadSettings()
 			font.setPointSize(m_fontSize);
 			text_widget->setFont(font);
 			text_widget->SetText(in.readAll());
-			// TODO
-			//connect(text_widget, &CustomTextEdit::textChanged,
-			//	[=]() { m_messageBus->Publish("Text Changed"); });
+			connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
+				{
+					m_messageBus->Publish("Text Changed");
+				});
 			m_openedFileName.append(opened_file_name[index]);
 			m_openedFilePath.append(opened_file_path[index]);
 			m_savedFile.append(saved_file[index]);

@@ -24,15 +24,12 @@ CustomTextEdit::~CustomTextEdit()
 
 void CustomTextEdit::SetText(const QString& text)
 {
-	// TODO
-	//setText(text);
+	setText(text.toUtf8().constData());
 }
 
-QString CustomTextEdit::GetText() const
+QString CustomTextEdit::GetText()
 {
-	// TODO
-	//return toPlainText();
-	return "";
+	return  QString::fromUtf8(getText(length()));
 }
 
 void CustomTextEdit::wheelEvent(QWheelEvent* event)
@@ -61,7 +58,9 @@ void CustomTextEdit::InitUi()
 	SetupEditor();
 }
 
-void CustomTextEdit::InitValue() {}
+void CustomTextEdit::InitValue()
+{
+}
 
 void CustomTextEdit::InitConnect() {}
 

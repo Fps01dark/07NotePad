@@ -13,7 +13,7 @@ public:
 	explicit CustomTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
 	~CustomTextEdit();
 	void    SetText(const QString& text);
-	QString GetText() const;
+	QString GetText();
 
 protected:
 	void wheelEvent(QWheelEvent* event) override;

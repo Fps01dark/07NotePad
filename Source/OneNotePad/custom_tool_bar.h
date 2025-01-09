@@ -17,6 +17,7 @@ class CustomToolBar : public QToolBar
 
    private:
     std::shared_ptr<MessageBus> m_messageBus = nullptr;
+    QAction* m_debugAction = nullptr;
     // 工具栏
     QAction* m_newAction = nullptr;
     QAction* m_openAction = nullptr;
