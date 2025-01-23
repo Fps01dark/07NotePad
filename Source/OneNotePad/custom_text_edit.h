@@ -14,6 +14,10 @@ public:
 	~CustomTextEdit();
 	void    SetText(const QString& text);
 	QString GetText();
+	void AddText(const QString& text);
+	void Cut();
+	void Copy();
+	void Paste();
 
 protected:
 	void wheelEvent(QWheelEvent* event) override;

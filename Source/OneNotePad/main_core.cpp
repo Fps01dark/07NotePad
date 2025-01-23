@@ -13,8 +13,7 @@
 
 namespace
 {
-	const QString FILE_BACK_UP_DIR =
-		QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
+	const QString FILE_BACK_UP_DIR = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
 }
 
 MainCore::MainCore(MainWindow* main_window) : m_mainWindow(main_window), QObject(main_window)
@@ -115,14 +114,16 @@ void MainCore::InitValue()
 		});
 	m_messageBus->Subscribe("Open File", [=]()
 		{
-			QStringList&& file_paths = QFileDialog::getOpenFileNames(
-				m_mainWindow, tr("Open"), qApp->applicationDirPath(), "All types(*.*)");
+			QStringList&& file_paths = QFileDialog::getOpenFileNames(m_mainWindow, tr("Open"), "", "All types(*.*)");
 			for (const QString& file_path : file_paths)
 			{
 				OpenFile(file_path);
 			}
 		});
-	m_messageBus->Subscribe("Open File", [=](const QString& data) { OpenFile(data); });
+	m_messageBus->Subscribe("Open File", [=](const QString& data)
+		{
+			OpenFile(data);
+		});
 	m_messageBus->Subscribe("Open Explorer", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
@@ -166,8 +167,7 @@ void MainCore::InitValue()
 		});
 	m_messageBus->Subscribe("Open Directory As Workspace", [=]()
 		{
-			QString file_dir = QFileDialog::getExistingDirectory(
-				m_mainWindow, tr("Open Directory As Workspace"), qApp->applicationDirPath());
+			QString file_dir = QFileDialog::getExistingDirectory(m_mainWindow, tr("Open Directory As Workspace"), qApp->applicationDirPath());
 			if (!file_dir.isEmpty()) {
 				m_dirWorkSpace->SetRootDir(file_dir);
 				m_dirWorkSpace->show();
@@ -563,7 +563,6 @@ void MainCore::InitValue()
 			}
 		}
 		});
-
 	m_messageBus->Subscribe("Clear Recent Record", [=]()
 		{
 			m_menuBar->SetRecentFiles(QStringList());
@@ -572,6 +571,7 @@ void MainCore::InitValue()
 		{
 			m_mainWindow->close();
 		});
+
 	m_messageBus->Subscribe("Undo", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
@@ -583,9 +583,89 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Redo", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
+			if (index >= 0)
+			{
 				m_textWidget[index]->redo();
 			}
+		});
+	m_messageBus->Subscribe("Cut", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->Cut();
+			}
+		});
+	m_messageBus->Subscribe("Copy", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->Copy();
+			}
+		});
+	m_messageBus->Subscribe("Paste", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->Paste();
+			}
+		});
+	m_messageBus->Subscribe("Delete", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->clear();
+			}
+		});
+	m_messageBus->Subscribe("Select All", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->selectAll();
+			}
+		});
+	m_messageBus->Subscribe("Insert Short Time", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				QDateTime current_date_time = QDateTime::currentDateTime();
+				m_textWidget[index]->AddText(current_date_time.toString("HH:mm yyyy/MM/dd"));
+			}
+		});
+	m_messageBus->Subscribe("Insert Long Time", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				QDateTime current_date_time = QDateTime::currentDateTime();
+				qDebug() << current_date_time.toString("HH:mm yyyy年MM月dd日");
+				m_textWidget[index]->AddText(current_date_time.toString("HH:mm yyyy年MM月dd日"));
+
+			}
+		});
+	m_messageBus->Subscribe("Insert Custom Time", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				QDateTime current_date_time = QDateTime::currentDateTime();
+				m_textWidget[index]->AddText(current_date_time.toString("yyyy-MM-dd HH:mm:ss"));
+			}
+		});
+	m_messageBus->Subscribe("Copy All Names",[=]()
+		{
+			QClipboard* clipboard = QApplication::clipboard();
+
+
+		});
+	m_messageBus->Subscribe("Copy All Paths", [=]()
+		{
+			QClipboard* clipboard = QApplication::clipboard();
 		});
 
 	// Directory
@@ -635,7 +715,8 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Copy Path", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
+			if (index >= 0) 
+			{
 				QClipboard* clipboard = QApplication::clipboard();
 				clipboard->setText(m_openedFilePath[index]);
 			}
@@ -643,7 +724,8 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Copy Name", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
+			if (index >= 0) 
+			{
 				QClipboard* clipboard = QApplication::clipboard();
 				clipboard->setText(m_openedFileName[index]);
 			}
@@ -651,7 +733,8 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Copy Directory", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
+			if (index >= 0) 
+			{
 				QClipboard* clipboard = QApplication::clipboard();
 				QFileInfo   file_info(m_openedFilePath[index]);
 				clipboard->setText(file_info.absolutePath());
@@ -660,7 +743,8 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Change Zoom", [=](int data)
 		{
 			m_fontSize = data;
-			for (int i = 0; i < m_textWidget.size(); ++i) {
+			for (int i = 0; i < m_textWidget.size(); ++i) 
+			{
 				QFont font = m_textWidget[i]->font();
 				font.setPointSize(m_fontSize);
 				m_textWidget[i]->setFont(font);
@@ -742,7 +826,8 @@ bool MainCore::OpenFile(const QString& file_path)
 	{
 		// 未打开过
 		QFile file(file_path);
-		if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
 			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
@@ -881,7 +966,8 @@ bool MainCore::LoadSettings()
 	return true;
 }
 
-bool MainCore::SaveSettings() {
+bool MainCore::SaveSettings()
+{
 	// 保存上次打开文件
 	m_settings->setValue("MainCore/OpenedFilePaths", m_openedFilePath);
 	m_settings->setValue("MainCore/OpenedFileNames", m_openedFileName);

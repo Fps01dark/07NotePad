@@ -3,12 +3,14 @@
 #include "framework.h"
 #include "message_bus.h"
 
-namespace {
+namespace
+{
 	const int MAX_HISTORY_FILE_SIZE = 10;
 }
 
 CustomMenuBar::CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
-	: m_messageBus(message_bus), QMenuBar(parent) {
+	: m_messageBus(message_bus), QMenuBar(parent)
+{
 	InitUi();
 	InitValue();
 	InitConnect();
@@ -103,8 +105,11 @@ void CustomMenuBar::InitUi()
 	m_longTimeAction = m_insertMenu->addAction(tr("Long Data Time"));
 	m_customTimeAction = m_insertMenu->addAction(tr("Custom Date Time"));
 	m_copyToClipboardMenu = edit_menu->addMenu(tr("Copy To Clipboard"));
-	m_copyFilePathAction = m_copyToClipboardMenu->addAction(tr("Copy Current File Path"));
-	m_copyToClipboardMenu->addAction(tr("Copy Current File Name"));
+	m_copyFilePathAction = m_copyToClipboardMenu->addAction(tr("Copy Current Full File Path"));
+	m_copyFileNameAction = m_copyToClipboardMenu->addAction(tr("Copy Current Filename"));
+	m_copyFileDirAction = m_copyToClipboardMenu->addAction(tr("Copy Current Dir Name"));
+	m_copyAllFileNameAction = m_copyToClipboardMenu->addAction(tr("Copy All Filenames"));
+	m_copyAllFilePathAction = m_copyToClipboardMenu->addAction(tr("Copy All File Paths"));
 	// 菜单栏-查找
 
 	// 菜单栏-视图
@@ -134,41 +139,93 @@ void CustomMenuBar::InitValue()
 		});
 }
 
-void CustomMenuBar::InitConnect() {
+void CustomMenuBar::InitConnect()
+{
 	// 文件
-	connect(m_newAction, &QAction::triggered, [=]() { m_messageBus->Publish("New File"); });
-	connect(m_openAction, &QAction::triggered, [=]() { m_messageBus->Publish("Open File"); });
-	connect(m_explorerAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Open Explorer"); });
-	connect(m_cmdAction, &QAction::triggered, [=]() { m_messageBus->Publish("Open Cmd"); });
-	connect(m_defaultViewerAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Open In Default Viewer"); });
-	connect(m_folderAsWorkspace, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Open Directory Workspace"); });
-	connect(m_openFolderAsWorkspaceAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Open Directory As Workspace"); });
-	connect(m_reloadAction, &QAction::triggered, [=]() { m_messageBus->Publish("Reload File"); });
-	connect(m_saveAction, &QAction::triggered, [=]() { m_messageBus->Publish("Save File"); });
-	connect(m_saveAsAction, &QAction::triggered, [=]() { m_messageBus->Publish("Save As File"); });
-	connect(m_copySaveAsAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Save As Clipboard"); });
-	connect(m_saveAllAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Save All File"); });
-	connect(m_renameAction, &QAction::triggered, [=]() { m_messageBus->Publish("Save As File"); });
-	connect(m_closeAction, &QAction::triggered, [=]() { m_messageBus->Publish("Close File"); });
-	connect(m_closeAllAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Close All File"); });
-	connect(m_closeAllButCurrentAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Close All But Current File"); });
-	connect(m_closeLeftAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Close Left File"); });
-	connect(m_closeRightAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Close Right File"); });
-	connect(m_closeAllUnchangeAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Close All Unchanged File"); });
-	connect(m_deleteFileAction, &QAction::triggered,
-		[=]() { m_messageBus->Publish("Delete File"); });
-	connect(m_printAction, &QAction::triggered, [=]() { m_messageBus->Publish("Print"); });
+	connect(m_newAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("New File");
+		});
+	connect(m_openAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open File");
+		});
+	connect(m_explorerAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open Explorer");
+		});
+	connect(m_cmdAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open Cmd");
+		});
+	connect(m_defaultViewerAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open In Default Viewer");
+		});
+	connect(m_folderAsWorkspace, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open Directory Workspace");
+		});
+	connect(m_openFolderAsWorkspaceAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Open Directory As Workspace");
+		});
+	connect(m_reloadAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Reload File");
+		});
+	connect(m_saveAction, &QAction::triggered, [=]() 
+		{ 
+			m_messageBus->Publish("Save File");
+		});
+	connect(m_saveAsAction, &QAction::triggered, [=]() 
+		{ 
+			m_messageBus->Publish("Save As File"); 
+		});
+	connect(m_copySaveAsAction, &QAction::triggered,[=]() 
+		{ 
+			m_messageBus->Publish("Save As Clipboard"); 
+		});
+	connect(m_saveAllAction, &QAction::triggered,[=]() 
+		{
+			m_messageBus->Publish("Save All File");
+		});
+	connect(m_renameAction, &QAction::triggered, [=]() 
+		{
+			m_messageBus->Publish("Save As File"); 
+		});
+	connect(m_closeAction, &QAction::triggered, [=]() 
+		{ 
+			m_messageBus->Publish("Close File"); 
+		});
+	connect(m_closeAllAction, &QAction::triggered,[=]() 
+		{ 
+			m_messageBus->Publish("Close All File"); 
+		});
+	connect(m_closeAllButCurrentAction, &QAction::triggered,[=]() 
+		{ 
+			m_messageBus->Publish("Close All But Current File");
+		});
+	connect(m_closeLeftAction, &QAction::triggered,	[=]() 
+		{ 
+			m_messageBus->Publish("Close Left File"); 
+		});
+	connect(m_closeRightAction, &QAction::triggered,[=]() 
+		{
+			m_messageBus->Publish("Close Right File"); 
+		});
+	connect(m_closeAllUnchangeAction, &QAction::triggered,	[=]() 
+		{ 
+			m_messageBus->Publish("Close All Unchanged File"); 
+		});
+	connect(m_deleteFileAction, &QAction::triggered,[=]() 
+		{ 
+			m_messageBus->Publish("Delete File");
+		});
+	connect(m_printAction, &QAction::triggered, [=]() 
+		{ 
+			m_messageBus->Publish("Print"); 
+		});
 	connect(m_openAllRecentAction, &QAction::triggered, [=]()
 		{
 			for (auto action : m_recentFileMenu->actions())
@@ -185,6 +242,64 @@ void CustomMenuBar::InitConnect() {
 			m_messageBus->Publish("Exit Software");
 		});
 	// 编辑
-	connect(m_undoAction, &QAction::triggered, [=]() { m_messageBus->Publish("Undo"); });
-	connect(m_redoAction, &QAction::triggered, [=]() { m_messageBus->Publish("Redo"); });
+	connect(m_undoAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Undo");
+		});
+	connect(m_redoAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Redo");
+		});
+	connect(m_cutAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Cut");
+		});
+	connect(m_copyAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Copy");
+		});
+	connect(m_pasteAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Paste");
+		});
+	connect(m_deleteTextAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Delete");
+		});
+	connect(m_selectAllAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Select All");
+		});
+	connect(m_shortTimeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Insert Short Time");
+		});
+	connect(m_longTimeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Insert Long Time");
+		});
+	connect(m_customTimeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Insert Custom Time");
+		});
+	connect(m_copyFilePathAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Copy Path");
+		});
+	connect(m_copyFileNameAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Copy Name");
+		});
+	connect(m_copyFileDirAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Copy Directory");
+		});
+	connect(m_copyAllFileNameAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Copy All Names");
+		});
+	connect(m_copyAllFilePathAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Copy All Paths");
+		});
 }

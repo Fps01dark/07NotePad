@@ -32,6 +32,33 @@ QString CustomTextEdit::GetText()
 	return  QString::fromUtf8(getText(length()));
 }
 
+void CustomTextEdit::AddText(const QString& text)
+{
+	addText(text.toUtf8().length(), text.toUtf8().constData());
+}
+
+void CustomTextEdit::Cut()
+{
+	if (selectionEmpty())
+	{
+		cutAllowLine();
+	}
+	else
+	{
+		cut();
+	}
+}
+
+void CustomTextEdit::Copy()
+{
+	copyAllowLine();
+}
+
+void CustomTextEdit::Paste()
+{
+	paste();
+}
+
 void CustomTextEdit::wheelEvent(QWheelEvent* event)
 {
 	if (event->modifiers() & Qt::ControlModifier)

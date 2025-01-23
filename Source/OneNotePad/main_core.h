@@ -28,7 +28,6 @@ private:
 	void InitValue();
 	void InitConnect();
 	// 文件
-
 	bool NewFile(const QString& new_file_name);
 	bool OpenFile(const QString& file_path);
 	bool SaveFile(int index, const QString& file_path);
@@ -46,10 +45,10 @@ private:
 	CustomTabBar* m_tabBar = nullptr;
 	CustomTabWidget* m_centralWidget = nullptr;
 	DirWorkspaceDock* m_dirWorkSpace = nullptr;
-	int                         m_fontSize = 9;
+	int m_fontSize = 9;
 	// 以下数量保持一致，下标为 m_centralWidget Tab下标
-	QList<QString>         m_openedFileName;
-	QList<QString>         m_openedFilePath;
-	QList<bool>            m_savedFile;
+	QList<QString> m_openedFileName;
+	QList<QString> m_openedFilePath;
+	QList<bool> m_savedFile;
 	QList<CustomTextEdit*> m_textWidget;
 };
