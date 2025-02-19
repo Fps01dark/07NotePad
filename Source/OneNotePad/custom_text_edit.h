@@ -12,12 +12,14 @@ class CustomTextEdit : public ScintillaEdit
 public:
 	explicit CustomTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
 	~CustomTextEdit();
-	void    SetText(const QString& text);
-	QString GetText();
-	void AddText(const QString& text);
+	QString GetFileName() const;
+	void SetFileName(const QString& file_name);
+	QString GetFilePath() const;
+	void SetFilePath(const QString& file_path);
+	bool GetSaveStatus() const;
+	void SetSaveStatus(bool save_status);
 	void Cut();
-	void Copy();
-	void Paste();
+	QString GetEOLString() const;
 
 protected:
 	void wheelEvent(QWheelEvent* event) override;
@@ -30,4 +32,8 @@ private:
 
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;
+
+	QString m_fileName;
+	QString m_filePath;
+	bool m_savedStatus;
 };

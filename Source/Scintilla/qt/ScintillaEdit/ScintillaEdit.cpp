@@ -1,4 +1,4 @@
-// @file ScintillaEdit.cpp
+﻿// @file ScintillaEdit.cpp
 // Extended version of ScintillaEditBase with a method for each API
 // Copyright (c) 2011 Archaeopteryx Software, Inc. d/b/a Wingware
 

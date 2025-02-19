@@ -2,6 +2,7 @@
 
 #include "framework.h"
 #include "message_bus.h"
+#include "custom_text_edit.h"
 
 namespace
 {
@@ -16,7 +17,9 @@ CustomMenuBar::CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* p
 	InitConnect();
 }
 
-CustomMenuBar::~CustomMenuBar() {}
+CustomMenuBar::~CustomMenuBar()
+{
+}
 
 void CustomMenuBar::SetRecentFiles(const QStringList& recent_list)
 {
@@ -50,6 +53,21 @@ QStringList CustomMenuBar::GetRecentFiles() const
 	return recent_files;
 }
 
+void CustomMenuBar::UpdateEOLAction(CustomTextEdit* editor)
+{
+	switch (editor->eOLMode())
+	{
+	case SC_EOL_CRLF:
+		m_eolWindowsAction->setChecked(true);
+		break;
+	case SC_EOL_CR:
+		m_eolMacintoshAction->setChecked(true);
+		break;
+	case SC_EOL_LF:
+		m_eolUnixAction->setChecked(true);
+		break;
+	}
+}
 void CustomMenuBar::InitUi()
 {
 	// 菜单栏-文件
@@ -108,19 +126,68 @@ void CustomMenuBar::InitUi()
 	m_copyFilePathAction = m_copyToClipboardMenu->addAction(tr("Copy Current Full File Path"));
 	m_copyFileNameAction = m_copyToClipboardMenu->addAction(tr("Copy Current Filename"));
 	m_copyFileDirAction = m_copyToClipboardMenu->addAction(tr("Copy Current Dir Name"));
+	m_copyToClipboardMenu->addSeparator();
 	m_copyAllFileNameAction = m_copyToClipboardMenu->addAction(tr("Copy All Filenames"));
 	m_copyAllFilePathAction = m_copyToClipboardMenu->addAction(tr("Copy All File Paths"));
+	m_indentMenu = edit_menu->addMenu(tr("Indent"));
+	m_insertLineIndentAction = m_indentMenu->addAction(tr("Increase Line Indent"));
+	m_deleteLineIndentAction = m_indentMenu->addAction(tr("Decrease Line Indent"));
+	m_convertCaseMenu = edit_menu->addMenu(tr("Convert Case To"));
+	m_UPPERCASEAction = m_convertCaseMenu->addAction(tr("UPPERCASE"));
+	m_lowercaseAction = m_convertCaseMenu->addAction(tr("lowercase"));
+	m_lineOperationsMenu = edit_menu->addMenu(tr("Line Operations"));
+	m_duplicateCurrentLineAction = m_lineOperationsMenu->addAction(tr("Duplicate Current Line"));
+	m_removeDuplicateLinesAction = m_lineOperationsMenu->addAction(tr("Remove Duplicate Lines(未实现)"));
+	m_removeConsecutiveDuplicateLinesAction = m_lineOperationsMenu->addAction(tr("Remove Consecutive Duplicate Lines(未实现)"));
+	m_splitLinesAction = m_lineOperationsMenu->addAction(tr("Split Lines"));
+	m_joinLinesAction = m_lineOperationsMenu->addAction(tr("Join Lines"));
+	m_moveUpCurrentLineAction = m_lineOperationsMenu->addAction(tr("Move Up Current Line"));
+	m_moveDownCurrentLineAction = m_lineOperationsMenu->addAction(tr("Move Down Current Line"));
+	m_removeEmptyLinesAction = m_lineOperationsMenu->addAction(tr("Remove Empty Lines(未实现)"));
+	m_removeEmptyLinesBlankAction = m_lineOperationsMenu->addAction(tr("Remove Empty Lines(Containing Blank Characters)(未实现)"));
+	m_insertBlankLineAboveCurrentAction = m_lineOperationsMenu->addAction(tr("Insert Blank Line Above Current"));
+	m_insertBlankLineBelowCurrentAction = m_lineOperationsMenu->addAction(tr("Insert Blank Line Below Current"));
+	m_reverseLineOrderAction = m_lineOperationsMenu->addAction(tr("Reverse Line Order"));
+	m_randomizeLineOrderAction = m_lineOperationsMenu->addAction(tr("Randomize Line Order"));
+	m_lineOperationsMenu->addSeparator();
+	m_eolConvertMenu = edit_menu->addMenu(tr("EOL Conversion"));
+	m_eolWindowsAction = m_eolConvertMenu->addAction(tr("Windows(CR LF)"));
+	m_eolUnixAction = m_eolConvertMenu->addAction(tr("Unix(LF)"));
+	m_eolMacintoshAction = m_eolConvertMenu->addAction(tr("Macintosh(CR)"));
 	// 菜单栏-查找
-
+	QMenu* search_menu = this->addMenu(tr("Search"));
+	m_findAction = search_menu->addAction(tr("Find"));
 	// 菜单栏-视图
-
+	QMenu* view_menu = this->addMenu(tr("View"));
+	m_alwaysOnTopAction = view_menu->addAction(tr("Always On Top"));
 	// 菜单栏-编码
-
+	QMenu* encoding_menu = this->addMenu(tr("Encoding"));
+	m_anslAction = encoding_menu->addAction(tr("ANSI"));
 	// 菜单栏-语言
-
+	QMenu* language_menu = this->addMenu(tr("Language"));
+	m_noneAction = language_menu->addAction(tr("None(Normal Text)"));
 	// 菜单栏-设置
-
-	// 菜单栏-关于
+	QMenu* settings_menu = this->addMenu(tr("Settings"));
+	m_preferencesAction = settings_menu->addAction(tr("Preferences"));
+	// 菜单栏-工具
+	QMenu* tools_menu = this->addMenu(tr("Tools"));
+	m_md5Menu = tools_menu->addMenu(tr("MD5"));
+	// 菜单栏-宏
+	QMenu* macro_menu = this->addMenu(tr("Macro"));
+	m_startRecordingAction = macro_menu->addAction(tr("Start Recording"));
+	// 菜单栏-运行
+	QMenu* run_menu = this->addMenu(tr("Run"));
+	m_runAction = run_menu->addAction(tr("Run"));
+	// 菜单栏-插件
+	QMenu* plugins_menu = this->addMenu(tr("Plugins"));
+	m_openPluginsFolderAction = plugins_menu->addAction(tr("Open Plugins Folder"));
+	// 菜单栏-窗口
+	QMenu* window_menu = this->addMenu(tr("Window"));
+	m_sortByMenu = window_menu->addMenu(tr("Sort By"));
+	// 菜单栏-帮助
+	QMenu* help_menu = this->addMenu(tr("Help"));
+	m_commandLineArgumentsAction = help_menu->addAction(tr("Command Line Arguments"));
+	m_debugAction = help_menu->addAction(tr("Debug"));
 }
 
 void CustomMenuBar::InitValue()
@@ -174,57 +241,57 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Reload File");
 		});
-	connect(m_saveAction, &QAction::triggered, [=]() 
-		{ 
+	connect(m_saveAction, &QAction::triggered, [=]()
+		{
 			m_messageBus->Publish("Save File");
 		});
-	connect(m_saveAsAction, &QAction::triggered, [=]() 
-		{ 
-			m_messageBus->Publish("Save As File"); 
+	connect(m_saveAsAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Save As File");
 		});
-	connect(m_copySaveAsAction, &QAction::triggered,[=]() 
-		{ 
-			m_messageBus->Publish("Save As Clipboard"); 
+	connect(m_copySaveAsAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Save As Clipboard");
 		});
-	connect(m_saveAllAction, &QAction::triggered,[=]() 
+	connect(m_saveAllAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Save All File");
 		});
-	connect(m_renameAction, &QAction::triggered, [=]() 
+	connect(m_renameAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Save As File"); 
+			m_messageBus->Publish("Save As File");
 		});
-	connect(m_closeAction, &QAction::triggered, [=]() 
-		{ 
-			m_messageBus->Publish("Close File"); 
+	connect(m_closeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close File");
 		});
-	connect(m_closeAllAction, &QAction::triggered,[=]() 
-		{ 
-			m_messageBus->Publish("Close All File"); 
+	connect(m_closeAllAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close All File");
 		});
-	connect(m_closeAllButCurrentAction, &QAction::triggered,[=]() 
-		{ 
+	connect(m_closeAllButCurrentAction, &QAction::triggered, [=]()
+		{
 			m_messageBus->Publish("Close All But Current File");
 		});
-	connect(m_closeLeftAction, &QAction::triggered,	[=]() 
-		{ 
-			m_messageBus->Publish("Close Left File"); 
-		});
-	connect(m_closeRightAction, &QAction::triggered,[=]() 
+	connect(m_closeLeftAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Close Right File"); 
+			m_messageBus->Publish("Close Left File");
 		});
-	connect(m_closeAllUnchangeAction, &QAction::triggered,	[=]() 
-		{ 
-			m_messageBus->Publish("Close All Unchanged File"); 
+	connect(m_closeRightAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close Right File");
 		});
-	connect(m_deleteFileAction, &QAction::triggered,[=]() 
-		{ 
+	connect(m_closeAllUnchangeAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Close All Unchanged File");
+		});
+	connect(m_deleteFileAction, &QAction::triggered, [=]()
+		{
 			m_messageBus->Publish("Delete File");
 		});
-	connect(m_printAction, &QAction::triggered, [=]() 
-		{ 
-			m_messageBus->Publish("Print"); 
+	connect(m_printAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Print");
 		});
 	connect(m_openAllRecentAction, &QAction::triggered, [=]()
 		{
@@ -301,5 +368,91 @@ void CustomMenuBar::InitConnect()
 	connect(m_copyAllFilePathAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Copy All Paths");
+		});
+	connect(m_insertLineIndentAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Increase Line Indent");
+		});
+	connect(m_deleteLineIndentAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Decrease Line Indent");
+		});
+	connect(m_UPPERCASEAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("UPPERCASE");
+		});
+	connect(m_lowercaseAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("lowercase");
+		});
+	connect(m_duplicateCurrentLineAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Duplicate Current Line");
+		});
+	connect(m_removeDuplicateLinesAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Remove Duplicate Line");
+		});
+	connect(m_removeConsecutiveDuplicateLinesAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Remove Consecutive Duplicate Lines");
+		});
+	connect(m_splitLinesAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Split Lines");
+		});
+	connect(m_joinLinesAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Join Lines");
+		});
+	connect(m_moveUpCurrentLineAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Move Up Current Line");
+		});
+	connect(m_moveDownCurrentLineAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Move Down Current Line");
+		});
+	connect(m_removeEmptyLinesAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Remove Empty Lines");
+		});
+	connect(m_removeEmptyLinesBlankAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Remove Empty Lines Blank");
+		});
+	connect(m_insertBlankLineAboveCurrentAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Insert Blank Line Above Current");
+		});
+	connect(m_insertBlankLineBelowCurrentAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Insert Blank Line Below Current");
+		});
+	connect(m_reverseLineOrderAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Reverse Line Order");
+		});
+	connect(m_randomizeLineOrderAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Randomize Line Order");
+		});
+
+	connect(m_eolWindowsAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("EOL Conversion", SC_EOL_CRLF);
+		});
+	connect(m_eolUnixAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("EOL Conversion", SC_EOL_LF);
+		});
+	connect(m_eolMacintoshAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("EOL Conversion", SC_EOL_CR);
+		});
+
+	connect(m_debugAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Debug");
 		});
 }

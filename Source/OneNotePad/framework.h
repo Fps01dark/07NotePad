@@ -34,3 +34,8 @@
 #include <QVariant>
 #include <QWheelEvent>
 #include <QHeaderView>
+#include <QPrintPreviewDialog>
+#include <QActionGroup>
+#include <QLabel>
+#include <QDebug>
+#include <QPair>

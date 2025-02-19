@@ -22,19 +22,34 @@ CustomTextEdit::~CustomTextEdit()
 {
 }
 
-void CustomTextEdit::SetText(const QString& text)
+QString CustomTextEdit::GetFileName() const
 {
-	setText(text.toUtf8().constData());
+	return m_fileName;
 }
 
-QString CustomTextEdit::GetText()
+void CustomTextEdit::SetFileName(const QString& file_name)
 {
-	return  QString::fromUtf8(getText(length()));
+	m_fileName = file_name;
 }
 
-void CustomTextEdit::AddText(const QString& text)
+QString CustomTextEdit::GetFilePath() const
 {
-	addText(text.toUtf8().length(), text.toUtf8().constData());
+	return m_filePath;
+}
+
+void CustomTextEdit::SetFilePath(const QString& file_path)
+{
+	m_filePath = file_path;
+}
+
+bool CustomTextEdit::GetSaveStatus() const
+{
+	return m_savedStatus;
+}
+
+void CustomTextEdit::SetSaveStatus(bool save_status)
+{
+	m_savedStatus = save_status;
 }
 
 void CustomTextEdit::Cut()
@@ -49,14 +64,21 @@ void CustomTextEdit::Cut()
 	}
 }
 
-void CustomTextEdit::Copy()
+QString CustomTextEdit::GetEOLString() const
 {
-	copyAllowLine();
-}
-
-void CustomTextEdit::Paste()
-{
-	paste();
+	sptr_t eol_mode = eOLMode();
+	if (eol_mode == SC_EOL_CRLF)
+	{
+		return "\r\n";
+	}
+	else if (eol_mode == SC_EOL_LF)
+	{
+		return "\n";
+	}
+	else
+	{
+		return "\r";
+	}
 }
 
 void CustomTextEdit::wheelEvent(QWheelEvent* event)
@@ -89,7 +111,9 @@ void CustomTextEdit::InitValue()
 {
 }
 
-void CustomTextEdit::InitConnect() {}
+void CustomTextEdit::InitConnect()
+{
+}
 
 void CustomTextEdit::SetupEditor()
 {
@@ -235,7 +259,7 @@ void CustomTextEdit::SetupEditor()
 	// 设置如何显示空白字符的方式
 	this->setViewWS(/*m_settings->showWhitespace() ? SCWS_VISIBLEALWAYS :*/ SCWS_INVISIBLE);
 	// 用于控制行结束符（End of Line, EOL）的显示方式
-	this->setViewEOL(/*m_settings->showEndOfLine()*/false);
+	this->setViewEOL(/*m_settings->showEndOfLine()*/true);
 	// 用于控制文本行换行时显示的可视化标记
 	this->setWrapVisualFlags(/*m_settings->showWrapSymbol() ? SC_WRAPVISUALFLAG_END : */SC_WRAPVISUALFLAG_NONE);
 	// 设置缩进引导线（Indentation Guides）显示方式的消息

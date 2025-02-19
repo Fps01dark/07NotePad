@@ -1,5 +1,6 @@
 ﻿#include "main_core.h"
 
+#include "framework.h"
 #include "custom_menu_bar.h"
 #include "custom_settings.h"
 #include "custom_tab_bar.h"
@@ -7,7 +8,6 @@
 #include "custom_text_edit.h"
 #include "custom_tool_bar.h"
 #include "dir_workspace_dock.h"
-#include "framework.h"
 #include "main_window.h"
 #include "message_bus.h"
 
@@ -90,27 +90,38 @@ void MainCore::InitValue()
 			else
 			{
 				QString win_title;
-				if (index < m_openedFilePath.size())
+				if (index < m_textWidget.size())
 				{
-					win_title = m_openedFilePath[index];
+					win_title = m_textWidget[index]->GetFilePath();
 				}
-				if (win_title.isEmpty() && index < m_openedFileName.size())
+				if (win_title.isEmpty() && index < m_textWidget.size())
 				{
-					win_title = m_openedFileName[index];
+					win_title = m_textWidget[index]->GetFileName();
 				}
 				m_mainWindow->setWindowTitle(win_title + " - OneNotePad");
 			}
 		});
 	m_messageBus->Subscribe("New File", [=]()
 		{
-			static int     index = 0;
-			QString new_file_name = tr("new ") + QString::number(index);
-			while (m_openedFileName.contains(new_file_name))
+			static int count = 0;
+			while (true)
 			{
-				index++;
-				new_file_name = tr("new ") + QString::number(index);
+				QString new_file_name = tr("new %1").arg(count++);
+				bool can_use_name = true;
+				for (int i = 0; i < m_textWidget.size(); ++i)
+				{
+					if (m_textWidget[i]->GetFileName() == new_file_name)
+					{
+						can_use_name = false;
+						break;
+					}
+				}
+				if (can_use_name)
+				{
+					NewFile(new_file_name);
+					break;
+				}
 			}
-			NewFile(new_file_name);
 		});
 	m_messageBus->Subscribe("Open File", [=]()
 		{
@@ -127,8 +138,9 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Open Explorer", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
-				QString   file_path = m_openedFilePath[index];
+			if (index >= 0)
+			{
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				QFileInfo file_info(file_path);
 				QDesktopServices::openUrl(QUrl::fromLocalFile(file_info.absolutePath()));
 			}
@@ -140,8 +152,9 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Open Cmd", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
-				QString   file_path = m_openedFilePath[index];
+			if (index >= 0)
+			{
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				QFileInfo file_info(file_path);
 				QString   file_dir = file_info.absolutePath();
 				// 启动命令行窗口并进入文件所在目录
@@ -156,10 +169,12 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Open Directory Workspace", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
-				QString   file_path = m_openedFilePath[index];
+			if (index >= 0)
+			{
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				QFileInfo file_info(file_path);
-				if (!file_path.isEmpty()) {
+				if (!file_path.isEmpty())
+				{
 					m_dirWorkSpace->SetRootDir(file_info.absolutePath());
 					m_dirWorkSpace->show();
 				}
@@ -176,8 +191,9 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Open In Default Viewer", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
-				QString file_path = m_openedFilePath[index];
+			if (index >= 0)
+			{
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				QDesktopServices::openUrl(QUrl::fromLocalFile(file_path));
 			}
 		});
@@ -188,17 +204,21 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Reload File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
-				QString file_path = m_openedFilePath[index];
+			if (index >= 0)
+			{
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
 				{
 				}
-				else {
+				else
+				{
 					QFile file(file_path);
-					if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+					if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+					{
 						QTextStream in(&file);
 						in.setEncoding(QStringConverter::Utf8);
-						m_textWidget[index]->SetText(in.readAll());
+						// TODO:不一定是UTF-8编码格式的数据
+						m_textWidget[index]->setText(in.readAll().toUtf8().constData());
 						file.close();
 					}
 				}
@@ -209,12 +229,12 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				QString file_path = m_openedFilePath[index];
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
 				{
 					file_path = QFileDialog::getSaveFileName(
-						m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-						qApp->applicationDirPath() + "/" + m_openedFileName[index],
+						m_mainWindow, tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+						qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
 						"Text files(*.txt);;All types(*.*)");
 					if (!file_path.isEmpty())
 					{
@@ -233,8 +253,8 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				QString file_path = QFileDialog::getSaveFileName(
-					m_mainWindow, tr("Save As File") + "\"" + m_openedFileName[index] + "\"",
-					qApp->applicationDirPath() + "/" + m_openedFileName[index],
+					m_mainWindow, tr("Save As File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+					qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
 					"Text files(*.txt);;All types(*.*)");
 				if (!file_path.isEmpty()) {
 					SaveFile(index, file_path);
@@ -245,12 +265,12 @@ void MainCore::InitValue()
 		{
 			for (int index = 0; index < m_centralWidget->count(); ++index)
 			{
-				QString file_path = m_openedFilePath[index];
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				if (file_path.isEmpty() || !QFileInfo::exists(file_path))
 				{
 					file_path = QFileDialog::getSaveFileName(
-						m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-						qApp->applicationDirPath() + "/" + m_openedFileName[index],
+						m_mainWindow, tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+						qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
 						"Text files(*.txt);;All types(*.*)");
 					if (!file_path.isEmpty())
 					{
@@ -287,24 +307,111 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				if (m_savedFile[index] == true)
+				if (m_textWidget[index]->GetSaveStatus() == true)
 				{
 					CloseFile(index);
 				}
 				else
 				{
 					QMessageBox question_box(QMessageBox::Question, tr("Save File"),
-						tr("Save file") + "\"" + m_openedFileName[index] + "\"?",
+						tr("Save file") + "\"" + m_textWidget[index]->GetFileName() + "\"?",
+						QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString&& file_path = m_textWidget[index]->GetFilePath();
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(
+								m_mainWindow, tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+								qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
+								"Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty())
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else {
+							SaveFile(index, file_path);
+							CloseFile(index);
+						}
+					}
+					else if (ret == QMessageBox::No) {
+						CloseFile(index);
+					}
+					else if (ret == QMessageBox::Cancel) {
+					}
+				}
+			}
+		});
+	m_messageBus->Subscribe("Close File", [=](int index)
+		{
+			if (index >= 0 && index < m_centralWidget->count())
+			{
+				if (m_textWidget[index]->GetSaveStatus() == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"),
+						tr("Save file") + "\"" + m_textWidget[index]->GetFileName() + "\"?",
+						QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString&& file_path = m_textWidget[index]->GetFilePath();
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(
+								m_mainWindow, tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+								qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
+								"Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty()) {
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else {
+							SaveFile(index, file_path);
+							CloseFile(index);
+						}
+					}
+					else if (ret == QMessageBox::No) {
+						CloseFile(index);
+					}
+					else if (ret == QMessageBox::Cancel) {
+					}
+				}
+			}
+		});
+	m_messageBus->Subscribe("Close All File", [=]()
+		{
+			for (int index = m_centralWidget->count() - 1; index >= 0; --index)
+			{
+				if (m_textWidget[index]->GetSaveStatus() == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"),
+						tr("Save file") + "\"" + m_textWidget[index]->GetFileName() + "\"?",
 						QMessageBox::Ok, m_mainWindow);
 					question_box.addButton(QMessageBox::No);
 					question_box.addButton(QMessageBox::Cancel);
 					int ret = question_box.exec();
 					if (ret == QMessageBox::Ok) {
-						QString file_path = m_openedFilePath[index];
+						QString&& file_path = m_textWidget[index]->GetFilePath();
 						if (file_path.isEmpty() || !QFileInfo::exists(file_path)) {
 							file_path = QFileDialog::getSaveFileName(
-								m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-								qApp->applicationDirPath() + "/" + m_openedFileName[index],
+								m_mainWindow, tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+								qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
 								"Text files(*.txt);;All types(*.*)");
 							if (!file_path.isEmpty()) {
 								SaveFile(index, file_path);
@@ -324,101 +431,74 @@ void MainCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close File", [=](int index) {
-		if (index >= 0 && index < m_centralWidget->count()) {
-			if (m_savedFile[index] == true) {
-				CloseFile(index);
-			}
-			else {
-				QMessageBox question_box(QMessageBox::Question, tr("Save File"),
-					tr("Save file") + "\"" + m_openedFileName[index] + "\"?",
-					QMessageBox::Ok, m_mainWindow);
-				question_box.addButton(QMessageBox::No);
-				question_box.addButton(QMessageBox::Cancel);
-				int ret = question_box.exec();
-				if (ret == QMessageBox::Ok) {
-					QString file_path = m_openedFilePath[index];
-					if (file_path.isEmpty() || !QFileInfo::exists(file_path)) {
-						file_path = QFileDialog::getSaveFileName(
-							m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-							qApp->applicationDirPath() + "/" + m_openedFileName[index],
-							"Text files(*.txt);;All types(*.*)");
-						if (!file_path.isEmpty()) {
-							SaveFile(index, file_path);
-							CloseFile(index);
-						}
-					}
-					else {
-						SaveFile(index, file_path);
+	m_messageBus->Subscribe("Close All But Current File", [=]()
+		{
+			for (int index = m_centralWidget->count() - 1; index >= 0; --index)
+			{
+				if (index != m_centralWidget->currentIndex())
+				{
+					if (m_textWidget[index]->GetSaveStatus() == true)
+					{
 						CloseFile(index);
 					}
-				}
-				else if (ret == QMessageBox::No) {
-					CloseFile(index);
-				}
-				else if (ret == QMessageBox::Cancel) {
-				}
-			}
-		}
-		});
-	m_messageBus->Subscribe("Close All File", [=]() {
-		for (int index = m_centralWidget->count() - 1; index >= 0; --index) {
-			if (m_savedFile[index] == true) {
-				CloseFile(index);
-			}
-			else {
-				QMessageBox question_box(QMessageBox::Question, tr("Save File"),
-					tr("Save file") + "\"" + m_openedFileName[index] + "\"?",
-					QMessageBox::Ok, m_mainWindow);
-				question_box.addButton(QMessageBox::No);
-				question_box.addButton(QMessageBox::Cancel);
-				int ret = question_box.exec();
-				if (ret == QMessageBox::Ok) {
-					QString file_path = m_openedFilePath[index];
-					if (file_path.isEmpty() || !QFileInfo::exists(file_path)) {
-						file_path = QFileDialog::getSaveFileName(
-							m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-							qApp->applicationDirPath() + "/" + m_openedFileName[index],
-							"Text files(*.txt);;All types(*.*)");
-						if (!file_path.isEmpty()) {
-							SaveFile(index, file_path);
+					else {
+						QMessageBox question_box(
+							QMessageBox::Question, tr("Save File"),
+							tr("Save file") + "\"" + m_textWidget[index]->GetFileName() + "\"?", QMessageBox::Ok,
+							m_mainWindow);
+						question_box.addButton(QMessageBox::No);
+						question_box.addButton(QMessageBox::Cancel);
+						int ret = question_box.exec();
+						if (ret == QMessageBox::Ok)
+						{
+							QString&& file_path = m_textWidget[index]->GetFilePath();
+							if (file_path.isEmpty() || !QFileInfo::exists(file_path)) {
+								file_path = QFileDialog::getSaveFileName(
+									m_mainWindow,
+									tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+									qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
+									"Text files(*.txt);;All types(*.*)");
+								if (!file_path.isEmpty()) {
+									SaveFile(index, file_path);
+									CloseFile(index);
+								}
+							}
+							else {
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else if (ret == QMessageBox::No) {
 							CloseFile(index);
 						}
+						else if (ret == QMessageBox::Cancel) {
+						}
 					}
-					else {
-						SaveFile(index, file_path);
-						CloseFile(index);
-					}
-				}
-				else if (ret == QMessageBox::No) {
-					CloseFile(index);
-				}
-				else if (ret == QMessageBox::Cancel) {
 				}
 			}
-		}
 		});
-	m_messageBus->Subscribe("Close All But Current File", [=]() {
-		for (int index = m_centralWidget->count() - 1; index >= 0; --index) {
-			if (index != m_centralWidget->currentIndex()) {
-				if (m_savedFile[index] == true) {
+	m_messageBus->Subscribe("Close Left File", [=]()
+		{
+			int current_index = m_centralWidget->currentIndex();
+			for (int index = current_index - 1; index >= 0; --index)
+			{
+				if (m_textWidget[index]->GetSaveStatus() == true) {
 					CloseFile(index);
 				}
 				else {
-					QMessageBox question_box(
-						QMessageBox::Question, tr("Save File"),
-						tr("Save file") + "\"" + m_openedFileName[index] + "\"?", QMessageBox::Ok,
-						m_mainWindow);
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"),
+						tr("Save file") + "\"" + m_textWidget[index]->GetFileName() + "\"?",
+						QMessageBox::Ok, m_mainWindow);
 					question_box.addButton(QMessageBox::No);
 					question_box.addButton(QMessageBox::Cancel);
 					int ret = question_box.exec();
-					if (ret == QMessageBox::Ok) {
-						QString file_path = m_openedFilePath[index];
+					if (ret == QMessageBox::Ok)
+					{
+						QString&& file_path = m_textWidget[index]->GetFilePath();
 						if (file_path.isEmpty() || !QFileInfo::exists(file_path)) {
 							file_path = QFileDialog::getSaveFileName(
-								m_mainWindow,
-								tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-								qApp->applicationDirPath() + "/" + m_openedFileName[index],
+								m_mainWindow, tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+								qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
 								"Text files(*.txt);;All types(*.*)");
 							if (!file_path.isEmpty()) {
 								SaveFile(index, file_path);
@@ -437,95 +517,68 @@ void MainCore::InitValue()
 					}
 				}
 			}
-		}
 		});
-	m_messageBus->Subscribe("Close Left File", [=]() {
-		int current_index = m_centralWidget->currentIndex();
-		for (int index = current_index - 1; index >= 0; --index) {
-			if (m_savedFile[index] == true) {
-				CloseFile(index);
-			}
-			else {
-				QMessageBox question_box(QMessageBox::Question, tr("Save File"),
-					tr("Save file") + "\"" + m_openedFileName[index] + "\"?",
-					QMessageBox::Ok, m_mainWindow);
-				question_box.addButton(QMessageBox::No);
-				question_box.addButton(QMessageBox::Cancel);
-				int ret = question_box.exec();
-				if (ret == QMessageBox::Ok) {
-					QString file_path = m_openedFilePath[index];
-					if (file_path.isEmpty() || !QFileInfo::exists(file_path)) {
-						file_path = QFileDialog::getSaveFileName(
-							m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-							qApp->applicationDirPath() + "/" + m_openedFileName[index],
-							"Text files(*.txt);;All types(*.*)");
-						if (!file_path.isEmpty()) {
+	m_messageBus->Subscribe("Close Right File", [=]()
+		{
+			int current_index = m_centralWidget->currentIndex();
+			for (int index = m_centralWidget->count() - 1; index >= current_index + 1; --index)
+			{
+				if (m_textWidget[index]->GetSaveStatus() == true)
+				{
+					CloseFile(index);
+				}
+				else
+				{
+					QMessageBox question_box(QMessageBox::Question, tr("Save File"),
+						tr("Save file") + "\"" + m_textWidget[index]->GetFileName() + "\"?",
+						QMessageBox::Ok, m_mainWindow);
+					question_box.addButton(QMessageBox::No);
+					question_box.addButton(QMessageBox::Cancel);
+					int ret = question_box.exec();
+					if (ret == QMessageBox::Ok)
+					{
+						QString&& file_path = m_textWidget[index]->GetFilePath();
+						if (file_path.isEmpty() || !QFileInfo::exists(file_path))
+						{
+							file_path = QFileDialog::getSaveFileName(
+								m_mainWindow, tr("Save File") + "\"" + m_textWidget[index]->GetFileName() + "\"",
+								qApp->applicationDirPath() + "/" + m_textWidget[index]->GetFileName(),
+								"Text files(*.txt);;All types(*.*)");
+							if (!file_path.isEmpty())
+							{
+								SaveFile(index, file_path);
+								CloseFile(index);
+							}
+						}
+						else
+						{
 							SaveFile(index, file_path);
 							CloseFile(index);
 						}
 					}
-					else {
-						SaveFile(index, file_path);
+					else if (ret == QMessageBox::No) {
 						CloseFile(index);
 					}
-				}
-				else if (ret == QMessageBox::No) {
-					CloseFile(index);
-				}
-				else if (ret == QMessageBox::Cancel) {
-				}
-			}
-		}
-		});
-	m_messageBus->Subscribe("Close Right File", [=]() {
-		int current_index = m_centralWidget->currentIndex();
-		for (int index = m_centralWidget->count() - 1; index >= current_index + 1; --index) {
-			if (m_savedFile[index] == true) {
-				CloseFile(index);
-			}
-			else {
-				QMessageBox question_box(QMessageBox::Question, tr("Save File"),
-					tr("Save file") + "\"" + m_openedFileName[index] + "\"?",
-					QMessageBox::Ok, m_mainWindow);
-				question_box.addButton(QMessageBox::No);
-				question_box.addButton(QMessageBox::Cancel);
-				int ret = question_box.exec();
-				if (ret == QMessageBox::Ok) {
-					QString file_path = m_openedFilePath[index];
-					if (file_path.isEmpty() || !QFileInfo::exists(file_path)) {
-						file_path = QFileDialog::getSaveFileName(
-							m_mainWindow, tr("Save File") + "\"" + m_openedFileName[index] + "\"",
-							qApp->applicationDirPath() + "/" + m_openedFileName[index],
-							"Text files(*.txt);;All types(*.*)");
-						if (!file_path.isEmpty()) {
-							SaveFile(index, file_path);
-							CloseFile(index);
-						}
-					}
-					else {
-						SaveFile(index, file_path);
-						CloseFile(index);
+					else if (ret == QMessageBox::Cancel) {
 					}
 				}
-				else if (ret == QMessageBox::No) {
+			}
+		});
+	m_messageBus->Subscribe("Close All Unchanged File", [=]()
+		{
+			for (int index = m_centralWidget->count() - 1; index >= 0; --index)
+			{
+				if (m_textWidget[index]->GetSaveStatus() == true)
+				{
 					CloseFile(index);
 				}
-				else if (ret == QMessageBox::Cancel) {
-				}
 			}
-		}
-		});
-	m_messageBus->Subscribe("Close All Unchanged File", [=]() {
-		for (int index = m_centralWidget->count() - 1; index >= 0; --index) {
-			if (m_savedFile[index] == true) {
-				CloseFile(index);
-			}
-		}
 		});
 	m_messageBus->Subscribe("Delete File", [=]() {
 		int index = m_centralWidget->currentIndex();
-		if (index >= 0) {
-			QString file_path = m_openedFilePath[index];
+		if (index >= 0)
+		{
+			QString&& file_path = m_textWidget[index]->GetFilePath();
 			if (!file_path.isEmpty() && QFileInfo::exists(file_path)) {
 				if (QMessageBox::Ok ==
 					QMessageBox::question(m_mainWindow, tr("Delete File"),
@@ -540,28 +593,34 @@ void MainCore::InitValue()
 			}
 		}
 		});
-	m_messageBus->Subscribe("Print", [=]() {
-		int index = m_centralWidget->currentIndex();
-		if (index >= 0) {
-			// 创建QPrinter对象
-			QPrinter     printer;
-			QPrintDialog printDialog(&printer, m_mainWindow);
+	m_messageBus->Subscribe("Print", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// 创建QPrinter对象
+				QPrinter     printer;
+				QPrintDialog printDialog(&printer, m_mainWindow);
 
-			// 打开打印对话框
-			if (printDialog.exec() == QDialog::Accepted) {
-				// 创建QPainter对象用于绘制内容
-				QPainter painter;
-				if (painter.begin(&printer)) {
-					// 设置打印内容，绘制文本或其他图形
-					painter.setFont(m_textWidget[index]->font());
-					painter.drawText(100, 100, m_textWidget[index]->GetText());
-					painter.end();  // 完成绘制
-				}
-				else {
-					qDebug() << "打印失败";
+				// 打开打印对话框
+				if (printDialog.exec() == QDialog::Accepted)
+				{
+					CustomTextEdit* text_edit = m_textWidget[index];
+					// 创建QPainter对象用于绘制内容
+					QPainter painter;
+					if (painter.begin(&printer))
+					{
+						// 设置打印内容，绘制文本或其他图形
+						painter.setFont(text_edit->font());
+						painter.drawText(100, 100, text_edit->getText(text_edit->length()));
+						painter.end();  // 完成绘制
+					}
+					else
+					{
+						qDebug() << "打印失败";
+					}
 				}
 			}
-		}
 		});
 	m_messageBus->Subscribe("Clear Recent Record", [=]()
 		{
@@ -593,7 +652,7 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				m_textWidget[index]->Cut();
+				m_textWidget[index]->cut();
 			}
 		});
 	m_messageBus->Subscribe("Copy", [=]()
@@ -601,7 +660,7 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				m_textWidget[index]->Copy();
+				m_textWidget[index]->copyAllowLine();
 			}
 		});
 	m_messageBus->Subscribe("Paste", [=]()
@@ -609,7 +668,7 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				m_textWidget[index]->Paste();
+				m_textWidget[index]->paste();
 			}
 		});
 	m_messageBus->Subscribe("Delete", [=]()
@@ -634,7 +693,9 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				QDateTime current_date_time = QDateTime::currentDateTime();
-				m_textWidget[index]->AddText(current_date_time.toString("HH:mm yyyy/MM/dd"));
+				QString date_string = current_date_time.toString("HH:mm yyyy/MM/dd");
+				// TODO:不一定是UTF-8编码格式的数据
+				m_textWidget[index]->addText(date_string.toUtf8().length(), date_string.toUtf8().constData());
 			}
 		});
 	m_messageBus->Subscribe("Insert Long Time", [=]()
@@ -643,9 +704,9 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				QDateTime current_date_time = QDateTime::currentDateTime();
-				qDebug() << current_date_time.toString("HH:mm yyyy年MM月dd日");
-				m_textWidget[index]->AddText(current_date_time.toString("HH:mm yyyy年MM月dd日"));
-
+				QString date_string = current_date_time.toString("HH:mm yyyy年MM月dd日");
+				// TODO:不一定是UTF-8编码格式的数据
+				m_textWidget[index]->addText(date_string.toUtf8().length(), date_string.toUtf8().constData());
 			}
 		});
 	m_messageBus->Subscribe("Insert Custom Time", [=]()
@@ -654,20 +715,192 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				QDateTime current_date_time = QDateTime::currentDateTime();
-				m_textWidget[index]->AddText(current_date_time.toString("yyyy-MM-dd HH:mm:ss"));
+				QString date_string = current_date_time.toString("yyyy-MM-dd HH:mm:ss");
+				// TODO:不一定是UTF-8编码格式的数据
+				m_textWidget[index]->addText(date_string.toUtf8().length(), date_string.toUtf8().constData());
 			}
 		});
-	m_messageBus->Subscribe("Copy All Names",[=]()
+	m_messageBus->Subscribe("Copy All Names", [=]()
 		{
 			QClipboard* clipboard = QApplication::clipboard();
-
-
+			QString all_names;
+			for (int i = 0; i < m_textWidget.size(); ++i)
+			{
+				all_names.append(m_textWidget[i]->GetFileName() + "\n");
+			}
+			clipboard->setText(all_names);
 		});
 	m_messageBus->Subscribe("Copy All Paths", [=]()
 		{
 			QClipboard* clipboard = QApplication::clipboard();
+			QString all_paths;
+			for (int i = 0; i < m_textWidget.size(); ++i)
+			{
+				all_paths.append(m_textWidget[i]->GetFilePath() + "\n");
+			}
+			clipboard->setText(all_paths);
+		});
+	m_messageBus->Subscribe("Increase Line Indent", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->tab();
+			}
+		});
+	m_messageBus->Subscribe("Decrease Line Indent", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->backTab();
+			}
+		});
+	m_messageBus->Subscribe("UPPERCASE", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->upperCase();
+			}
+		});
+	m_messageBus->Subscribe("lowercase", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->lowerCase();
+			}
+		});
+	m_messageBus->Subscribe("Duplicate Current Line", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->lineDuplicate();
+			}
+		});
+	m_messageBus->Subscribe("Remove Duplicate Line", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:通过搜索功能删除重复行
+			}
+		});
+	m_messageBus->Subscribe("Remove Consecutive Duplicate Lines", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:通过搜索功能删除重复行
+			}
+		});
+	m_messageBus->Subscribe("Split Lines", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->targetFromSelection();
+				m_textWidget[index]->linesSplit(0);
+			}
+		});
+	m_messageBus->Subscribe("Join Lines", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->targetFromSelection();
+				m_textWidget[index]->linesJoin();
+			}
+		});
+	m_messageBus->Subscribe("Move Up Current Line", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->moveSelectedLinesUp();
+			}
+		});
+	m_messageBus->Subscribe("Move Down Current Line", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->moveSelectedLinesDown();
+			}
+		});
+	m_messageBus->Subscribe("Remove Empty Lines", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:通过搜索功能删除空行
+			}
+		});
+	m_messageBus->Subscribe("Remove Empty Lines Blank", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:通过搜索功能删除空行
+			}
+		});
+	m_messageBus->Subscribe("Insert Blank Line Above Current", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				CustomTextEdit* text_edit = m_textWidget[index];
+				// 获取当前行号
+				intptr_t current_line_index = text_edit->lineFromPosition(text_edit->currentPos());
+				// 获取当前行开始的位置
+				intptr_t pos = text_edit->positionFromLine(current_line_index);
+				// 插入空行
+				text_edit->insertText(pos, "\r\n");
+			}
+		});
+	m_messageBus->Subscribe("Insert Blank Line Below Current", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				CustomTextEdit* text_edit = m_textWidget[index];
+				// 获取当前行号
+				intptr_t current_line_index = text_edit->lineFromPosition(text_edit->currentPos());
+				// 获取下一行开始的位置
+				intptr_t pos = text_edit->positionFromLine(current_line_index + 1);
+				// TODO:不一定是UTF-8编码格式的数据
+				text_edit->insertText(pos, text_edit->GetEOLString().toUtf8().constData());
+			}
+		});
+	m_messageBus->Subscribe("Reverse Line Order", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				CustomTextEdit* text_edit = m_textWidget[index];
+				QByteArray sel_text = text_edit->getSelText();
+			}
+		});
+	m_messageBus->Subscribe("Randomize Line Order", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+			}
 		});
 
+	m_messageBus->Subscribe("EOL Conversion", [=](int eolMode)
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				m_textWidget[index]->convertEOLs(eolMode);
+				m_textWidget[index]->setEOLMode(eolMode);
+				m_menuBar->UpdateEOLAction(m_textWidget[index]);
+			}
+		});
 	// Directory
 	m_messageBus->Subscribe("Expand All", [=]()
 		{
@@ -680,8 +913,9 @@ void MainCore::InitValue()
 	m_messageBus->Subscribe("Locate The Current File", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
-				QString file_path = m_openedFilePath[index];
+			if (index >= 0)
+			{
+				QString&& file_path = m_textWidget[index]->GetFilePath();
 				m_dirWorkSpace->LocationFile(file_path);
 			}
 		});
@@ -699,51 +933,49 @@ void MainCore::InitValue()
 	// QTabWidget
 	m_messageBus->Subscribe("Tab Moved", [=](int data1, int data2)
 		{
-			m_openedFileName.swapItemsAt(data1, data2);
-			m_openedFilePath.swapItemsAt(data1, data2);
-			m_savedFile.swapItemsAt(data1, data2);
 			m_textWidget.swapItemsAt(data1, data2);
 		});
 	m_messageBus->Subscribe("Text Changed", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) {
-				m_savedFile[index] = false;
+			if (index >= 0)
+			{
+				m_textWidget[index]->SetSaveStatus(false);
 				m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"));
 			}
 		});
 	m_messageBus->Subscribe("Copy Path", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) 
+			if (index >= 0)
 			{
 				QClipboard* clipboard = QApplication::clipboard();
-				clipboard->setText(m_openedFilePath[index]);
+				clipboard->setText(m_textWidget[index]->GetFilePath());
 			}
 		});
 	m_messageBus->Subscribe("Copy Name", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) 
+			if (index >= 0)
 			{
 				QClipboard* clipboard = QApplication::clipboard();
-				clipboard->setText(m_openedFileName[index]);
+				clipboard->setText(m_textWidget[index]->GetFileName());
 			}
 		});
 	m_messageBus->Subscribe("Copy Directory", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
-			if (index >= 0) 
+			if (index >= 0)
 			{
 				QClipboard* clipboard = QApplication::clipboard();
-				QFileInfo   file_info(m_openedFilePath[index]);
+				QFileInfo   file_info(m_textWidget[index]->GetFilePath());
 				clipboard->setText(file_info.absolutePath());
 			}
 		});
 	m_messageBus->Subscribe("Change Zoom", [=](int data)
 		{
 			m_fontSize = data;
-			for (int i = 0; i < m_textWidget.size(); ++i) 
+			for (int i = 0; i < m_textWidget.size(); ++i)
 			{
 				QFont font = m_textWidget[i]->font();
 				font.setPointSize(m_fontSize);
@@ -763,12 +995,14 @@ void MainCore::InitValue()
 			SaveSettings();
 		});
 
-	// Debug
 	m_messageBus->Subscribe("Debug", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
+				// 选择的区域个数
+				sptr_t sel = m_textWidget[index]->selections();
+				qDebug() << "Debug";
 			}
 		});
 }
@@ -792,19 +1026,21 @@ void MainCore::InitConnect()
 bool MainCore::NewFile(const QString& new_file_name)
 {
 	CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
-	//QFont           font = editor->font();
+	text_widget->setEOLMode(SC_EOL_CRLF);
+	//QFont font = editor->font();
 	//font.setPointSize(m_fontSize);
 	//text_widget->setFont(font);
 	connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
 		{
 			m_messageBus->Publish("Text Changed");
 		});
-	m_openedFileName.append(new_file_name);
-	m_openedFilePath.append("");
-	m_savedFile.append(true);
+	text_widget->SetFileName(new_file_name);
+	text_widget->SetFilePath("");
+	text_widget->SetSaveStatus(true);
 	m_textWidget.append(text_widget);
 	m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), new_file_name);
 	m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
+	m_menuBar->UpdateEOLAction(text_widget);
 	return true;
 }
 
@@ -816,11 +1052,20 @@ bool MainCore::OpenFile(const QString& file_path)
 		return false;
 	}
 	QString abs_file_path = file_info.absoluteFilePath();
-	int     index = m_openedFilePath.indexOf(abs_file_path);
-	if (index != -1)
+	// 判断文件是否已打开
+	int opened_index = -1;
+	for (int i = 0; i < m_textWidget.size(); ++i)
+	{
+		if (m_textWidget[i]->GetFilePath() == abs_file_path)
+		{
+			opened_index = i;
+		}
+	}
+	if (opened_index != -1)
 	{
 		// 打开过
-		m_centralWidget->setCurrentIndex(index);
+		m_centralWidget->setCurrentIndex(opened_index);
+		m_menuBar->UpdateEOLAction(m_textWidget[opened_index]);
 	}
 	else
 	{
@@ -831,10 +1076,12 @@ bool MainCore::OpenFile(const QString& file_path)
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
 			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
+			text_widget->setEOLMode(SC_EOL_CRLF);
 			QFont           font = text_widget->font();
 			font.setPointSize(m_fontSize);
 			text_widget->setFont(font);
-			text_widget->SetText(in.readAll());
+			// TODO:不一定是UTF-8编码格式的数据
+			text_widget->setText(in.readAll().toUtf8().constData());
 			file.close();
 
 			// 打开后处理
@@ -842,13 +1089,13 @@ bool MainCore::OpenFile(const QString& file_path)
 				{
 					m_messageBus->Publish("Text Changed");
 				});
-			m_openedFileName.append(file_info.fileName());
-			m_openedFilePath.append(abs_file_path);
-			m_savedFile.append(true);
+			text_widget->SetFileName(file_info.fileName());
+			text_widget->SetFilePath(abs_file_path);
+			text_widget->SetSaveStatus(true);
 			m_textWidget.append(text_widget);
-			m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"),
-				file_info.fileName());
+			m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_info.fileName());
 			m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
+			m_menuBar->UpdateEOLAction(text_widget);
 		}
 	}
 	return true;
@@ -872,13 +1119,14 @@ bool MainCore::SaveFile(int index, const QString& file_path)
 		// 保存
 		QTextStream in(&file);
 		in.setEncoding(QStringConverter::Utf8);
-		in << m_textWidget[index]->GetText();
+		CustomTextEdit* text_edit = m_textWidget[index];
+		in << text_edit->getText(m_textWidget[index]->length());
 		file.close();
 
 		// 保存后处理
-		m_openedFileName[index] = file_info.fileName();
-		m_openedFilePath[index] = file_info.absoluteFilePath();
-		m_savedFile[index] = true;
+		text_edit->SetFileName(file_info.fileName());
+		text_edit->SetFilePath(file_info.absoluteFilePath());
+		text_edit->SetSaveStatus(true);
 		m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/saved.ico"));
 		m_centralWidget->setTabText(index, file_info.fileName());
 		m_messageBus->Publish("Update Window Title");
@@ -886,23 +1134,28 @@ bool MainCore::SaveFile(int index, const QString& file_path)
 	return true;
 }
 
-bool MainCore::CloseFile(int index) {
+bool MainCore::CloseFile(int index)
+{
 	if (index < 0 || index >= m_centralWidget->count())
 	{
 		return false;
 	}
 
 	// 最近文件
-	if (!m_openedFilePath[index].isEmpty())
+	if (!m_textWidget[index]->GetFilePath().isEmpty())
 	{
-		m_messageBus->Publish("Add Recent File", m_openedFilePath[index]);
+		m_messageBus->Publish("Add Recent File", m_textWidget[index]->GetFilePath());
 	}
 	// 关闭
-	m_openedFileName.removeAt(index);
-	m_openedFilePath.removeAt(index);
-	m_savedFile.removeAt(index);
 	m_textWidget.removeAt(index);
 	m_centralWidget->removeTab(index);
+	// 更新
+	int new_index = m_centralWidget->currentIndex();
+	if (new_index >= 0)
+	{
+		m_menuBar->UpdateEOLAction(m_textWidget[new_index]);
+	}
+
 	return true;
 }
 
@@ -927,17 +1180,18 @@ bool MainCore::LoadSettings()
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
 			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
+			text_widget->setEOLMode(SC_EOL_CRLF);
 			QFont           font = text_widget->font();
 			font.setPointSize(m_fontSize);
 			text_widget->setFont(font);
-			text_widget->SetText(in.readAll());
+			text_widget->setText(in.readAll().toUtf8().constData());
 			connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
 				{
 					m_messageBus->Publish("Text Changed");
 				});
-			m_openedFileName.append(opened_file_name[index]);
-			m_openedFilePath.append(opened_file_path[index]);
-			m_savedFile.append(saved_file[index]);
+			text_widget->SetFileName(opened_file_name[index]);
+			text_widget->SetFilePath(opened_file_path[index]);
+			text_widget->SetSaveStatus(saved_file[index]);
 			m_textWidget.append(text_widget);
 			if (saved_file[index] == true)
 			{
@@ -952,6 +1206,7 @@ bool MainCore::LoadSettings()
 					opened_file_name[index]);
 			}
 			file.close();
+			m_menuBar->UpdateEOLAction(text_widget);
 		}
 	}
 	// 设置当前文件
@@ -968,6 +1223,15 @@ bool MainCore::LoadSettings()
 
 bool MainCore::SaveSettings()
 {
+	QList<QString> m_openedFilePath;
+	QList<QString> m_openedFileName;
+	QList<bool> m_savedFile;
+	for (int i = 0; i < m_textWidget.size(); ++i)
+	{
+		m_openedFilePath.append(m_textWidget[i]->GetFilePath());
+		m_openedFileName.append(m_textWidget[i]->GetFileName());
+		m_savedFile.append(m_textWidget[i]->GetSaveStatus());
+	}
 	// 保存上次打开文件
 	m_settings->setValue("MainCore/OpenedFilePaths", m_openedFilePath);
 	m_settings->setValue("MainCore/OpenedFileNames", m_openedFileName);
@@ -975,18 +1239,22 @@ bool MainCore::SaveSettings()
 	m_settings->setValue("MainCore/CurrentIndex", m_centralWidget->currentIndex());
 
 	// 保存无路径文件
-	for (int index = 0; index < m_centralWidget->count(); ++index) {
-		if (m_savedFile[index] == false) {
+	for (int index = 0; index < m_centralWidget->count(); ++index)
+	{
+		if (m_textWidget[index]->GetSaveStatus() == false)
+		{
 			QDir file_dir(FILE_BACK_UP_DIR);
-			if (!file_dir.exists()) {
+			if (!file_dir.exists())
+			{
 				// 不存在 创建路径
 				bool mk_success = file_dir.mkpath(FILE_BACK_UP_DIR);
 			}
-			QFile file(FILE_BACK_UP_DIR + "/" + m_openedFileName[index]);
-			if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+			QFile file(FILE_BACK_UP_DIR + "/" + m_textWidget[index]->GetFileName());
+			if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+			{
 				QTextStream in(&file);
 				in.setEncoding(QStringConverter::Utf8);
-				in << m_textWidget[index]->GetText();
+				in << m_textWidget[index]->getText(m_textWidget[index]->length());
 				file.close();
 			}
 		}

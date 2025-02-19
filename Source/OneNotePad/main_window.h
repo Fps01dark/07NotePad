@@ -9,7 +9,7 @@ class QString;
 class QCloseEvent;
 class MainCore;
 
-class MainWindow : public QMainWindow 
+class MainWindow final : public QMainWindow
 {
     Q_OBJECT
    public:
