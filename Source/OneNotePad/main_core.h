@@ -13,6 +13,7 @@ class CustomToolBar;
 class CustomTabBar;
 class CustomTextEdit;
 class CustomTabWidget;
+class CustomStatusBar;
 class DirWorkspaceDock;
 
 class MainCore : public QObject
@@ -44,6 +45,7 @@ private:
 	CustomToolBar* m_toolBar = nullptr;
 	CustomTabBar* m_tabBar = nullptr;
 	CustomTabWidget* m_centralWidget = nullptr;
+	CustomStatusBar* m_statusBar = nullptr;
 	DirWorkspaceDock* m_dirWorkSpace = nullptr;
 	int m_fontSize = 9;
 	// 下标为 m_centralWidget Tab下标

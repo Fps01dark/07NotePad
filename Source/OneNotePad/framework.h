@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <algorithm>
 #include <QAction>
 #include <QApplication>
 #include <QBitArray>

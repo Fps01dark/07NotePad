@@ -3,6 +3,7 @@
 #include "framework.h"
 #include "message_bus.h"
 #include "custom_text_edit.h"
+#include "status_label.h"
 
 CustomStatusBar::CustomStatusBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	:m_messageBus(message_bus), QStatusBar(parent)
@@ -22,27 +23,40 @@ void CustomStatusBar::Refresh(CustomTextEdit* editor)
 
 void CustomStatusBar::InitUi()
 {
-	m_docType = new QLabel();
+	m_docType = new StatusLabel();
 	addWidget(m_docType, 1);
 
-	m_docSize = new QLabel(this);
+	m_docSize = new StatusLabel(200);
 	addPermanentWidget(m_docSize, 0);
 
-	m_docPos = new QLabel(this);
+	m_docPos = new StatusLabel(250);
 	addPermanentWidget(m_docPos, 0);
 
-	m_eolFormat = new QLabel(this);
+	m_eolFormat = new StatusLabel(100);
 	addPermanentWidget(m_eolFormat, 0);
 
-	m_unicodeType = new QLabel(this);
+	m_unicodeType = new StatusLabel(125);
 	addPermanentWidget(m_unicodeType, 0);
 
-	m_overType = new QLabel(this);
+	m_overType = new StatusLabel(25);
 	addPermanentWidget(m_overType, 0);
 }
 
 void CustomStatusBar::InitValue()
 {
+	m_messageBus->Subscribe("Update Status Bar", [=](CustomTextEdit* editor)
+		{
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
+			m_messageBus->Publish("Update Language", editor);
+			m_messageBus->Publish("Update Document Size", editor);
+			m_messageBus->Publish("Update Selection Info", editor);
+			m_messageBus->Publish("Update Eol", editor);
+			m_messageBus->Publish("Update Encoding", editor);
+			m_messageBus->Publish("Update OverType", editor);
+		});
+
 	m_messageBus->Subscribe("Update Language", [=](CustomTextEdit* editor)
 		{
 			// TODO:暂时语言只有None
@@ -50,11 +64,17 @@ void CustomStatusBar::InitValue()
 		});
 	m_messageBus->Subscribe("Update Document Size", [=](CustomTextEdit* editor)
 		{
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
 			QString size_text = tr("Length: %L1    Lines: %L2").arg(editor->length()).arg(editor->lineCount());
 			m_docSize->setText(size_text);
 		});
 	m_messageBus->Subscribe("Update Selection Info", [=](CustomTextEdit* editor)
 		{
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
 			const sptr_t pos = editor->currentPos();
 			QString selection_text;
 			if (editor->selectionEnd() == editor->selectionStart())
@@ -89,6 +109,9 @@ void CustomStatusBar::InitValue()
 		});
 	m_messageBus->Subscribe("Update Eol", [=](CustomTextEdit* editor)
 		{
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
 			switch (editor->eOLMode())
 			{
 			case SC_EOL_CR:

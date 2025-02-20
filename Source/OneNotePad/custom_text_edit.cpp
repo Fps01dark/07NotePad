@@ -81,6 +81,8 @@ QString CustomTextEdit::GetEOLString() const
 	}
 }
 
+
+
 void CustomTextEdit::wheelEvent(QWheelEvent* event)
 {
 	if (event->modifiers() & Qt::ControlModifier)

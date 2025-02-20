@@ -65,6 +65,9 @@
     <ClCompile Include="main_window.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
+    <ClCompile Include="status_label.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="custom_settings.h">
@@ -92,6 +95,9 @@
       <Filter>Ui</Filter>
     </QtMoc>
     <QtMoc Include="main_window.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+    <QtMoc Include="status_label.h">
       <Filter>Ui</Filter>
     </QtMoc>
   </ItemGroup>

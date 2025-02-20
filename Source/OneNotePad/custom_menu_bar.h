@@ -13,9 +13,8 @@ class CustomMenuBar : public QMenuBar
 public:
 	explicit CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
 	~CustomMenuBar();
-	void        SetRecentFiles(const QStringList& recent_list);
+	void SetRecentFiles(const QStringList& recent_list);
 	QStringList GetRecentFiles() const;
-	void UpdateEOLAction(CustomTextEdit* editor);
 
 private:
 	void InitUi();

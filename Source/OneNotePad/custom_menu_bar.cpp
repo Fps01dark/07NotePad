@@ -44,7 +44,7 @@ void CustomMenuBar::SetRecentFiles(const QStringList& recent_list)
 
 QStringList CustomMenuBar::GetRecentFiles() const
 {
-	QStringList             recent_files;
+	QStringList recent_files;
 	const QList<QAction*>& actions = m_recentFileMenu->actions();
 	for (int i = 0; i < actions.size(); ++i)
 	{
@@ -53,21 +53,7 @@ QStringList CustomMenuBar::GetRecentFiles() const
 	return recent_files;
 }
 
-void CustomMenuBar::UpdateEOLAction(CustomTextEdit* editor)
-{
-	switch (editor->eOLMode())
-	{
-	case SC_EOL_CRLF:
-		m_eolWindowsAction->setChecked(true);
-		break;
-	case SC_EOL_CR:
-		m_eolMacintoshAction->setChecked(true);
-		break;
-	case SC_EOL_LF:
-		m_eolUnixAction->setChecked(true);
-		break;
-	}
-}
+
 void CustomMenuBar::InitUi()
 {
 	// 菜单栏-文件

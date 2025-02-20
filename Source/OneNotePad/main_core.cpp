@@ -10,13 +10,15 @@
 #include "dir_workspace_dock.h"
 #include "main_window.h"
 #include "message_bus.h"
+#include "custom_status_bar.h"
 
 namespace
 {
 	const QString FILE_BACK_UP_DIR = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
 }
 
-MainCore::MainCore(MainWindow* main_window) : m_mainWindow(main_window), QObject(main_window)
+MainCore::MainCore(MainWindow* main_window)
+	: m_mainWindow(main_window), QObject(main_window)
 {
 	m_messageBus = std::make_shared<MessageBus>();
 	m_settings = new CustomSettings(m_mainWindow);
@@ -24,6 +26,7 @@ MainCore::MainCore(MainWindow* main_window) : m_mainWindow(main_window), QObject
 	m_toolBar = new CustomToolBar(m_messageBus, m_mainWindow);
 	m_centralWidget = new CustomTabWidget(m_messageBus, m_mainWindow);
 	m_tabBar = new CustomTabBar(m_messageBus, m_mainWindow);
+	m_statusBar = new CustomStatusBar(m_messageBus, m_mainWindow);
 	m_dirWorkSpace = new DirWorkspaceDock(m_messageBus, m_mainWindow);
 
 	InitUi();
@@ -67,6 +70,7 @@ void MainCore::InitUi()
 	m_mainWindow->setMenuBar(m_menuBar);
 	m_mainWindow->addToolBar(Qt::TopToolBarArea, m_toolBar);
 	m_mainWindow->setCentralWidget(m_centralWidget);
+	m_mainWindow->setStatusBar(m_statusBar);
 	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, m_dirWorkSpace);
 
 	// 加载最近文件记录
@@ -879,8 +883,111 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* text_edit = m_textWidget[index];
-				QByteArray sel_text = text_edit->getSelText();
+				CustomTextEdit* editor = m_textWidget[index];
+				if (editor->selections() > 1)
+				{
+					// Alt
+					if (editor->selectionIsRectangle() || editor->selectionMode() == SC_SEL_THIN)
+					{
+						// 获取行号
+						sptr_t rect_sel_anchor = editor->rectangularSelectionAnchor();
+						sptr_t rect_sel_caret = editor->rectangularSelectionCaret();
+						sptr_t from_line = editor->lineFromPosition(rect_sel_anchor);
+						sptr_t to_line = editor->lineFromPosition(rect_sel_caret);
+						// 获取位置
+						sptr_t start_pos = editor->positionFromLine(from_line);
+						sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+						// 反转文本
+						QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+						QStringList text_list = text.split(editor->GetEOLString());
+						bool sort_entire_document = to_line == editor->lineCount() - 1;
+						if (sort_entire_document == false)
+						{
+							if (text_list.rbegin()->isEmpty())
+							{
+								text_list.pop_back();
+							}
+						}
+						std::reverse(text_list.begin(), text_list.end());
+						QString joined_text = text_list.join(editor->GetEOLString());
+						if (sort_entire_document == true)
+						{
+							assert(joined_text.length() == text.length());
+						}
+						else
+						{
+							assert(joined_text.length() + editor->GetEOLString().length() == text.length());
+							joined_text += editor->GetEOLString();
+						}
+						// 替换
+						editor->setTargetRange(start_pos, end_pos);
+						editor->replaceTarget(-1, joined_text.toUtf8().constData());
+					}
+					else
+					{
+						return;
+					}
+				}
+				else
+				{
+					if (editor->selectionStart() == editor->selectionEnd())
+					{
+						// 获取行号
+						sptr_t from_line = 0;
+						sptr_t to_line = editor->lineCount() - 1;
+						// 获取位置
+						sptr_t start_pos = editor->positionFromLine(from_line);
+						sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+						// 反转文本
+						QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+						QStringList text_list = text.split(editor->GetEOLString());
+						std::reverse(text_list.begin(), text_list.end());
+						text = text_list.join(editor->GetEOLString());
+						// 替换
+						editor->setTargetRange(start_pos, end_pos);
+						editor->replaceTarget(-1, text.toUtf8().constData());
+					}
+					else
+					{
+						// 获取行号
+						sptr_t start_pos = editor->selectionStart();
+						sptr_t end_pos = editor->selectionEnd();
+						sptr_t from_line = editor->lineFromPosition(start_pos);
+						sptr_t to_line = editor->lineFromPosition(end_pos);
+						if ((from_line != to_line) && (static_cast<size_t>(editor->positionFromLine(to_line)) == end_pos))
+						{
+							--to_line;
+						}
+						// 获取位置
+						start_pos = editor->positionFromLine(from_line);
+						end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+						// 反转文本
+						QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+						QStringList text_list = text.split(editor->GetEOLString());
+						bool sort_entire_document = to_line == editor->lineCount() - 1;
+						if (sort_entire_document == false)
+						{
+							if (text_list.rbegin()->isEmpty())
+							{
+								text_list.pop_back();
+							}
+						}
+						std::reverse(text_list.begin(), text_list.end());
+						QString joined_text = text_list.join(editor->GetEOLString());
+						if (sort_entire_document == true)
+						{
+							assert(joined_text.length() == text.length());
+						}
+						else
+						{
+							assert(joined_text.length() + editor->GetEOLString().length() == text.length());
+							joined_text += editor->GetEOLString();
+						}
+						// 替换
+						editor->setTargetRange(start_pos, end_pos);
+						editor->replaceTarget(-1, joined_text.toUtf8().constData());
+					}
+				}
 			}
 		});
 	m_messageBus->Subscribe("Randomize Line Order", [=]()
@@ -893,12 +1000,13 @@ void MainCore::InitValue()
 
 	m_messageBus->Subscribe("EOL Conversion", [=](int eolMode)
 		{
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				m_textWidget[index]->convertEOLs(eolMode);
-				m_textWidget[index]->setEOLMode(eolMode);
-				m_menuBar->UpdateEOLAction(m_textWidget[index]);
+				// TODO:
 			}
 		});
 	// Directory
@@ -931,10 +1039,6 @@ void MainCore::InitValue()
 		});
 
 	// QTabWidget
-	m_messageBus->Subscribe("Tab Moved", [=](int data1, int data2)
-		{
-			m_textWidget.swapItemsAt(data1, data2);
-		});
 	m_messageBus->Subscribe("Text Changed", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
@@ -1001,7 +1105,9 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				// 选择的区域个数
-				sptr_t sel = m_textWidget[index]->selections();
+				sptr_t sel1 = m_textWidget[index]->selections();
+				// 获取矩形选择的锚点位置
+				sptr_t sel2 = m_textWidget[index]->rectangularSelectionAnchor();
 				qDebug() << "Debug";
 			}
 		});
@@ -1009,9 +1115,28 @@ void MainCore::InitValue()
 
 void MainCore::InitConnect()
 {
+	qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+	qDebug(Q_FUNC_INFO);
+	// 初次
+	int index = m_centralWidget->currentIndex();
+	if (index >= 0)
+	{
+		CustomTextEdit* editor = m_textWidget[index];
+		m_messageBus->Publish("Update Window Title");
+		m_messageBus->Publish("Update Status Bar", editor);
+	}
 	connect(m_centralWidget, &CustomTabWidget::currentChanged, [=]()
 		{
-			m_messageBus->Publish("Update Window Title");
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				CustomTextEdit* editor = m_textWidget[index];
+				m_messageBus->Publish("Update Window Title");
+				m_messageBus->Publish("Update Status Bar", editor);
+			}
 		});
 	connect(m_centralWidget, &CustomTabWidget::tabCloseRequested, [=](int index)
 		{
@@ -1019,28 +1144,40 @@ void MainCore::InitConnect()
 		});
 	connect(m_tabBar, &CustomTabBar::tabMoved, [=](int from, int to)
 		{
-			m_messageBus->Publish("Tab Moved", from, to);
+			m_textWidget.swapItemsAt(from, to);
 		});
 }
 
 bool MainCore::NewFile(const QString& new_file_name)
 {
 	CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
+	text_widget->SetFileName(new_file_name);
+	text_widget->SetFilePath("");
+	text_widget->SetSaveStatus(true);
+	text_widget->convertEOLs(SC_EOL_CRLF);
 	text_widget->setEOLMode(SC_EOL_CRLF);
-	//QFont font = editor->font();
-	//font.setPointSize(m_fontSize);
-	//text_widget->setFont(font);
 	connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
 		{
 			m_messageBus->Publish("Text Changed");
 		});
-	text_widget->SetFileName(new_file_name);
-	text_widget->SetFilePath("");
-	text_widget->SetSaveStatus(true);
+	connect(text_widget, &CustomTextEdit::updateUi, [=](Scintilla::Update updated)
+		{
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
+			CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
+			if (Scintilla::FlagSet(updated, Scintilla::Update::Content))
+			{
+				m_messageBus->Publish("Update Document Size", text_widget);
+			}
+			if (Scintilla::FlagSet(updated, Scintilla::Update::Content) || Scintilla::FlagSet(updated, Scintilla::Update::Selection))
+			{
+				m_messageBus->Publish("Update Selection Info", text_widget);
+			}
+		});
 	m_textWidget.append(text_widget);
 	m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), new_file_name);
 	m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
-	m_menuBar->UpdateEOLAction(text_widget);
 	return true;
 }
 
@@ -1065,7 +1202,6 @@ bool MainCore::OpenFile(const QString& file_path)
 	{
 		// 打开过
 		m_centralWidget->setCurrentIndex(opened_index);
-		m_menuBar->UpdateEOLAction(m_textWidget[opened_index]);
 	}
 	else
 	{
@@ -1076,26 +1212,35 @@ bool MainCore::OpenFile(const QString& file_path)
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
 			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
-			text_widget->setEOLMode(SC_EOL_CRLF);
-			QFont           font = text_widget->font();
-			font.setPointSize(m_fontSize);
-			text_widget->setFont(font);
-			// TODO:不一定是UTF-8编码格式的数据
 			text_widget->setText(in.readAll().toUtf8().constData());
 			file.close();
-
-			// 打开后处理
+			text_widget->SetFileName(file_info.fileName());
+			text_widget->SetFilePath(abs_file_path);
+			text_widget->SetSaveStatus(true);
+			text_widget->convertEOLs(SC_EOL_CRLF);
+			text_widget->setEOLMode(SC_EOL_CRLF);
 			connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
 				{
 					m_messageBus->Publish("Text Changed");
 				});
-			text_widget->SetFileName(file_info.fileName());
-			text_widget->SetFilePath(abs_file_path);
-			text_widget->SetSaveStatus(true);
+			connect(text_widget, &CustomTextEdit::updateUi, [=](Scintilla::Update updated)
+				{
+					qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+					qDebug(Q_FUNC_INFO);
+
+					CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
+					if (Scintilla::FlagSet(updated, Scintilla::Update::Content))
+					{
+						m_messageBus->Publish("Update Document Size", text_widget);
+					}
+					if (Scintilla::FlagSet(updated, Scintilla::Update::Content) || Scintilla::FlagSet(updated, Scintilla::Update::Selection))
+					{
+						m_messageBus->Publish("Update Selection Info", text_widget);
+					}
+				});
 			m_textWidget.append(text_widget);
 			m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_info.fileName());
 			m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
-			m_menuBar->UpdateEOLAction(text_widget);
 		}
 	}
 	return true;
@@ -1149,13 +1294,6 @@ bool MainCore::CloseFile(int index)
 	// 关闭
 	m_textWidget.removeAt(index);
 	m_centralWidget->removeTab(index);
-	// 更新
-	int new_index = m_centralWidget->currentIndex();
-	if (new_index >= 0)
-	{
-		m_menuBar->UpdateEOLAction(m_textWidget[new_index]);
-	}
-
 	return true;
 }
 
@@ -1180,18 +1318,33 @@ bool MainCore::LoadSettings()
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
 			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
-			text_widget->setEOLMode(SC_EOL_CRLF);
-			QFont           font = text_widget->font();
-			font.setPointSize(m_fontSize);
-			text_widget->setFont(font);
 			text_widget->setText(in.readAll().toUtf8().constData());
+			file.close();
+			text_widget->SetFileName(opened_file_name[index]);
+			text_widget->SetFilePath(opened_file_path[index]);
+			text_widget->SetSaveStatus(saved_file[index]);
+			text_widget->convertEOLs(SC_EOL_CRLF);
+			text_widget->setEOLMode(SC_EOL_CRLF);
 			connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
 				{
 					m_messageBus->Publish("Text Changed");
 				});
-			text_widget->SetFileName(opened_file_name[index]);
-			text_widget->SetFilePath(opened_file_path[index]);
-			text_widget->SetSaveStatus(saved_file[index]);
+			connect(text_widget, &CustomTextEdit::updateUi, [=](Scintilla::Update updated)
+				{
+					qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+					qDebug(Q_FUNC_INFO);
+
+					CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
+					if (Scintilla::FlagSet(updated, Scintilla::Update::Content))
+					{
+						m_messageBus->Publish("Update Document Size", text_widget);
+					}
+
+					if (Scintilla::FlagSet(updated, Scintilla::Update::Content) || Scintilla::FlagSet(updated, Scintilla::Update::Selection))
+					{
+						m_messageBus->Publish("Update Selection Info", text_widget);
+					}
+				});
 			m_textWidget.append(text_widget);
 			if (saved_file[index] == true)
 			{
@@ -1205,8 +1358,6 @@ bool MainCore::LoadSettings()
 					QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"),
 					opened_file_name[index]);
 			}
-			file.close();
-			m_menuBar->UpdateEOLAction(text_widget);
 		}
 	}
 	// 设置当前文件

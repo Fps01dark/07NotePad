@@ -20,7 +20,7 @@ public:
 	void SetSaveStatus(bool save_status);
 	void Cut();
 	QString GetEOLString() const;
-
+	
 protected:
 	void wheelEvent(QWheelEvent* event) override;
 
