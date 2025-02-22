@@ -53,7 +53,6 @@ QStringList CustomMenuBar::GetRecentFiles() const
 	return recent_files;
 }
 
-
 void CustomMenuBar::InitUi()
 {
 	// 菜单栏-文件
@@ -82,11 +81,11 @@ void CustomMenuBar::InitUi()
 	m_closeAllUnchangeAction = m_closeMenu->addAction(tr("Close All Unchanged"));
 	m_deleteFileAction = file_menu->addAction(tr("Delete File"));
 	file_menu->addSeparator();
-	m_loadSessionAction = file_menu->addAction(tr("Load Session...(未实现)"));
-	m_saveSessionAction = file_menu->addAction(tr("Save Session...(未实现)"));
+	m_loadSessionAction = file_menu->addAction(tr("Load Session..."));
+	m_saveSessionAction = file_menu->addAction(tr("Save Session..."));
 	file_menu->addSeparator();
 	m_printAction = file_menu->addAction(tr("Print..."));
-	m_printNowAction = file_menu->addAction(tr("Print Now(未实现)"));
+	m_printNowAction = file_menu->addAction(tr("Print Now"));
 	file_menu->addSeparator();
 	m_recentFileMenu = file_menu->addMenu(tr("Recent File"));
 	m_openAllRecentAction = file_menu->addAction(tr("Open All Recent Files"));
@@ -103,6 +102,10 @@ void CustomMenuBar::InitUi()
 	m_pasteAction = edit_menu->addAction(tr("Paste"));
 	m_deleteTextAction = edit_menu->addAction(tr("Delete"));
 	m_selectAllAction = edit_menu->addAction(tr("Select All"));
+	m_beginEndSelectAction = edit_menu->addAction(tr("Begin/End Select"));
+	m_beginEndSelectAction->setCheckable(true);
+	m_beginEndColumnSelectAction = edit_menu->addAction(tr("Begin/End Select in Column Mode"));
+	m_beginEndColumnSelectAction->setCheckable(true);
 	edit_menu->addSeparator();
 	m_insertMenu = edit_menu->addMenu(tr("Insert"));
 	m_shortTimeAction = m_insertMenu->addAction(tr("Short Date Time"));
@@ -121,25 +124,62 @@ void CustomMenuBar::InitUi()
 	m_convertCaseMenu = edit_menu->addMenu(tr("Convert Case To"));
 	m_UPPERCASEAction = m_convertCaseMenu->addAction(tr("UPPERCASE"));
 	m_lowercaseAction = m_convertCaseMenu->addAction(tr("lowercase"));
+	m_ProperCaseAction = m_convertCaseMenu->addAction(tr("Proper Case"));
+	m_ProperCaseBlendAction = m_convertCaseMenu->addAction(tr("Proper Case(blend)"));
+	m_SentencecaseAction = m_convertCaseMenu->addAction(tr("Sentence case"));
+	m_SentencecaseBlendAction = m_convertCaseMenu->addAction(tr("Sentence case(blend)"));
+	m_iNVERTcASEAction = m_convertCaseMenu->addAction(tr("iNVERT cASE"));
+	m_ranDOmCasEAction = m_convertCaseMenu->addAction(tr("ranDOm CasE"));
 	m_lineOperationsMenu = edit_menu->addMenu(tr("Line Operations"));
 	m_duplicateCurrentLineAction = m_lineOperationsMenu->addAction(tr("Duplicate Current Line"));
-	m_removeDuplicateLinesAction = m_lineOperationsMenu->addAction(tr("Remove Duplicate Lines(未实现)"));
-	m_removeConsecutiveDuplicateLinesAction = m_lineOperationsMenu->addAction(tr("Remove Consecutive Duplicate Lines(未实现)"));
+	m_removeDuplicateLinesAction = m_lineOperationsMenu->addAction(tr("Remove Duplicate Lines"));
+	m_removeConsecutiveDuplicateLinesAction = m_lineOperationsMenu->addAction(tr("Remove Consecutive Duplicate Lines"));
 	m_splitLinesAction = m_lineOperationsMenu->addAction(tr("Split Lines"));
 	m_joinLinesAction = m_lineOperationsMenu->addAction(tr("Join Lines"));
 	m_moveUpCurrentLineAction = m_lineOperationsMenu->addAction(tr("Move Up Current Line"));
 	m_moveDownCurrentLineAction = m_lineOperationsMenu->addAction(tr("Move Down Current Line"));
-	m_removeEmptyLinesAction = m_lineOperationsMenu->addAction(tr("Remove Empty Lines(未实现)"));
-	m_removeEmptyLinesBlankAction = m_lineOperationsMenu->addAction(tr("Remove Empty Lines(Containing Blank Characters)(未实现)"));
+	m_removeEmptyLinesAction = m_lineOperationsMenu->addAction(tr("Remove Empty Lines"));
+	m_removeEmptyLinesBlankAction = m_lineOperationsMenu->addAction(tr("Remove Empty Lines(Containing Blank Characters)"));
 	m_insertBlankLineAboveCurrentAction = m_lineOperationsMenu->addAction(tr("Insert Blank Line Above Current"));
 	m_insertBlankLineBelowCurrentAction = m_lineOperationsMenu->addAction(tr("Insert Blank Line Below Current"));
 	m_reverseLineOrderAction = m_lineOperationsMenu->addAction(tr("Reverse Line Order"));
 	m_randomizeLineOrderAction = m_lineOperationsMenu->addAction(tr("Randomize Line Order"));
 	m_lineOperationsMenu->addSeparator();
+	m_sortLinesLexicographicallyAscendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines Lexicographically Ascending"));
+	m_sortLinesLexAscendingIgnoringCaseAction = m_lineOperationsMenu->addAction(tr("Sort Lines Lex. Ascending Ignoring Case"));
+	m_sortLinesAsIntegersAscendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines As Integers Ascending"));
+	m_sortLinesAsDecimalsCommaAscendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines As Decimals(Comma) Ascending"));
+	m_sortLinesAsDecimalsDotAscendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines As Decimals(Dot) Ascending"));
+	m_lineOperationsMenu->addSeparator();
+	m_sortLinesLexicographicallyDescendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines Lexicographically Descending"));
+	m_sortLinesLexDescendingIgnoringCaseAction = m_lineOperationsMenu->addAction(tr("Sort Lines Lex. Descending Ignoring Case"));
+	m_sortLinesAsIntegersDescendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines As Integers Descending"));
+	m_sortLinesAsDecimalsCommaDescendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines As Decimals(Comma) Descending"));
+	m_sortLinesAsDecimalsDotDescendingAction = m_lineOperationsMenu->addAction(tr("Sort Lines As Decimals(Dot) Descending"));
+	m_commentMenu = edit_menu->addMenu(tr("Comment/Uncomment"));
+	m_toggleSingleLineCommentAction = m_commentMenu->addAction(tr("Toggle Single Line Comment"));
+	m_singleLineCommentAction = m_commentMenu->addAction(tr("Single Line Comment"));
+	m_singleLineUncommentAction = m_commentMenu->addAction(tr("Single Line Uncomment"));
+	m_blockCommentAction = m_commentMenu->addAction(tr("Block Comment"));
+	m_blockUncommentAction = m_commentMenu->addAction(tr("Block Uncomment"));
+	m_autoCompletionMenu = edit_menu->addMenu(tr("Auto Completion"));
+	m_functionCompletionAction = m_autoCompletionMenu->addAction(tr("Function Completion"));
+	m_wordCompletionAction = m_autoCompletionMenu->addAction(tr("Word Completion"));
+	m_functionParametersHintAction = m_autoCompletionMenu->addAction(tr("Function Parameters Hint"));
+	m_functionParametersPreviousHintAction = m_autoCompletionMenu->addAction(tr("Function Parameters Previous Hint"));
+	m_functionParametersNextHintAction = m_autoCompletionMenu->addAction(tr("Function Parameters Next Hint"));
+	m_pathCompletion = m_autoCompletionMenu->addAction(tr("Path Completion"));
 	m_eolConvertMenu = edit_menu->addMenu(tr("EOL Conversion"));
 	m_eolWindowsAction = m_eolConvertMenu->addAction(tr("Windows(CR LF)"));
+	m_eolWindowsAction->setCheckable(true);
 	m_eolUnixAction = m_eolConvertMenu->addAction(tr("Unix(LF)"));
+	m_eolUnixAction->setCheckable(true);
 	m_eolMacintoshAction = m_eolConvertMenu->addAction(tr("Macintosh(CR)"));
+	m_eolMacintoshAction->setCheckable(true);
+	QActionGroup* eol_convert_action_group = new QActionGroup(this);
+	eol_convert_action_group->addAction(m_eolWindowsAction);
+	eol_convert_action_group->addAction(m_eolUnixAction);
+	eol_convert_action_group->addAction(m_eolMacintoshAction);
 	// 菜单栏-查找
 	QMenu* search_menu = this->addMenu(tr("Search"));
 	m_findAction = search_menu->addAction(tr("Find"));
@@ -189,6 +229,33 @@ void CustomMenuBar::InitValue()
 			m_recentFiles.prepend(file_path);
 			// UI
 			SetRecentFiles(m_recentFiles);
+		});
+	m_messageBus->Subscribe("Update Menu Bar", [=](CustomTextEdit* editor)
+		{
+			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
+			qDebug(Q_FUNC_INFO);
+
+			// Edit
+			if (editor->GetBeginSelectPosition() == -1)
+			{
+				// 未选中
+				m_beginEndSelectAction->setChecked(false);
+			}
+			else
+			{
+				// 选中
+				m_beginEndSelectAction->setChecked(true);
+			}
+			if (editor->GetBeginColumnSelectPosition() == -1)
+			{
+				// 未选中
+				m_beginEndColumnSelectAction->setChecked(false);
+			}
+			else
+			{
+				// 选中
+				m_beginEndColumnSelectAction->setChecked(true);
+			}
 		});
 }
 
@@ -323,6 +390,32 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Select All");
 		});
+	connect(m_beginEndSelectAction, &QAction::triggered, [=]()
+		{
+			if (m_beginEndSelectAction->isChecked() == true)
+			{
+				// 开始
+				m_messageBus->Publish("Begin/End Select", 1);
+			}
+			else
+			{
+				// 结束
+				m_messageBus->Publish("Begin/End Select", 0);
+			}
+		});
+	connect(m_beginEndColumnSelectAction, &QAction::triggered, [=]()
+		{
+			if (m_beginEndColumnSelectAction->isChecked() == true)
+			{
+				// 开始
+				m_messageBus->Publish("Begin/End Select in Column Mode", 1);
+			}
+			else
+			{
+				// 结束
+				m_messageBus->Publish("Begin/End Select in Column Mode", 0);
+			}
+		});
 	connect(m_shortTimeAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Insert Short Time");
@@ -370,6 +463,74 @@ void CustomMenuBar::InitConnect()
 	connect(m_lowercaseAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("lowercase");
+		});
+	connect(m_ProperCaseAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Proper Case");
+		});
+	connect(m_ProperCaseBlendAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Proper Case(blend)");
+		});
+	connect(m_SentencecaseAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Sentence case");
+		});
+	connect(m_SentencecaseBlendAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Sentence case(blend)");
+		});
+	connect(m_iNVERTcASEAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("iNVERT cASE");
+		});
+	connect(m_ranDOmCasEAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("ranDOm CasE");
+		});
+	connect(m_toggleSingleLineCommentAction, &QAction::triggered, [=]()
+		{
+			// TODO:添加/删除单行注释
+		});
+	connect(m_singleLineCommentAction, &QAction::triggered, [=]()
+		{
+			// TODO:设置行注释
+		});
+	connect(m_singleLineUncommentAction, &QAction::triggered, [=]()
+		{
+			// TODO:取消行注释
+		});
+	connect(m_blockCommentAction, &QAction::triggered, [=]()
+		{
+			// TODO:设置区块注释
+		});
+	connect(m_blockUncommentAction, &QAction::triggered, [=]()
+		{
+			// TODO:取消区块注释
+		});
+	connect(m_functionCompletionAction, &QAction::triggered, [=]()
+		{
+			// TODO:函数补全
+		});
+	connect(m_wordCompletionAction, &QAction::triggered, [=]()
+		{
+			// TODO:单词补全
+		});
+	connect(m_functionParametersHintAction, &QAction::triggered, [=]()
+		{
+			// TODO:函数参数提示
+		});
+	connect(m_functionParametersPreviousHintAction, &QAction::triggered, [=]()
+		{
+			// TODO:函数参数上一个提示
+		});
+	connect(m_functionParametersNextHintAction, &QAction::triggered, [=]()
+		{
+			// TODO:函数参数下一个提示
+		});
+	connect(m_pathCompletion, &QAction::triggered, [=]()
+		{
+			// TODO:路径补全
 		});
 	connect(m_duplicateCurrentLineAction, &QAction::triggered, [=]()
 		{
@@ -423,7 +584,46 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Randomize Line Order");
 		});
-
+	connect(m_sortLinesLexicographicallyAscendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:升序排列文本行
+		});
+	connect(m_sortLinesLexAscendingIgnoringCaseAction, &QAction::triggered, [=]()
+		{
+			// TODO:升序排列行（不分大小写）
+		});
+	connect(m_sortLinesAsIntegersAscendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:升序排列整数
+		});
+	connect(m_sortLinesAsDecimalsCommaAscendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:升序排列小数（逗号作为小数点）
+		});
+	connect(m_sortLinesAsDecimalsDotAscendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:升序排列小数（句号作为小数点）
+		});
+	connect(m_sortLinesLexicographicallyDescendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:降序排列文本行
+		});
+	connect(m_sortLinesLexDescendingIgnoringCaseAction, &QAction::triggered, [=]()
+		{
+			// TODO:降序排列行（不分大小写）
+		});
+	connect(m_sortLinesAsIntegersDescendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:降序排列整数
+		});
+	connect(m_sortLinesAsDecimalsCommaDescendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:降序排列小数（逗号作为小数点）
+		});
+	connect(m_sortLinesAsDecimalsDotDescendingAction, &QAction::triggered, [=]()
+		{
+			// TODO:降序排列小数（句号作为小数点）
+		});
 	connect(m_eolWindowsAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("EOL Conversion", SC_EOL_CRLF);

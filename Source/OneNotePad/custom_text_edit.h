@@ -18,9 +18,14 @@ public:
 	void SetFilePath(const QString& file_path);
 	bool GetSaveStatus() const;
 	void SetSaveStatus(bool save_status);
+	sptr_t GetBeginSelectPosition() const;
+	void SetBeginSelectPosition(sptr_t position);
+	sptr_t GetBeginColumnSelectPosition() const;
+	void SetBeginColumnSelectPosition(sptr_t position);
+
 	void Cut();
 	QString GetEOLString() const;
-	
+
 protected:
 	void wheelEvent(QWheelEvent* event) override;
 
@@ -36,4 +41,6 @@ private:
 	QString m_fileName;
 	QString m_filePath;
 	bool m_savedStatus;
+	sptr_t m_beginSelectPosition = -1;
+	sptr_t m_beginColumnSelectPosition = -1;
 };

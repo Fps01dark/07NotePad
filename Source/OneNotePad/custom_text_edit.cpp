@@ -52,6 +52,26 @@ void CustomTextEdit::SetSaveStatus(bool save_status)
 	m_savedStatus = save_status;
 }
 
+sptr_t CustomTextEdit::GetBeginSelectPosition() const
+{
+	return m_beginSelectPosition;
+}
+
+void CustomTextEdit::SetBeginSelectPosition(sptr_t position)
+{
+	m_beginSelectPosition = position;
+}
+
+sptr_t CustomTextEdit::GetBeginColumnSelectPosition() const
+{
+	return m_beginColumnSelectPosition;
+}
+
+void CustomTextEdit::SetBeginColumnSelectPosition(sptr_t position)
+{
+	m_beginColumnSelectPosition = position;
+}
+
 void CustomTextEdit::Cut()
 {
 	if (selectionEmpty())
@@ -80,8 +100,6 @@ QString CustomTextEdit::GetEOLString() const
 		return "\r";
 	}
 }
-
-
 
 void CustomTextEdit::wheelEvent(QWheelEvent* event)
 {

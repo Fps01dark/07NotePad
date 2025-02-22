@@ -37,10 +37,11 @@ public:
 
 private:
 	// 存储每种消息类型对应的所有订阅者回调
-	QMap<QString, QList<std::function<void()>>>                   m_voidVoidsubscribers;
-	QMap<QString, QList<std::function<void(int)>>>                m_voidIntsubscribers;
-	QMap<QString, QList<std::function<void(int, int)>>>           m_voidIntIntsubscribers;
-	QMap<QString, QList<std::function<void(const QString&)>>>     m_voidQStringSubscribers;
+	QMap<QString, QList<std::function<void()>>> m_voidVoidsubscribers;
+	QMap<QString, QList<std::function<void(bool)>>> m_voidBoolsubscribers;
+	QMap<QString, QList<std::function<void(int)>>> m_voidIntsubscribers;
+	QMap<QString, QList<std::function<void(int, int)>>> m_voidIntIntsubscribers;
+	QMap<QString, QList<std::function<void(const QString&)>>> m_voidQStringSubscribers;
 	QMap<QString, QList<std::function<void(const QStringList&)>>> m_voidQStringListSubscribers;
 	QMap<QString, QList<std::function<void(CustomTextEdit*)>>> m_voidCustomTextEditSubscribers;
 };

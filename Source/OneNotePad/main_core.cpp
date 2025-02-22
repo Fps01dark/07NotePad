@@ -83,7 +83,7 @@ void MainCore::InitUi()
 
 void MainCore::InitValue()
 {
-	// Base
+	// File
 	m_messageBus->Subscribe("Update Window Title", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
@@ -634,7 +634,7 @@ void MainCore::InitValue()
 		{
 			m_mainWindow->close();
 		});
-
+	// Edit
 	m_messageBus->Subscribe("Undo", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
@@ -689,6 +689,47 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				m_textWidget[index]->selectAll();
+			}
+		});
+	m_messageBus->Subscribe("Begin/End Select", [=](int start)
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				CustomTextEdit* editor = m_textWidget[index];
+				if (start != 0)
+				{
+					// 开始
+					editor->SetBeginSelectPosition(editor->currentPos());
+					editor->changeSelectionMode(SC_SEL_STREAM);
+				}
+				else
+				{
+					// 结束
+					editor->setSel(editor->GetBeginSelectPosition(), editor->currentPos());
+					editor->SetBeginSelectPosition(-1);
+				}
+			}
+		});
+	m_messageBus->Subscribe("Begin/End Select in Column Mode", [=](int start)
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:不知道为什么不起作用
+				CustomTextEdit* editor = m_textWidget[index];
+				if (start != 0)
+				{
+					// 开始
+					editor->SetBeginColumnSelectPosition(editor->currentPos());
+					editor->changeSelectionMode(SC_SEL_RECTANGLE);
+				}
+				else
+				{
+					// 结束
+					editor->setAnchor(editor->GetBeginColumnSelectPosition());
+					editor->SetBeginColumnSelectPosition(-1);
+				}
 			}
 		});
 	m_messageBus->Subscribe("Insert Short Time", [=]()
@@ -774,6 +815,152 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				m_textWidget[index]->lowerCase();
+			}
+		});
+	m_messageBus->Subscribe("Proper Case", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				CustomTextEdit* editor = m_textWidget[index];
+				sptr_t from_line = 0;
+				sptr_t to_line = 0;
+				if (editor->selections() > 1)
+				{
+					// TODO:多选情况下未做处理
+				}
+				else
+				{
+					if (editor->selectionStart() == editor->selectionEnd())
+					{
+						// 获取行号
+						from_line = 0;
+						to_line = editor->lineCount() - 1;
+					}
+					else
+					{
+						// 获取行号
+						sptr_t start_pos = editor->selectionStart();
+						sptr_t end_pos = editor->selectionEnd();
+						from_line = editor->lineFromPosition(start_pos);
+						to_line = editor->lineFromPosition(end_pos);
+						if ((from_line != to_line) && (static_cast<size_t>(editor->positionFromLine(to_line)) == end_pos))
+						{
+							--to_line;
+						}
+					}
+				}
+				// 获取位置
+				sptr_t start_pos = editor->positionFromLine(from_line);
+				sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+				// 获取文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				for (int i = 0; i < text.size(); ++i)
+				{
+					if (text[i].isLetter())
+					{
+						if (i >= 2 && text[i - 1] == '\'' && text[i - 2].isLetterOrNumber())
+						{
+							text[i] = text[i].toLower();
+						}
+						else if (i < 1 || (i >= 1 && !text[i - 1].isLetterOrNumber()))
+						{
+							text[i] = text[i].toUpper();
+						}
+						else
+						{
+							text[i] = text[i].toLower();
+						}
+					}
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, text.toUtf8().constData());
+			}
+		});
+	m_messageBus->Subscribe("Proper Case(blend)", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				CustomTextEdit* editor = m_textWidget[index];
+				sptr_t from_line = 0;
+				sptr_t to_line = 0;
+				if (editor->selections() > 1)
+				{
+					// TODO:多选情况下未做处理
+				}
+				else
+				{
+					if (editor->selectionStart() == editor->selectionEnd())
+					{
+						// 获取行号
+						from_line = 0;
+						to_line = editor->lineCount() - 1;
+					}
+					else
+					{
+						// 获取行号
+						sptr_t start_pos = editor->selectionStart();
+						sptr_t end_pos = editor->selectionEnd();
+						from_line = editor->lineFromPosition(start_pos);
+						to_line = editor->lineFromPosition(end_pos);
+						if ((from_line != to_line) && (static_cast<size_t>(editor->positionFromLine(to_line)) == end_pos))
+						{
+							--to_line;
+						}
+					}
+				}
+				// 获取位置
+				sptr_t start_pos = editor->positionFromLine(from_line);
+				sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+				// 获取文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				for (int i = 0; i < text.size(); ++i)
+				{
+					if (text[i].isLetter())
+					{
+						if (i < 1 || (i >= 1 && !text[i - 1].isLetterOrNumber()))
+						{
+							text[i] = text[i].toUpper();
+						}
+					}
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, text.toUtf8().constData());
+			}
+		});
+	m_messageBus->Subscribe("Sentence case", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:
+			}
+		});
+	m_messageBus->Subscribe("Sentence case(blend)", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:
+			}
+		});
+	m_messageBus->Subscribe("iNVERT cASE", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:
+			}
+		});
+	m_messageBus->Subscribe("ranDOm CasE", [=]()
+		{
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				// TODO:
 			}
 		});
 	m_messageBus->Subscribe("Duplicate Current Line", [=]()
@@ -884,6 +1071,8 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				CustomTextEdit* editor = m_textWidget[index];
+				sptr_t from_line = 0;
+				sptr_t to_line = 0;
 				if (editor->selections() > 1)
 				{
 					// Alt
@@ -892,36 +1081,8 @@ void MainCore::InitValue()
 						// 获取行号
 						sptr_t rect_sel_anchor = editor->rectangularSelectionAnchor();
 						sptr_t rect_sel_caret = editor->rectangularSelectionCaret();
-						sptr_t from_line = editor->lineFromPosition(rect_sel_anchor);
-						sptr_t to_line = editor->lineFromPosition(rect_sel_caret);
-						// 获取位置
-						sptr_t start_pos = editor->positionFromLine(from_line);
-						sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
-						// 反转文本
-						QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
-						QStringList text_list = text.split(editor->GetEOLString());
-						bool sort_entire_document = to_line == editor->lineCount() - 1;
-						if (sort_entire_document == false)
-						{
-							if (text_list.rbegin()->isEmpty())
-							{
-								text_list.pop_back();
-							}
-						}
-						std::reverse(text_list.begin(), text_list.end());
-						QString joined_text = text_list.join(editor->GetEOLString());
-						if (sort_entire_document == true)
-						{
-							assert(joined_text.length() == text.length());
-						}
-						else
-						{
-							assert(joined_text.length() + editor->GetEOLString().length() == text.length());
-							joined_text += editor->GetEOLString();
-						}
-						// 替换
-						editor->setTargetRange(start_pos, end_pos);
-						editor->replaceTarget(-1, joined_text.toUtf8().constData());
+						from_line = editor->lineFromPosition(rect_sel_anchor);
+						to_line = editor->lineFromPosition(rect_sel_caret);
 					}
 					else
 					{
@@ -933,61 +1094,50 @@ void MainCore::InitValue()
 					if (editor->selectionStart() == editor->selectionEnd())
 					{
 						// 获取行号
-						sptr_t from_line = 0;
-						sptr_t to_line = editor->lineCount() - 1;
-						// 获取位置
-						sptr_t start_pos = editor->positionFromLine(from_line);
-						sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
-						// 反转文本
-						QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
-						QStringList text_list = text.split(editor->GetEOLString());
-						std::reverse(text_list.begin(), text_list.end());
-						text = text_list.join(editor->GetEOLString());
-						// 替换
-						editor->setTargetRange(start_pos, end_pos);
-						editor->replaceTarget(-1, text.toUtf8().constData());
+						from_line = 0;
+						to_line = editor->lineCount() - 1;
 					}
 					else
 					{
 						// 获取行号
 						sptr_t start_pos = editor->selectionStart();
 						sptr_t end_pos = editor->selectionEnd();
-						sptr_t from_line = editor->lineFromPosition(start_pos);
-						sptr_t to_line = editor->lineFromPosition(end_pos);
+						from_line = editor->lineFromPosition(start_pos);
+						to_line = editor->lineFromPosition(end_pos);
 						if ((from_line != to_line) && (static_cast<size_t>(editor->positionFromLine(to_line)) == end_pos))
 						{
 							--to_line;
 						}
-						// 获取位置
-						start_pos = editor->positionFromLine(from_line);
-						end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
-						// 反转文本
-						QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
-						QStringList text_list = text.split(editor->GetEOLString());
-						bool sort_entire_document = to_line == editor->lineCount() - 1;
-						if (sort_entire_document == false)
-						{
-							if (text_list.rbegin()->isEmpty())
-							{
-								text_list.pop_back();
-							}
-						}
-						std::reverse(text_list.begin(), text_list.end());
-						QString joined_text = text_list.join(editor->GetEOLString());
-						if (sort_entire_document == true)
-						{
-							assert(joined_text.length() == text.length());
-						}
-						else
-						{
-							assert(joined_text.length() + editor->GetEOLString().length() == text.length());
-							joined_text += editor->GetEOLString();
-						}
-						// 替换
-						editor->setTargetRange(start_pos, end_pos);
-						editor->replaceTarget(-1, joined_text.toUtf8().constData());
 					}
 				}
+				// 获取位置
+				sptr_t start_pos = editor->positionFromLine(from_line);
+				sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+				// 反转文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				QStringList text_list = text.split(editor->GetEOLString());
+				bool sort_entire_document = to_line == editor->lineCount() - 1;
+				if (sort_entire_document == false)
+				{
+					if (text_list.rbegin()->isEmpty())
+					{
+						text_list.pop_back();
+					}
+				}
+				std::reverse(text_list.begin(), text_list.end());
+				QString joined_text = text_list.join(editor->GetEOLString());
+				if (sort_entire_document == true)
+				{
+					assert(joined_text.length() == text.length());
+				}
+				else
+				{
+					assert(joined_text.length() + editor->GetEOLString().length() == text.length());
+					joined_text += editor->GetEOLString();
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, joined_text.toUtf8().constData());
 			}
 		});
 	m_messageBus->Subscribe("Randomize Line Order", [=]()
@@ -995,9 +1145,77 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
+				CustomTextEdit* editor = m_textWidget[index];
+				sptr_t from_line = 0;
+				sptr_t to_line = 0;
+				if (editor->selections() > 1)
+				{
+					// Alt
+					if (editor->selectionIsRectangle() || editor->selectionMode() == SC_SEL_THIN)
+					{
+						// 获取行号
+						sptr_t rect_sel_anchor = editor->rectangularSelectionAnchor();
+						sptr_t rect_sel_caret = editor->rectangularSelectionCaret();
+						from_line = editor->lineFromPosition(rect_sel_anchor);
+						to_line = editor->lineFromPosition(rect_sel_caret);
+					}
+					else
+					{
+						return;
+					}
+				}
+				else
+				{
+					if (editor->selectionStart() == editor->selectionEnd())
+					{
+						// 获取行号
+						from_line = 0;
+						to_line = editor->lineCount() - 1;
+					}
+					else
+					{
+						// 获取行号
+						sptr_t start_pos = editor->selectionStart();
+						sptr_t end_pos = editor->selectionEnd();
+						from_line = editor->lineFromPosition(start_pos);
+						to_line = editor->lineFromPosition(end_pos);
+						if ((from_line != to_line) && (static_cast<size_t>(editor->positionFromLine(to_line)) == end_pos))
+						{
+							--to_line;
+						}
+					}
+				}
+				// 获取位置
+				sptr_t start_pos = editor->positionFromLine(from_line);
+				sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+				// 反转文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				QStringList text_list = text.split(editor->GetEOLString());
+				bool sort_entire_document = to_line == editor->lineCount() - 1;
+				if (sort_entire_document == false)
+				{
+					if (text_list.rbegin()->isEmpty())
+					{
+						text_list.pop_back();
+					}
+				}
+				unsigned seed = static_cast<unsigned>(time(NULL));
+				std::shuffle(text_list.begin(), text_list.end(), std::default_random_engine(seed));
+				QString joined_text = text_list.join(editor->GetEOLString());
+				if (sort_entire_document == true)
+				{
+					assert(joined_text.length() == text.length());
+				}
+				else
+				{
+					assert(joined_text.length() + editor->GetEOLString().length() == text.length());
+					joined_text += editor->GetEOLString();
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, joined_text.toUtf8().constData());
 			}
 		});
-
 	m_messageBus->Subscribe("EOL Conversion", [=](int eolMode)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
@@ -1006,9 +1224,12 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				// TODO:
+				CustomTextEdit* editor = m_textWidget[index];
+				editor->convertEOLs(SC_EOL_CRLF);
+				editor->setEOLMode(SC_EOL_CRLF);
 			}
 		});
+
 	// Directory
 	m_messageBus->Subscribe("Expand All", [=]()
 		{
@@ -1099,6 +1320,7 @@ void MainCore::InitValue()
 			SaveSettings();
 		});
 
+	// Debug
 	m_messageBus->Subscribe("Debug", [=]()
 		{
 			int index = m_centralWidget->currentIndex();
@@ -1135,6 +1357,7 @@ void MainCore::InitConnect()
 			{
 				CustomTextEdit* editor = m_textWidget[index];
 				m_messageBus->Publish("Update Window Title");
+				m_messageBus->Publish("Update Menu Bar", editor);
 				m_messageBus->Publish("Update Status Bar", editor);
 			}
 		});
@@ -1302,7 +1525,7 @@ bool MainCore::LoadSettings()
 	QStringList&& opened_file_name = m_settings->value("MainCore/OpenedFileNames").toStringList();
 	QStringList&& opened_file_path = m_settings->value("MainCore/OpenedFilePaths").toStringList();
 	QList<bool>&& saved_file = m_settings->BoolList("MainCore/SavedFile");
-	int           current_index = m_settings->value("MainCore/CurrentIndex").toInt();
+	int current_index = m_settings->value("MainCore/CurrentIndex").toInt();
 	m_fontSize = m_settings->value("CustomTextEdit/FontSize").toInt();
 	for (int index = 0; index < opened_file_path.size(); ++index)
 	{
