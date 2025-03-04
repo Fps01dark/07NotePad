@@ -1,6 +1,7 @@
 ﻿#include "custom_text_edit.h"
 
-#include "framework.h"
+#include <QWheelEvent>
+
 #include "message_bus.h"
 
 namespace

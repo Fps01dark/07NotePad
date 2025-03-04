@@ -1,6 +1,18 @@
 ﻿#include "main_core.h"
 
-#include "framework.h"
+#include <random>
+
+#include <QProcess>
+#include <QPrinter>
+#include <QPainter>
+#include <QClipboard>
+#include <QWheelEvent>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QPrintDialog>
+#include <QStandardPaths>
+#include <QDesktopServices>
+
 #include "custom_menu_bar.h"
 #include "custom_settings.h"
 #include "custom_tab_bar.h"
@@ -823,36 +835,9 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				CustomTextEdit* editor = m_textWidget[index];
-				sptr_t from_line = 0;
-				sptr_t to_line = 0;
-				if (editor->selections() > 1)
-				{
-					// TODO:多选情况下未做处理
-				}
-				else
-				{
-					if (editor->selectionStart() == editor->selectionEnd())
-					{
-						// 获取行号
-						from_line = 0;
-						to_line = editor->lineCount() - 1;
-					}
-					else
-					{
-						// 获取行号
-						sptr_t start_pos = editor->selectionStart();
-						sptr_t end_pos = editor->selectionEnd();
-						from_line = editor->lineFromPosition(start_pos);
-						to_line = editor->lineFromPosition(end_pos);
-						if ((from_line != to_line) && (static_cast<size_t>(editor->positionFromLine(to_line)) == end_pos))
-						{
-							--to_line;
-						}
-					}
-				}
 				// 获取位置
-				sptr_t start_pos = editor->positionFromLine(from_line);
-				sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+				sptr_t start_pos = editor->selectionStart();
+				sptr_t end_pos = editor->selectionEnd();
 				// 获取文本
 				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
 				for (int i = 0; i < text.size(); ++i)
@@ -876,6 +861,7 @@ void MainCore::InitValue()
 				// 替换
 				editor->setTargetRange(start_pos, end_pos);
 				editor->replaceTarget(-1, text.toUtf8().constData());
+				editor->setSel(start_pos, end_pos);
 			}
 		});
 	m_messageBus->Subscribe("Proper Case(blend)", [=]()
@@ -884,36 +870,9 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				CustomTextEdit* editor = m_textWidget[index];
-				sptr_t from_line = 0;
-				sptr_t to_line = 0;
-				if (editor->selections() > 1)
-				{
-					// TODO:多选情况下未做处理
-				}
-				else
-				{
-					if (editor->selectionStart() == editor->selectionEnd())
-					{
-						// 获取行号
-						from_line = 0;
-						to_line = editor->lineCount() - 1;
-					}
-					else
-					{
-						// 获取行号
-						sptr_t start_pos = editor->selectionStart();
-						sptr_t end_pos = editor->selectionEnd();
-						from_line = editor->lineFromPosition(start_pos);
-						to_line = editor->lineFromPosition(end_pos);
-						if ((from_line != to_line) && (static_cast<size_t>(editor->positionFromLine(to_line)) == end_pos))
-						{
-							--to_line;
-						}
-					}
-				}
 				// 获取位置
-				sptr_t start_pos = editor->positionFromLine(from_line);
-				sptr_t end_pos = editor->positionFromLine(to_line) + editor->lineLength(to_line);
+				sptr_t start_pos = editor->selectionStart();
+				sptr_t end_pos = editor->selectionEnd();
 				// 获取文本
 				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
 				for (int i = 0; i < text.size(); ++i)
@@ -929,6 +888,7 @@ void MainCore::InitValue()
 				// 替换
 				editor->setTargetRange(start_pos, end_pos);
 				editor->replaceTarget(-1, text.toUtf8().constData());
+				editor->setSel(start_pos, end_pos);
 			}
 		});
 	m_messageBus->Subscribe("Sentence case", [=]()
@@ -936,7 +896,75 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				// TODO:
+				CustomTextEdit* editor = m_textWidget[index];
+				// 获取位置
+				sptr_t start_pos = editor->selectionStart();
+				sptr_t end_pos = editor->selectionEnd();
+				// 获取文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				bool is_new_sentence = true;
+				bool was_eol_r = false;
+				bool was_eol_n = false;
+				for (int i = 0; i < text.size(); ++i)
+				{
+					if (text[i].isLetter())
+					{
+						if (is_new_sentence)
+						{
+							text[i] = text[i].toUpper();
+							is_new_sentence = false;
+						}
+						else
+						{
+							text[i] = text[i].toLower();
+						}
+						was_eol_r = false;
+						was_eol_n = false;
+						if (text[i] == "i" &&
+							((i < 1) ? false : (text[i - 1].isSpace() || text[i - 1] == '(' || text[i - 1] == '"')) &&
+							((i + 1 == text.size()) ? false : (text[i + 1].isSpace() || text[i + 1] == '\'')))
+						{
+							text[i] = 'I';
+						}
+					}
+					else if (text[i] == '.' || text[i] == '!' || text[i] == '?')
+					{
+						if ((i + 1 == text.size()) ? true : text[i].isLetterOrNumber())
+						{
+							is_new_sentence = false;
+						}
+						else
+						{
+							is_new_sentence = true;
+						}
+					}
+					else if (text[i] == '\r')
+					{
+						if (was_eol_r)
+						{
+							is_new_sentence = true;
+						}
+						else
+						{
+							was_eol_r = true;
+						}
+					}
+					else if (text[i] == '\n')
+					{
+						if (was_eol_n)
+						{
+							is_new_sentence = true;
+						}
+						else
+						{
+							was_eol_n = true;
+						}
+					}
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, text.toUtf8().constData());
+				editor->setSel(start_pos, end_pos);
 			}
 		});
 	m_messageBus->Subscribe("Sentence case(blend)", [=]()
@@ -944,7 +972,71 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				// TODO:
+				CustomTextEdit* editor = m_textWidget[index];
+				// 获取位置
+				sptr_t start_pos = editor->selectionStart();
+				sptr_t end_pos = editor->selectionEnd();
+				// 获取文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				bool is_new_sentence = true;
+				bool was_eol_r = false;
+				bool was_eol_n = false;
+				for (int i = 0; i < text.size(); ++i)
+				{
+					if (text[i].isLetter())
+					{
+						if (is_new_sentence)
+						{
+							text[i] = text[i].toUpper();
+							is_new_sentence = false;
+						}
+						was_eol_r = false;
+						was_eol_n = false;
+						if (text[i] == "i" &&
+							((i < 1) ? false : (text[i - 1].isSpace() || text[i - 1] == '(' || text[i - 1] == '"')) &&
+							((i + 1 == text.size()) ? false : (text[i + 1].isSpace() || text[i + 1] == '\'')))
+						{
+							text[i] = 'I';
+						}
+					}
+					else if (text[i] == '.' || text[i] == '!' || text[i] == '?')
+					{
+						if ((i + 1 == text.size()) ? true : text[i].isLetterOrNumber())
+						{
+							is_new_sentence = false;
+						}
+						else
+						{
+							is_new_sentence = true;
+						}
+					}
+					else if (text[i] == '\r')
+					{
+						if (was_eol_r)
+						{
+							is_new_sentence = true;
+						}
+						else
+						{
+							was_eol_r = true;
+						}
+					}
+					else if (text[i] == '\n')
+					{
+						if (was_eol_n)
+						{
+							is_new_sentence = true;
+						}
+						else
+						{
+							was_eol_n = true;
+						}
+					}
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, text.toUtf8().constData());
+				editor->setSel(start_pos, end_pos);
 			}
 		});
 	m_messageBus->Subscribe("iNVERT cASE", [=]()
@@ -952,7 +1044,27 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				// TODO:
+				CustomTextEdit* editor = m_textWidget[index];
+				// 获取位置
+				sptr_t start_pos = editor->selectionStart();
+				sptr_t end_pos = editor->selectionEnd();
+				// 获取文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				for (int i = 0; i < text.size(); ++i)
+				{
+					if (text[i].isLower())
+					{
+						text[i] = text[i].toUpper();
+					}
+					else
+					{
+						text[i] = text[i].toLower();
+					}
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, text.toUtf8().constData());
+				editor->setSel(start_pos, end_pos);
 			}
 		});
 	m_messageBus->Subscribe("ranDOm CasE", [=]()
@@ -960,7 +1072,30 @@ void MainCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				// TODO:
+				CustomTextEdit* editor = m_textWidget[index];
+				// 获取位置
+				sptr_t start_pos = editor->selectionStart();
+				sptr_t end_pos = editor->selectionEnd();
+				// 获取文本
+				QString text = QString::fromUtf8(editor->textRange(start_pos, end_pos));
+				for (int i = 0; i < text.size(); ++i)
+				{
+					if (text[i].isLetter())
+					{
+						if (std::rand() & true)
+						{
+							text[i] = text[i].toUpper();
+						}
+						else
+						{
+							text[i] = text[i].toLower();
+						}
+					}
+				}
+				// 替换
+				editor->setTargetRange(start_pos, end_pos);
+				editor->replaceTarget(-1, text.toUtf8().constData());
+				editor->setSel(start_pos, end_pos);
 			}
 		});
 	m_messageBus->Subscribe("Duplicate Current Line", [=]()

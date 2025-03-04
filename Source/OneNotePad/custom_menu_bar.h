@@ -128,6 +128,15 @@ private:
 	QAction* m_eolWindowsAction = nullptr;
 	QAction* m_eolUnixAction = nullptr;
 	QAction* m_eolMacintoshAction = nullptr;
+	QMenu* m_blankOperationsMenu = nullptr;
+	QAction* m_trimTrailingSpaceAction = nullptr;
+	QAction* m_trimLeadingSpaceAction = nullptr;
+	QAction* m_trimLeadingAndTrailingSpaceAction = nullptr;
+	QAction* m_eolToSpaceAction = nullptr;
+	QAction* m_trimBothAndEolToSpaceAction = nullptr;
+	QAction* m_tabToSpaceAction = nullptr;
+	QAction* m_spaceToTabAllAction = nullptr;
+	QAction* m_spaceToTabLeadingAction = nullptr;
 	// 菜单栏-查找
 	QAction* m_findAction = nullptr;
 	// 菜单栏-视图

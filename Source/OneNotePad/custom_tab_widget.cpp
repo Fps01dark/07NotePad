@@ -1,12 +1,10 @@
 ﻿#include "custom_tab_widget.h"
 
-#include "framework.h"
-
 CustomTabWidget::CustomTabWidget(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
-    : m_messageBus(message_bus), QTabWidget(parent) {
-    InitUi();
-    InitValue();
-    InitConnect();
+	: m_messageBus(message_bus), QTabWidget(parent) {
+	InitUi();
+	InitValue();
+	InitConnect();
 }
 
 CustomTabWidget::~CustomTabWidget() {}

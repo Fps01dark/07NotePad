@@ -118,7 +118,6 @@
   <ItemGroup>
     <ClInclude Include="custom_status_bar.h" />
     <ClInclude Include="custom_tool_bar.h" />
-    <ClInclude Include="framework.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="message_bus.h" />
     <QtMoc Include="status_label.h" />

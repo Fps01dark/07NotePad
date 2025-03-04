@@ -1,6 +1,8 @@
 ﻿#include "custom_tab_bar.h"
 
-#include "framework.h"
+#include <QMenu>
+#include <QContextMenuEvent>
+
 #include "message_bus.h"
 
 CustomTabBar::CustomTabBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)

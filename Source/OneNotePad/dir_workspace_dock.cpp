@@ -1,7 +1,11 @@
 ﻿#include "dir_workspace_dock.h"
 
+#include <QToolBar>
+#include <QHeaderView>
+#include <QVBoxLayout>
+#include <QFileSystemModel>
+
 #include "dir_workspace_tree_view.h"
-#include "framework.h"
 #include "message_bus.h"
 
 DirWorkspaceDock::DirWorkspaceDock(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
@@ -78,20 +82,20 @@ void DirWorkspaceDock::InitValue()
 
 void DirWorkspaceDock::InitConnect()
 {
-	connect(m_expandAllAction, &QAction::triggered, [=]() 
-		{ 
-			m_messageBus->Publish("Expand All"); 
-		});
-	connect(m_collapseAllAction, &QAction::triggered,[=]() 
-		{ 
-			m_messageBus->Publish("Collapse All"); 
-		});
-	connect(m_locationAction, &QAction::triggered,[=]() 
+	connect(m_expandAllAction, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Locate The Current File"); 
+			m_messageBus->Publish("Expand All");
 		});
-	connect(m_treeView, &QTreeView::doubleClicked, this, [=](const QModelIndex& index) 
+	connect(m_collapseAllAction, &QAction::triggered, [=]()
 		{
-		m_messageBus->Publish("Open File", m_fileSystemModel->filePath(index));
+			m_messageBus->Publish("Collapse All");
+		});
+	connect(m_locationAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Locate The Current File");
+		});
+	connect(m_treeView, &QTreeView::doubleClicked, this, [=](const QModelIndex& index)
+		{
+			m_messageBus->Publish("Open File", m_fileSystemModel->filePath(index));
 		});
 }

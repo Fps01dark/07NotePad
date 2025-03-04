@@ -1,6 +1,5 @@
 ﻿#include "custom_tool_bar.h"
 
-#include "framework.h"
 #include "message_bus.h"
 
 CustomToolBar::CustomToolBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)

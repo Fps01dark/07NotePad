@@ -1,6 +1,8 @@
 ﻿#include "custom_menu_bar.h"
 
-#include "framework.h"
+#include <QFileInfo>
+#include <QActionGroup>
+
 #include "message_bus.h"
 #include "custom_text_edit.h"
 

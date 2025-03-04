@@ -1,6 +1,5 @@
 ﻿#include "custom_status_bar.h"
 
-#include "framework.h"
 #include "message_bus.h"
 #include "custom_text_edit.h"
 #include "status_label.h"
