@@ -2,9 +2,14 @@
 
 #include <QBitArray>
 
-CustomSettings::CustomSettings(QObject* parent) {}
+CustomSettings::CustomSettings(QObject* parent)
+	:QSettings(parent)
+{
+}
 
-CustomSettings::~CustomSettings() {}
+CustomSettings::~CustomSettings()
+{
+}
 
 void CustomSettings::SetBoolList(const QString& key, const QList<bool>& boolList)
 {

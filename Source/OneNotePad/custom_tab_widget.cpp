@@ -7,12 +7,23 @@ CustomTabWidget::CustomTabWidget(std::shared_ptr<MessageBus> message_bus, QWidge
 	InitConnect();
 }
 
-CustomTabWidget::~CustomTabWidget() {}
+CustomTabWidget::~CustomTabWidget()
+{
+}
 
-void CustomTabWidget::SetTabBar(QTabBar* tab_bar) { setTabBar(tab_bar); }
+void CustomTabWidget::SetTabBar(QTabBar* tab_bar)
+{
+	setTabBar(tab_bar);
+}
 
-void CustomTabWidget::InitUi() {}
+void CustomTabWidget::InitUi()
+{
+}
 
-void CustomTabWidget::InitValue() {}
+void CustomTabWidget::InitValue()
+{
+}
 
-void CustomTabWidget::InitConnect() {}
+void CustomTabWidget::InitConnect()
+{
+}

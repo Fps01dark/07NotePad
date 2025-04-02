@@ -46,7 +46,9 @@ MainCore::MainCore(MainWindow* main_window)
 	InitConnect();
 }
 
-MainCore::~MainCore() {}
+MainCore::~MainCore()
+{
+}
 
 void MainCore::ExitSoftware()
 {
@@ -89,7 +91,6 @@ void MainCore::InitUi()
 	QStringList&& recent_paths = m_settings->value("MainCore/RecentFilePaths").toStringList();
 	m_menuBar->SetRecentFiles(recent_paths);
 	// 加载上次打开的文件
-
 	LoadSettings();
 }
 

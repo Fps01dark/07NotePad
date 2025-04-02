@@ -1,7 +1,5 @@
 ﻿#include "message_bus.h"
 
-#pragma once
-
 #include <QList>
 #include <QMap>
 #include <QString>
