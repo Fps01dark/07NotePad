@@ -49,5 +49,6 @@
         <file>standard/panels/toolbar/funclstPreferences.ico</file>
         <file>standard/panels/toolbar/funclstReload.ico</file>
         <file>standard/panels/toolbar/funclstSort.ico</file>
+        <file>npp.ico</file>
     </qresource>
 </RCC>

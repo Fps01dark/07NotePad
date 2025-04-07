@@ -57,6 +57,7 @@ void MainCore::ExitSoftware()
 
 void MainCore::InitUi()
 {
+	m_mainWindow->setWindowIcon(QIcon(":/OneNotePad/npp.ico"));
 	// 工具栏
 	m_toolBar->setMovable(false);
 	m_toolBar->setWindowTitle("Tool Bar");

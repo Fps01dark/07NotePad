@@ -135,6 +135,9 @@
   <ItemGroup>
     <QtRcc Include="..\..\Resources\one_note_pad.qrc" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="one_note_pad.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />
