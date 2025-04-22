@@ -1,7 +1,9 @@
 ﻿#include "custom_menu_bar.h"
 
 #include <QFileInfo>
+#include <QMessageBox>
 #include <QActionGroup>
+#include <QApplication>
 
 #include "message_bus.h"
 #include "custom_text_edit.h"
@@ -215,7 +217,12 @@ void CustomMenuBar::InitUi()
 	// 菜单栏-帮助
 	QMenu* help_menu = this->addMenu(tr("Help"));
 	m_commandLineArgumentsAction = help_menu->addAction(tr("Command Line Arguments"));
-	m_debugAction = help_menu->addAction(tr("Debug"));
+	help_menu->addSeparator();
+	m_aboutQt = help_menu->addAction(tr("About Qt"));
+	m_aboutQt->setIcon(QIcon(":/Qt-project.org/Qt-project.org/QMessagebox/Images/qtlogo-64.png"));
+	m_aboutOneNotePad = help_menu->addAction(tr("About OneNotePad"));
+	m_aboutOneNotePad->setIcon(QIcon(":/Prefix/NotepadNext.ico"));
+	m_debugInfoAction = help_menu->addAction(tr("Debug Info"));
 }
 
 void CustomMenuBar::InitValue()
@@ -639,8 +646,13 @@ void CustomMenuBar::InitConnect()
 			m_messageBus->Publish("EOL Conversion", SC_EOL_CR);
 		});
 
-	connect(m_debugAction, &QAction::triggered, [=]()
+	connect(m_aboutQt, &QAction::triggered, &QApplication::aboutQt);
+	connect(m_aboutOneNotePad, &QAction::triggered, [=]()
 		{
-			m_messageBus->Publish("Debug");
+			m_messageBus->Publish("About OneNotePad");
+		});
+	connect(m_debugInfoAction, &QAction::triggered, [=]()
+		{
+			m_messageBus->Publish("Debug Info");
 		});
 }

@@ -26,12 +26,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="custom_settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,6 +61,15 @@
     </ClCompile>
     <ClCompile Include="status_label.cpp">
       <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="one_notepad_application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="custom_settings.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +117,9 @@
     <ClInclude Include="custom_tool_bar.h">
       <Filter>Ui</Filter>
     </ClInclude>
+    <ClInclude Include="one_notepad_application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -121,12 +127,12 @@
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="..\..\Resources\one_note_pad.qrc">
+    <QtRcc Include="..\..\Resources\one_notepad.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="one_note_pad.rc">
+    <ResourceCompile Include="..\..\Resources\one_notepad.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScintillaEdit", "Source\Sci
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lexilla", "Source\lexilla\src\Lexilla.vcxproj", "{17A42067-72A0-3744-AFE2-2BB90FB270F4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singleapplication", "Source\SingleApplication\singleapplication.vcxproj", "{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{17A42067-72A0-3744-AFE2-2BB90FB270F4}.Release|x64.Build.0 = Release|x64
 		{17A42067-72A0-3744-AFE2-2BB90FB270F4}.Release|x86.ActiveCfg = Release|x64
 		{17A42067-72A0-3744-AFE2-2BB90FB270F4}.Release|x86.Build.0 = Release|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x64.ActiveCfg = Debug|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x64.Build.0 = Debug|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x86.ActiveCfg = Debug|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x86.Build.0 = Debug|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x64.ActiveCfg = Release|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x64.Build.0 = Release|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x86.ActiveCfg = Release|x64
+		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

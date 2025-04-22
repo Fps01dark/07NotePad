@@ -32,7 +32,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.8.1_msvc2022_64</QtInstall>
-    <QtModules>core;gui;widgets;printsupport</QtModules>
+    <QtModules>core;gui;network;widgets;printsupport</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -61,12 +61,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Scintilla\qt\ScintillaEdit\;$(ProjectDir)..\Scintilla\qt\ScintillaEditBase\;$(ProjectDir)..\Scintilla\include\;$(ProjectDir)..\Scintilla\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Scintilla\qt\ScintillaEdit\;$(ProjectDir)..\Scintilla\qt\ScintillaEditBase\;$(ProjectDir)..\Scintilla\include\;$(ProjectDir)..\Scintilla\src\;$(ProjectDir)..\SingleApplication\;$(ProjectDir)..\..\ThirdParty\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\Build\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ScintillaEdit5.lib;Lexilla5.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\Build\;$(ProjectDir)..\..\ThirdParty\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ScintillaEdit5.lib;Lexilla5.lib;singleapplication.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -107,6 +107,7 @@
     <ClCompile Include="main_core.cpp" />
     <ClCompile Include="main_window.cpp" />
     <ClCompile Include="message_bus.cpp" />
+    <ClCompile Include="one_notepad_application.cpp" />
     <ClCompile Include="status_label.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +121,7 @@
     <ClInclude Include="custom_tool_bar.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="message_bus.h" />
+    <ClInclude Include="one_notepad_application.h" />
     <QtMoc Include="status_label.h" />
     <QtMoc Include="main_window.h" />
     <QtMoc Include="main_core.h" />
@@ -133,10 +135,10 @@
     <QtUic Include="main_window.ui" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="..\..\Resources\one_note_pad.qrc" />
+    <QtRcc Include="..\..\Resources\one_notepad.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="one_note_pad.rc" />
+    <ResourceCompile Include="..\..\Resources\one_notepad.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

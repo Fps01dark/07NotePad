@@ -1,0 +1,67 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file>Icons/application_osx_terminal.png</file>
+        <file>Icons/arrow_down.png</file>
+        <file>Icons/arrow_refresh.png</file>
+        <file>Icons/arrow_up.png</file>
+        <file>Icons/bin.png</file>
+        <file>Icons/bin_closed.png</file>
+        <file>Icons/closeAll.png</file>
+        <file>Icons/closeFile.png</file>
+        <file>Icons/cog.png</file>
+        <file>Icons/copy.png</file>
+        <file>Icons/cut.png</file>
+        <file>Icons/find.png</file>
+        <file>Icons/findReplace.png</file>
+        <file>Icons/folder_go.png</file>
+        <file>Icons/indentGuide.png</file>
+        <file>Icons/invisibleChar.png</file>
+        <file>Icons/newfile.png</file>
+        <file>Icons/openFile.png</file>
+        <file>Icons/paste.png</file>
+        <file>Icons/playRecord.png</file>
+        <file>Icons/playRecord_m.png</file>
+        <file>Icons/printer.png</file>
+        <file>Icons/readonly.png</file>
+        <file>Icons/redo.png</file>
+        <file>Icons/saveAll.png</file>
+        <file>Icons/saved.png</file>
+        <file>Icons/saveRecord.png</file>
+        <file>Icons/startRecord.png</file>
+        <file>Icons/stopRecord.png</file>
+        <file>Icons/table_delete.png</file>
+        <file>Icons/table_edit.png</file>
+        <file>Icons/table_row_delete.png</file>
+        <file>Icons/table_row_insert.png</file>
+        <file>Icons/text_indent.png</file>
+        <file>Icons/text_indent_remove.png</file>
+        <file>Icons/undo.png</file>
+        <file>Icons/unsaved.png</file>
+        <file>Icons/wrap.png</file>
+        <file>Icons/wrapindicator.png</file>
+        <file>Icons/zoomIn.png</file>
+        <file>Icons/zoomOut.png</file>
+        <file>Icons/one_notepad.ico</file>
+    </qresource>
+    <qresource prefix="/Qt-project.org">
+        <file>Qt-project.org/QMessagebox/Images/qtlogo-64.png</file>
+    </qresource>
+    <qresource prefix="/Standard">
+        <file>Standard/tabbar/closeTabButton.ico</file>
+        <file>Standard/tabbar/closeTabButton_hoverIn.ico</file>
+        <file>Standard/tabbar/closeTabButton_hoverOnTab.ico</file>
+        <file>Standard/tabbar/closeTabButton_push.ico</file>
+        <file>Standard/tabbar/empty.ico</file>
+        <file>Standard/tabbar/monitoring.ico</file>
+        <file>Standard/tabbar/pinTabButton.ico</file>
+        <file>Standard/tabbar/pinTabButton_hover.ico</file>
+        <file>Standard/tabbar/pinTabButton_pinned.ico</file>
+        <file>Standard/tabbar/pinTabButton_pinnedHover.ico</file>
+        <file>Standard/tabbar/readonly.ico</file>
+        <file>Standard/tabbar/readonly_alt.ico</file>
+        <file>Standard/tabbar/saved.ico</file>
+        <file>Standard/tabbar/saved_alt.ico</file>
+        <file>Standard/tabbar/unsaved.ico</file>
+        <file>Standard/tabbar/unsaved_alt.ico</file>
+    </qresource>
+</RCC>

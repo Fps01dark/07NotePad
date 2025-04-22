@@ -37,17 +37,10 @@ private:
 	// 工具栏-视图
 	QAction* m_zoomInAction = nullptr;
 	QAction* m_zoomOutAction = nullptr;
-	QAction* m_syncVerticalScrollingAction = nullptr;
-	QAction* m_syncHorizontalScrollingAction = nullptr;
 	QAction* m_wordWrapAction = nullptr;
 	QAction* m_showAllCharactersAction = nullptr;
 	QAction* m_showIndentGuideAction = nullptr;
-	QAction* m_defineYourLanguageAction = nullptr;
-	QAction* m_documentMapAction = nullptr;
-	QAction* m_documentListAction = nullptr;
-	QAction* m_functionListAction = nullptr;
 	QAction* m_folderAsWorkspaceAction = nullptr;
-	QAction* m_monitoringAction = nullptr;
 	// 工具栏-宏
 	QAction* m_startRecordingAction = nullptr;
 	QAction* m_stopRecordingAction = nullptr;

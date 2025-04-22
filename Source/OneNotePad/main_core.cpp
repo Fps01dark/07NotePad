@@ -27,6 +27,8 @@
 namespace
 {
 	const QString FILE_BACK_UP_DIR = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
+	const QString& APP_VERSION = "0.1";
+	const QString& APP_COPYRIGHT = "Copyright 2025-2025 Wang Shuaiwu";
 }
 
 MainCore::MainCore(MainWindow* main_window)
@@ -57,7 +59,7 @@ void MainCore::ExitSoftware()
 
 void MainCore::InitUi()
 {
-	m_mainWindow->setWindowIcon(QIcon(":/OneNotePad/npp.ico"));
+	m_mainWindow->setWindowIcon(QIcon(":/Icons/Icons/one_note_pad.ico"));
 	// 工具栏
 	m_toolBar->setMovable(false);
 	m_toolBar->setWindowTitle("Tool Bar");
@@ -66,11 +68,11 @@ void MainCore::InitUi()
 	m_tabBar->setMovable(true);
 	m_tabBar->setStyleSheet(
 		"QTabBar::close-button { image: "
-		"url(:/OneNotePad/standard/tabbar/closeTabButton.ico); }"
+		"url(:/Standard/Standard/tabbar/closeTabButton.ico); }"
 		"QTabBar::close-button:hover { image: "
-		"url(:/OneNotePad/standard/tabbar/closeTabButton_hover.ico); }"
+		"url(:/Standard/Standard/tabbar/closeTabButton_hoverIn.ico); }"
 		"QTabBar::close-button:pressed { image: "
-		"url(:/OneNotePad/standard/tabbar/closeTabButton_push.ico); }");
+		"url(:/Standard/Standard/tabbar/closeTabButton_push.ico); }");
 	// 中心区域
 	m_centralWidget->SetTabBar(m_tabBar);
 	// 目录工作区
@@ -1403,7 +1405,7 @@ void MainCore::InitValue()
 			if (index >= 0)
 			{
 				m_textWidget[index]->SetSaveStatus(false);
-				m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"));
+				m_centralWidget->setTabIcon(index, QIcon(":/Icons/Icons/unsaved.png"));
 			}
 		});
 	m_messageBus->Subscribe("Copy Path", [=]()
@@ -1457,18 +1459,19 @@ void MainCore::InitValue()
 			SaveSettings();
 		});
 
-	// Debug
-	m_messageBus->Subscribe("Debug", [=]()
+	// Help
+	m_messageBus->Subscribe("About OneNotePad", [=]()
 		{
-			int index = m_centralWidget->currentIndex();
-			if (index >= 0)
-			{
-				// 选择的区域个数
-				sptr_t sel1 = m_textWidget[index]->selections();
-				// 获取矩形选择的锚点位置
-				sptr_t sel2 = m_textWidget[index]->rectangularSelectionAnchor();
-				qDebug() << "Debug";
-			}
+			QMessageBox::about(m_mainWindow, tr("About OneNotePad"),
+				QStringLiteral("<h3>%1 v%2 </h3>"
+					"<p>%4</p>"
+					"<p><a href=\"https://github.com/Fps01dark/OneNotePad\">OneNotePad Home Page</a></p>"
+					R"(<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p> <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p> <p>You should have received a copy of the GNU General Public License along with this program. If not, see &lt;<a href="https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>&gt;.</p>)")
+				.arg(QApplication::applicationDisplayName(), APP_VERSION, APP_COPYRIGHT.toHtmlEscaped()));
+		});
+	m_messageBus->Subscribe("Debug Info", [=]()
+		{
+
 		});
 }
 
@@ -1536,7 +1539,7 @@ bool MainCore::NewFile(const QString& new_file_name)
 			}
 		});
 	m_textWidget.append(text_widget);
-	m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), new_file_name);
+	m_centralWidget->addTab(text_widget, QIcon(":/Icons/Icons/saved.png"), new_file_name);
 	m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
 	return true;
 }
@@ -1599,7 +1602,7 @@ bool MainCore::OpenFile(const QString& file_path)
 					}
 				});
 			m_textWidget.append(text_widget);
-			m_centralWidget->addTab(text_widget, QIcon(":/OneNotePad/standard/tabbar/saved.ico"), file_info.fileName());
+			m_centralWidget->addTab(text_widget, QIcon(":/Icons/Icons/saved.png"), file_info.fileName());
 			m_centralWidget->setCurrentIndex(m_centralWidget->count() - 1);
 		}
 	}
@@ -1632,7 +1635,7 @@ bool MainCore::SaveFile(int index, const QString& file_path)
 		text_edit->SetFileName(file_info.fileName());
 		text_edit->SetFilePath(file_info.absoluteFilePath());
 		text_edit->SetSaveStatus(true);
-		m_centralWidget->setTabIcon(index, QIcon(":/OneNotePad/standard/tabbar/saved.ico"));
+		m_centralWidget->setTabIcon(index, QIcon(":/Icons/Icons/saved.png"));
 		m_centralWidget->setTabText(index, file_info.fileName());
 		m_messageBus->Publish("Update Window Title");
 	}
@@ -1709,13 +1712,13 @@ bool MainCore::LoadSettings()
 			if (saved_file[index] == true)
 			{
 				m_centralWidget->addTab(text_widget,
-					QIcon(":/OneNotePad/standard/tabbar/saved.ico"),
+					QIcon(":/Icons/Icons/saved.png"),
 					opened_file_name[index]);
 			}
 			else
 			{
 				m_centralWidget->addTab(text_widget,
-					QIcon(":/OneNotePad/standard/tabbar/unsaved.ico"),
+					QIcon(":/Icons/Icons/unsaved.png"),
 					opened_file_name[index]);
 			}
 		}

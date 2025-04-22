@@ -5,6 +5,7 @@
 #include <QSysInfo>
 
 #include "main_window.h"
+#include "one_notepad_application.h"
 
 int main(int argc, char* argv[])
 {
@@ -30,8 +31,7 @@ int main(int argc, char* argv[])
 	// Default settings format
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
-	QApplication a(argc, argv);
-	QApplication::setApplicationVersion("1.0.0");
+	OneNotepadApplication app(argc, argv);
 
 	// Log some debug info
 	qInfo("=============================");
@@ -45,10 +45,24 @@ int main(int argc, char* argv[])
 	qInfo("Locale: %s", qUtf8Printable(QLocale::system().name()));
 	qInfo("CPU: %s", qUtf8Printable(QSysInfo::currentCpuArchitecture()));
 	qInfo("File Path: %s", qUtf8Printable(QApplication::applicationFilePath()));
-	qInfo("Arguments: %s", qUtf8Printable(a.arguments().join(' ')));
+	qInfo("Arguments: %s", qUtf8Printable(app.arguments().join(' ')));
 	qInfo("=============================");
 
-	MainWindow w;
-	w.show();
-	return a.exec();
+	if (app.isPrimary())
+	{
+		MainWindow w;
+		w.show();
+
+		return app.exec();
+	}
+	else
+	{
+		qInfo() << "Primary instance already running. PID:" << app.primaryPid();
+
+		qInfo() << "Secondary instance closing...";
+
+		app.exit(0);
+
+		return 0;
+	}
 }

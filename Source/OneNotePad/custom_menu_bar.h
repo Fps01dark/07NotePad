@@ -220,5 +220,7 @@ private:
 	QMenu* m_sortByMenu = nullptr;
 	// 菜单栏-帮助
 	QAction* m_commandLineArgumentsAction = nullptr;
-	QAction* m_debugAction = nullptr;
+	QAction* m_aboutQt = nullptr;
+	QAction* m_aboutOneNotePad = nullptr;
+	QAction* m_debugInfoAction = nullptr;
 };
