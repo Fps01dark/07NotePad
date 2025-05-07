@@ -52,17 +52,13 @@ int main(int argc, char* argv[])
 	{
 		MainWindow w;
 		w.show();
-
 		return app.exec();
 	}
 	else
 	{
 		qInfo() << "Primary instance already running. PID:" << app.primaryPid();
-
 		qInfo() << "Secondary instance closing...";
-
 		app.exit(0);
-
 		return 0;
 	}
 }

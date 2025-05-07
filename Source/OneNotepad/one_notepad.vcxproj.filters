@@ -24,6 +24,12 @@
     <Filter Include="Ui">
       <UniqueIdentifier>{27db1a03-4c15-4e91-963c-a2c2d06a268c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SingleApplication">
+      <UniqueIdentifier>{b27c2c85-f9cc-4ec5-b7ce-91f94d9fedce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tinyxml2">
+      <UniqueIdentifier>{441118e2-7cf8-4c4a-b6ec-9bd43c31d135}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main_core.cpp">
@@ -65,11 +71,20 @@
     <ClCompile Include="one_notepad_application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="custom_settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleApplication\singleapplication.cpp">
+      <Filter>SingleApplication</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleApplication\singleapplication_p.cpp">
+      <Filter>SingleApplication</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="custom_settings.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="tinyxml2\tinyxml2.cpp">
+      <Filter>tinyxml2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +118,15 @@
     <QtMoc Include="status_label.h">
       <Filter>Ui</Filter>
     </QtMoc>
+    <QtMoc Include="one_notepad_application.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SingleApplication\singleapplication.h">
+      <Filter>SingleApplication</Filter>
+    </QtMoc>
+    <QtMoc Include="SingleApplication\singleapplication_p.h">
+      <Filter>SingleApplication</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="message.h">
@@ -117,7 +141,10 @@
     <ClInclude Include="custom_tool_bar.h">
       <Filter>Ui</Filter>
     </ClInclude>
-    <ClInclude Include="one_notepad_application.h">
+    <ClInclude Include="tinyxml2\tinyxml2.h">
+      <Filter>tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="one_notepad_global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

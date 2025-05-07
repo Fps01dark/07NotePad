@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35004.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "one_note_pad", "Source\OneNotePad\one_note_pad.vcxproj", "{CD1B87A7-92D8-458F-AEB0-44BF83C5AA58}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "one_notepad", "Source\OneNotepad\one_notepad.vcxproj", "{CD1B87A7-92D8-458F-AEB0-44BF83C5AA58}"
+	ProjectSection(ProjectDependencies) = postProject
+		{17A42067-72A0-3744-AFE2-2BB90FB270F4} = {17A42067-72A0-3744-AFE2-2BB90FB270F4}
+		{98A170AF-7524-3C05-9A5C-3B1F6155CD1C} = {98A170AF-7524-3C05-9A5C-3B1F6155CD1C}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScintillaEdit", "Source\Scintilla\qt\ScintillaEdit\ScintillaEdit.vcxproj", "{98A170AF-7524-3C05-9A5C-3B1F6155CD1C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lexilla", "Source\lexilla\src\Lexilla.vcxproj", "{17A42067-72A0-3744-AFE2-2BB90FB270F4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singleapplication", "Source\SingleApplication\singleapplication.vcxproj", "{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,14 +45,6 @@ Global
 		{17A42067-72A0-3744-AFE2-2BB90FB270F4}.Release|x64.Build.0 = Release|x64
 		{17A42067-72A0-3744-AFE2-2BB90FB270F4}.Release|x86.ActiveCfg = Release|x64
 		{17A42067-72A0-3744-AFE2-2BB90FB270F4}.Release|x86.Build.0 = Release|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x64.ActiveCfg = Debug|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x64.Build.0 = Debug|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x86.ActiveCfg = Debug|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Debug|x86.Build.0 = Debug|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x64.ActiveCfg = Release|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x64.Build.0 = Release|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x86.ActiveCfg = Release|x64
-		{09E8D7AD-D0A1-37A2-A970-24776CDCCCAE}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

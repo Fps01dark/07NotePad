@@ -16,6 +16,7 @@
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <ProjectName>one_notepad</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -32,7 +33,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.8.1_msvc2022_64</QtInstall>
-    <QtModules>core;gui;network;widgets;printsupport</QtModules>
+    <QtModules>core;gui;network;widgets;core5compat;printsupport</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -61,12 +62,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Scintilla\qt\ScintillaEdit\;$(ProjectDir)..\Scintilla\qt\ScintillaEditBase\;$(ProjectDir)..\Scintilla\include\;$(ProjectDir)..\Scintilla\src\;$(ProjectDir)..\SingleApplication\;$(ProjectDir)..\..\ThirdParty\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Scintilla\qt\ScintillaEdit\;$(ProjectDir)..\Scintilla\qt\ScintillaEditBase\;$(ProjectDir)..\Scintilla\include\;$(ProjectDir)..\Scintilla\src\;$(ProjectDir)SingleApplication\;$(ProjectDir)..\..\ThirdParty\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\Build\;$(ProjectDir)..\..\ThirdParty\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ScintillaEdit5.lib;Lexilla5.lib;singleapplication.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ScintillaEdit5.lib;Lexilla5.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -108,7 +109,10 @@
     <ClCompile Include="main_window.cpp" />
     <ClCompile Include="message_bus.cpp" />
     <ClCompile Include="one_notepad_application.cpp" />
+    <ClCompile Include="SingleApplication\singleapplication.cpp" />
+    <ClCompile Include="SingleApplication\singleapplication_p.cpp" />
     <ClCompile Include="status_label.cpp" />
+    <ClCompile Include="tinyxml2\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="custom_menu_bar.h" />
@@ -121,7 +125,11 @@
     <ClInclude Include="custom_tool_bar.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="message_bus.h" />
-    <ClInclude Include="one_notepad_application.h" />
+    <ClInclude Include="one_notepad_global.h" />
+    <ClInclude Include="tinyxml2\tinyxml2.h" />
+    <QtMoc Include="SingleApplication\singleapplication_p.h" />
+    <QtMoc Include="SingleApplication\singleapplication.h" />
+    <QtMoc Include="one_notepad_application.h" />
     <QtMoc Include="status_label.h" />
     <QtMoc Include="main_window.h" />
     <QtMoc Include="main_core.h" />

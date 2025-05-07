@@ -13,6 +13,7 @@
 #include <QStandardPaths>
 #include <QDesktopServices>
 
+#include "tinyxml2/tinyxml2.h"
 #include "custom_menu_bar.h"
 #include "custom_settings.h"
 #include "custom_tab_bar.h"
@@ -23,6 +24,11 @@
 #include "main_window.h"
 #include "message_bus.h"
 #include "custom_status_bar.h"
+
+using tinyxml2::XMLDocument;
+using tinyxml2::XMLNode;
+using tinyxml2::XMLElement;
+using tinyxml2::XMLAttribute;
 
 namespace
 {
@@ -59,7 +65,6 @@ void MainCore::ExitSoftware()
 
 void MainCore::InitUi()
 {
-	m_mainWindow->setWindowIcon(QIcon(":/Icons/Icons/one_note_pad.ico"));
 	// 工具栏
 	m_toolBar->setMovable(false);
 	m_toolBar->setWindowTitle("Tool Bar");
@@ -594,24 +599,69 @@ void MainCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Delete File", [=]() {
-		int index = m_centralWidget->currentIndex();
-		if (index >= 0)
+	m_messageBus->Subscribe("Delete File", [=]()
 		{
-			QString&& file_path = m_textWidget[index]->GetFilePath();
-			if (!file_path.isEmpty() && QFileInfo::exists(file_path)) {
-				if (QMessageBox::Ok ==
-					QMessageBox::question(m_mainWindow, tr("Delete File"),
-						tr("The file") + "\"" + file_path + "\"" +
-						tr("will be removed and this file will "
-							"be closed.Continue?"),
-						QMessageBox::Ok, QMessageBox::No)) {
-					QFile file(file_path);
-					file.remove();
-					CloseFile(index);
+			int index = m_centralWidget->currentIndex();
+			if (index >= 0)
+			{
+				QString&& file_path = m_textWidget[index]->GetFilePath();
+				if (!file_path.isEmpty() && QFileInfo::exists(file_path)) {
+					if (QMessageBox::Ok ==
+						QMessageBox::question(m_mainWindow, tr("Delete File"),
+							tr("The file") + "\"" + file_path + "\"" +
+							tr("will be removed and this file will "
+								"be closed.Continue?"),
+							QMessageBox::Ok, QMessageBox::No)) {
+						QFile file(file_path);
+						file.remove();
+						CloseFile(index);
+					}
 				}
 			}
-		}
+		});
+	m_messageBus->Subscribe("Load Session", [=]()
+		{
+			// 选择文件
+			QString&& file_path = QFileDialog::getOpenFileName(m_mainWindow, tr("Open Session"), "", "All types(*.*)");
+			if (file_path.isEmpty())
+			{
+				return;
+			}
+			// 加载文件
+			QStringList file_paths;
+			XMLDocument doc;
+			doc.LoadFile(file_path.toLocal8Bit().constData());
+			if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
+			{
+				return;
+			}
+
+		});
+	m_messageBus->Subscribe("Save Session", [=]()
+		{
+			// 收集文件路径
+			QStringList file_paths;
+			for (const auto& it : m_textWidget)
+			{
+				file_paths.append(it->GetFilePath());
+			}
+			// 保存文件路径
+			XMLDocument doc;
+			XMLNode* one_notepad = doc.InsertFirstChild(doc.NewElement("OneNotepad"));
+			XMLNode* session = one_notepad->InsertFirstChild(doc.NewElement("Session"));
+			for (const auto& it : file_paths)
+			{
+				XMLNode* file = session->InsertEndChild(doc.NewElement("File"));
+				file->InsertFirstChild(doc.NewText(it.toLocal8Bit().constData()));
+			}
+			doc.Print();
+			// 选择保存路径
+			QString&& save_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save Session"), "", "All types(*.*)");
+			if (save_path.isEmpty())
+			{
+				return;
+			}
+			doc.SaveFile(save_path.toLocal8Bit().constData());
 		});
 	m_messageBus->Subscribe("Print", [=]()
 		{
@@ -1370,23 +1420,6 @@ void MainCore::InitValue()
 		});
 
 	// Directory
-	m_messageBus->Subscribe("Expand All", [=]()
-		{
-			m_dirWorkSpace->ExpandAll();
-		});
-	m_messageBus->Subscribe("Collapse All", [=]()
-		{
-			m_dirWorkSpace->CollapseAll();
-		});
-	m_messageBus->Subscribe("Locate The Current File", [=]()
-		{
-			int index = m_centralWidget->currentIndex();
-			if (index >= 0)
-			{
-				QString&& file_path = m_textWidget[index]->GetFilePath();
-				m_dirWorkSpace->LocationFile(file_path);
-			}
-		});
 	m_messageBus->Subscribe("Copy Path", [=](const QString& data)
 		{
 			QClipboard* clipboard = QApplication::clipboard();
@@ -1471,7 +1504,6 @@ void MainCore::InitValue()
 		});
 	m_messageBus->Subscribe("Debug Info", [=]()
 		{
-
 		});
 }
 

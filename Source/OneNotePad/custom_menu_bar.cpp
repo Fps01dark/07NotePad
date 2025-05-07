@@ -351,6 +351,14 @@ void CustomMenuBar::InitConnect()
 		{
 			m_messageBus->Publish("Delete File");
 		});
+	connect(m_loadSessionAction,&QAction::triggered,[=]()
+		{
+			m_messageBus->Publish("Load Session");
+		});
+	connect(m_saveSessionAction,&QAction::triggered,[=]()
+		{
+			m_messageBus->Publish("Save Session");
+		});
 	connect(m_printAction, &QAction::triggered, [=]()
 		{
 			m_messageBus->Publish("Print");

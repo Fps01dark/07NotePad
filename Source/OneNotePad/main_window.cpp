@@ -9,7 +9,6 @@
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-
 	m_mainCore = new MainCore(this);
 
 	InitUi();

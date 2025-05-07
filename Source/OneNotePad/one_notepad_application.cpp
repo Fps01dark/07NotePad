@@ -4,6 +4,9 @@
 #include <Windows.h>
 #endif
 
+#include <QObject>
+#include <QIcon>
+
 OneNotepadApplication::OneNotepadApplication(int& argc, char** argv)
 	:SingleApplication(argc, argv)
 {
@@ -11,8 +14,24 @@ OneNotepadApplication::OneNotepadApplication(int& argc, char** argv)
 	// 创建一个系统范围的互斥锁，以便安装程序可以检测它是否正在运行
 	CreateMutex(NULL, false, L"OneNotepadMutex");
 #endif
+	InitUi();
+	InitValue();
+	InitConnect();
 }
 
 OneNotepadApplication::~OneNotepadApplication()
+{
+}
+
+void OneNotepadApplication::InitUi()
+{
+	setWindowIcon(QIcon(":/Icons/Icons/one_notepad.ico"));
+}
+
+void OneNotepadApplication::InitValue()
+{
+}
+
+void OneNotepadApplication::InitConnect()
 {
 }
