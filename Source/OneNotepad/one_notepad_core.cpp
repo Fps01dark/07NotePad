@@ -1,4 +1,4 @@
-﻿#include "main_core.h"
+﻿#include "one_notepad_core.h"
 
 #include <random>
 
@@ -21,7 +21,7 @@
 #include "custom_text_edit.h"
 #include "custom_tool_bar.h"
 #include "dir_workspace_dock.h"
-#include "main_window.h"
+#include "one_notepad_main_window.h"
 #include "message_bus.h"
 #include "custom_status_bar.h"
 
@@ -37,7 +37,7 @@ namespace
 	const QString& APP_COPYRIGHT = "Copyright 2025-2025 Wang Shuaiwu";
 }
 
-MainCore::MainCore(MainWindow* main_window)
+OneNotepadCore::OneNotepadCore(OneNotepadMainWindow* main_window)
 	: m_mainWindow(main_window), QObject(main_window)
 {
 	m_messageBus = std::make_shared<MessageBus>();
@@ -54,16 +54,16 @@ MainCore::MainCore(MainWindow* main_window)
 	InitConnect();
 }
 
-MainCore::~MainCore()
+OneNotepadCore::~OneNotepadCore()
 {
 }
 
-void MainCore::ExitSoftware()
+void OneNotepadCore::ExitSoftware()
 {
 	m_messageBus->Publish("Exit Software");
 }
 
-void MainCore::InitUi()
+void OneNotepadCore::InitUi()
 {
 	// 工具栏
 	m_toolBar->setMovable(false);
@@ -85,8 +85,8 @@ void MainCore::InitUi()
 	m_dirWorkSpace->hide();
 
 	// 主界面
-	int width = m_settings->value("MainWindow/Width", 1920).toInt();
-	int height = m_settings->value("MainWindow/Height", 1080).toInt();
+	int width = m_settings->value("OneNotepadMainWindow/Width", 1920).toInt();
+	int height = m_settings->value("OneNotepadMainWindow/Height", 1080).toInt();
 	m_mainWindow->resize(width, height);
 	m_mainWindow->setWindowTitle("OneNotePad");
 	m_mainWindow->setMenuBar(m_menuBar);
@@ -96,13 +96,13 @@ void MainCore::InitUi()
 	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, m_dirWorkSpace);
 
 	// 加载最近文件记录
-	QStringList&& recent_paths = m_settings->value("MainCore/RecentFilePaths").toStringList();
+	QStringList&& recent_paths = m_settings->value("OneNotepadCore/RecentFilePaths").toStringList();
 	m_menuBar->SetRecentFiles(recent_paths);
 	// 加载上次打开的文件
 	LoadSettings();
 }
 
-void MainCore::InitValue()
+void OneNotepadCore::InitValue()
 {
 	// File
 	m_messageBus->Subscribe("Update Window Title", [=]()
@@ -635,7 +635,6 @@ void MainCore::InitValue()
 			{
 				return;
 			}
-
 		});
 	m_messageBus->Subscribe("Save Session", [=]()
 		{
@@ -1485,10 +1484,10 @@ void MainCore::InitValue()
 		{
 			// 保存主窗口大小
 			QSize main_window_size = m_mainWindow->size();
-			m_settings->setValue("MainWindow/Width", main_window_size.width());
-			m_settings->setValue("MainWindow/Height", main_window_size.height());
+			m_settings->setValue("OneNotepadMainWindow/Width", main_window_size.width());
+			m_settings->setValue("OneNotepadMainWindow/Height", main_window_size.height());
 			// 保存上次打开文件
-			m_settings->setValue("MainCore/RecentFilePaths", m_menuBar->GetRecentFiles());
+			m_settings->setValue("OneNotepadCore/RecentFilePaths", m_menuBar->GetRecentFiles());
 			SaveSettings();
 		});
 
@@ -1507,7 +1506,7 @@ void MainCore::InitValue()
 		});
 }
 
-void MainCore::InitConnect()
+void OneNotepadCore::InitConnect()
 {
 	qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 	qDebug(Q_FUNC_INFO);
@@ -1543,7 +1542,7 @@ void MainCore::InitConnect()
 		});
 }
 
-bool MainCore::NewFile(const QString& new_file_name)
+bool OneNotepadCore::NewFile(const QString& new_file_name)
 {
 	CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
 	text_widget->SetFileName(new_file_name);
@@ -1576,7 +1575,7 @@ bool MainCore::NewFile(const QString& new_file_name)
 	return true;
 }
 
-bool MainCore::OpenFile(const QString& file_path)
+bool OneNotepadCore::OpenFile(const QString& file_path)
 {
 	QFileInfo file_info(file_path);
 	if (file_path.isEmpty() || !file_info.exists())
@@ -1641,7 +1640,7 @@ bool MainCore::OpenFile(const QString& file_path)
 	return true;
 }
 
-bool MainCore::SaveFile(int index, const QString& file_path)
+bool OneNotepadCore::SaveFile(int index, const QString& file_path)
 {
 	if (index < 0 || index >= m_centralWidget->count())
 	{
@@ -1674,7 +1673,7 @@ bool MainCore::SaveFile(int index, const QString& file_path)
 	return true;
 }
 
-bool MainCore::CloseFile(int index)
+bool OneNotepadCore::CloseFile(int index)
 {
 	if (index < 0 || index >= m_centralWidget->count())
 	{
@@ -1692,12 +1691,12 @@ bool MainCore::CloseFile(int index)
 	return true;
 }
 
-bool MainCore::LoadSettings()
+bool OneNotepadCore::LoadSettings()
 {
-	QStringList&& opened_file_name = m_settings->value("MainCore/OpenedFileNames").toStringList();
-	QStringList&& opened_file_path = m_settings->value("MainCore/OpenedFilePaths").toStringList();
-	QList<bool>&& saved_file = m_settings->BoolList("MainCore/SavedFile");
-	int current_index = m_settings->value("MainCore/CurrentIndex").toInt();
+	QStringList&& opened_file_name = m_settings->value("OneNotepadCore/OpenedFileNames").toStringList();
+	QStringList&& opened_file_path = m_settings->value("OneNotepadCore/OpenedFilePaths").toStringList();
+	QList<bool>&& saved_file = m_settings->BoolList("OneNotepadCore/SavedFile");
+	int current_index = m_settings->value("OneNotepadCore/CurrentIndex").toInt();
 	m_fontSize = m_settings->value("CustomTextEdit/FontSize").toInt();
 	for (int index = 0; index < opened_file_path.size(); ++index)
 	{
@@ -1767,7 +1766,7 @@ bool MainCore::LoadSettings()
 	return true;
 }
 
-bool MainCore::SaveSettings()
+bool OneNotepadCore::SaveSettings()
 {
 	QList<QString> m_openedFilePath;
 	QList<QString> m_openedFileName;
@@ -1779,10 +1778,10 @@ bool MainCore::SaveSettings()
 		m_savedFile.append(m_textWidget[i]->GetSaveStatus());
 	}
 	// 保存上次打开文件
-	m_settings->setValue("MainCore/OpenedFilePaths", m_openedFilePath);
-	m_settings->setValue("MainCore/OpenedFileNames", m_openedFileName);
-	m_settings->SetBoolList("MainCore/SavedFile", m_savedFile);
-	m_settings->setValue("MainCore/CurrentIndex", m_centralWidget->currentIndex());
+	m_settings->setValue("OneNotepadCore/OpenedFilePaths", m_openedFilePath);
+	m_settings->setValue("OneNotepadCore/OpenedFileNames", m_openedFileName);
+	m_settings->SetBoolList("OneNotepadCore/SavedFile", m_savedFile);
+	m_settings->setValue("OneNotepadCore/CurrentIndex", m_centralWidget->currentIndex());
 
 	// 保存无路径文件
 	for (int index = 0; index < m_centralWidget->count(); ++index)

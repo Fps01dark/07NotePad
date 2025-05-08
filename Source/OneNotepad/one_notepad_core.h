@@ -7,7 +7,7 @@ class QString;
 
 class MessageBus;
 class CustomSettings;
-class MainWindow;
+class OneNotepadMainWindow;
 class CustomMenuBar;
 class CustomToolBar;
 class CustomTabBar;
@@ -16,12 +16,12 @@ class CustomTabWidget;
 class CustomStatusBar;
 class DirWorkspaceDock;
 
-class MainCore : public QObject
+class OneNotepadCore : public QObject
 {
 	Q_OBJECT
 public:
-	explicit MainCore(MainWindow* main_window);
-	~MainCore();
+	explicit OneNotepadCore(OneNotepadMainWindow* main_window);
+	~OneNotepadCore();
 	void ExitSoftware();
 
 private:
@@ -40,7 +40,7 @@ private:
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;
 	CustomSettings* m_settings = nullptr;
-	MainWindow* m_mainWindow = nullptr;
+	OneNotepadMainWindow* m_mainWindow = nullptr;
 	CustomMenuBar* m_menuBar = nullptr;
 	CustomToolBar* m_toolBar = nullptr;
 	CustomTabBar* m_tabBar = nullptr;

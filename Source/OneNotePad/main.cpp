@@ -4,7 +4,7 @@
 #include <QSettings>
 #include <QSysInfo>
 
-#include "main_window.h"
+#include "one_notepad_main_window.h"
 #include "one_notepad_application.h"
 
 int main(int argc, char* argv[])
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
 	if (app.isPrimary())
 	{
-		MainWindow w;
+		OneNotepadMainWindow w;
 		w.show();
 		return app.exec();
 	}

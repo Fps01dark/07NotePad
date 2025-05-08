@@ -105,8 +105,8 @@
     <ClCompile Include="dir_workspace_dock.cpp" />
     <ClCompile Include="dir_workspace_tree_view.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="main_core.cpp" />
-    <ClCompile Include="main_window.cpp" />
+    <ClCompile Include="one_notepad_core.cpp" />
+    <ClCompile Include="one_notepad_main_window.cpp" />
     <ClCompile Include="message_bus.cpp" />
     <ClCompile Include="one_notepad_application.cpp" />
     <ClCompile Include="SingleApplication\singleapplication.cpp" />
@@ -131,8 +131,8 @@
     <QtMoc Include="SingleApplication\singleapplication.h" />
     <QtMoc Include="one_notepad_application.h" />
     <QtMoc Include="status_label.h" />
-    <QtMoc Include="main_window.h" />
-    <QtMoc Include="main_core.h" />
+    <QtMoc Include="one_notepad_main_window.h" />
+    <QtMoc Include="one_notepad_core.h" />
     <QtMoc Include="dir_workspace_tree_view.h" />
     <QtMoc Include="dir_workspace_dock.h" />
     <QtMoc Include="custom_text_edit.h" />
@@ -140,7 +140,7 @@
     <QtMoc Include="custom_tab_bar.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="main_window.ui" />
+    <QtUic Include="one_notepad_main_window.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="..\..\Resources\one_notepad.qrc" />

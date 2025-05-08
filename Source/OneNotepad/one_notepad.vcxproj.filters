@@ -32,7 +32,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main_core.cpp">
+    <ClCompile Include="one_notepad_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="message_bus.cpp">
@@ -62,7 +62,7 @@
     <ClCompile Include="dir_workspace_tree_view.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="main_window.cpp">
+    <ClCompile Include="one_notepad_main_window.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
     <ClCompile Include="status_label.cpp">
@@ -91,7 +91,7 @@
     <QtMoc Include="custom_settings.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="main_core.h">
+    <QtMoc Include="one_notepad_core.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="custom_menu_bar.h">
@@ -112,7 +112,7 @@
     <QtMoc Include="dir_workspace_tree_view.h">
       <Filter>Ui</Filter>
     </QtMoc>
-    <QtMoc Include="main_window.h">
+    <QtMoc Include="one_notepad_main_window.h">
       <Filter>Ui</Filter>
     </QtMoc>
     <QtMoc Include="status_label.h">
@@ -149,7 +149,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="main_window.ui">
+    <QtUic Include="one_notepad_main_window.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
