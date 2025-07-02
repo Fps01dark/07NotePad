@@ -227,7 +227,7 @@ void CustomMenuBar::InitUi()
 
 void CustomMenuBar::InitValue()
 {
-	m_messageBus->Subscribe("Add Recent File", [=](const QString& file_path)
+	m_messageBus->Subscribe("Add Recent File", [this](const QString& file_path)
 		{
 			// Data
 			m_recentFiles.removeOne(file_path);
@@ -239,7 +239,7 @@ void CustomMenuBar::InitValue()
 			// UI
 			SetRecentFiles(m_recentFiles);
 		});
-	m_messageBus->Subscribe("Update Menu Bar", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Menu Bar", [this](CustomTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -271,143 +271,143 @@ void CustomMenuBar::InitValue()
 void CustomMenuBar::InitConnect()
 {
 	// 文件
-	connect(m_newAction, &QAction::triggered, [=]()
+	connect(m_newAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("New File");
 		});
-	connect(m_openAction, &QAction::triggered, [=]()
+	connect(m_openAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open File");
 		});
-	connect(m_explorerAction, &QAction::triggered, [=]()
+	connect(m_explorerAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open Explorer");
 		});
-	connect(m_cmdAction, &QAction::triggered, [=]()
+	connect(m_cmdAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open Cmd");
 		});
-	connect(m_defaultViewerAction, &QAction::triggered, [=]()
+	connect(m_defaultViewerAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open In Default Viewer");
 		});
-	connect(m_folderAsWorkspace, &QAction::triggered, [=]()
+	connect(m_folderAsWorkspace, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open Directory Workspace");
 		});
-	connect(m_openFolderAsWorkspaceAction, &QAction::triggered, [=]()
+	connect(m_openFolderAsWorkspaceAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open Directory As Workspace");
 		});
-	connect(m_reloadAction, &QAction::triggered, [=]()
+	connect(m_reloadAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Reload File");
 		});
-	connect(m_saveAction, &QAction::triggered, [=]()
+	connect(m_saveAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save File");
 		});
-	connect(m_saveAsAction, &QAction::triggered, [=]()
+	connect(m_saveAsAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save As File");
 		});
-	connect(m_copySaveAsAction, &QAction::triggered, [=]()
+	connect(m_copySaveAsAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save As Clipboard");
 		});
-	connect(m_saveAllAction, &QAction::triggered, [=]()
+	connect(m_saveAllAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save All File");
 		});
-	connect(m_renameAction, &QAction::triggered, [=]()
+	connect(m_renameAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save As File");
 		});
-	connect(m_closeAction, &QAction::triggered, [=]()
+	connect(m_closeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close File");
 		});
-	connect(m_closeAllAction, &QAction::triggered, [=]()
+	connect(m_closeAllAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close All File");
 		});
-	connect(m_closeAllButCurrentAction, &QAction::triggered, [=]()
+	connect(m_closeAllButCurrentAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close All But Current File");
 		});
-	connect(m_closeLeftAction, &QAction::triggered, [=]()
+	connect(m_closeLeftAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close Left File");
 		});
-	connect(m_closeRightAction, &QAction::triggered, [=]()
+	connect(m_closeRightAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close Right File");
 		});
-	connect(m_closeAllUnchangeAction, &QAction::triggered, [=]()
+	connect(m_closeAllUnchangeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close All Unchanged File");
 		});
-	connect(m_deleteFileAction, &QAction::triggered, [=]()
+	connect(m_deleteFileAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Delete File");
 		});
-	connect(m_loadSessionAction,&QAction::triggered,[=]()
+	connect(m_loadSessionAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Load Session");
 		});
-	connect(m_saveSessionAction,&QAction::triggered,[=]()
+	connect(m_saveSessionAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save Session");
 		});
-	connect(m_printAction, &QAction::triggered, [=]()
+	connect(m_printAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Print");
 		});
-	connect(m_openAllRecentAction, &QAction::triggered, [=]()
+	connect(m_openAllRecentAction, &QAction::triggered, [this]()
 		{
 			for (auto action : m_recentFileMenu->actions())
 			{
 				action->triggered();
 			}
 		});
-	connect(m_clearRecentAction, &QAction::triggered, [=]()
+	connect(m_clearRecentAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Clear Recent Record");
 		});
-	connect(m_exitSotfwareAction, &QAction::triggered, [=]()
+	connect(m_exitSotfwareAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Exit Software");
 		});
 	// 编辑
-	connect(m_undoAction, &QAction::triggered, [=]()
+	connect(m_undoAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Undo");
 		});
-	connect(m_redoAction, &QAction::triggered, [=]()
+	connect(m_redoAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Redo");
 		});
-	connect(m_cutAction, &QAction::triggered, [=]()
+	connect(m_cutAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Cut");
 		});
-	connect(m_copyAction, &QAction::triggered, [=]()
+	connect(m_copyAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy");
 		});
-	connect(m_pasteAction, &QAction::triggered, [=]()
+	connect(m_pasteAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Paste");
 		});
-	connect(m_deleteTextAction, &QAction::triggered, [=]()
+	connect(m_deleteTextAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Delete");
 		});
-	connect(m_selectAllAction, &QAction::triggered, [=]()
+	connect(m_selectAllAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Select All");
 		});
-	connect(m_beginEndSelectAction, &QAction::triggered, [=]()
+	connect(m_beginEndSelectAction, &QAction::triggered, [this]()
 		{
 			if (m_beginEndSelectAction->isChecked() == true)
 			{
@@ -420,7 +420,7 @@ void CustomMenuBar::InitConnect()
 				m_messageBus->Publish("Begin/End Select", 0);
 			}
 		});
-	connect(m_beginEndColumnSelectAction, &QAction::triggered, [=]()
+	connect(m_beginEndColumnSelectAction, &QAction::triggered, [this]()
 		{
 			if (m_beginEndColumnSelectAction->isChecked() == true)
 			{
@@ -433,233 +433,233 @@ void CustomMenuBar::InitConnect()
 				m_messageBus->Publish("Begin/End Select in Column Mode", 0);
 			}
 		});
-	connect(m_shortTimeAction, &QAction::triggered, [=]()
+	connect(m_shortTimeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Insert Short Time");
 		});
-	connect(m_longTimeAction, &QAction::triggered, [=]()
+	connect(m_longTimeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Insert Long Time");
 		});
-	connect(m_customTimeAction, &QAction::triggered, [=]()
+	connect(m_customTimeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Insert Custom Time");
 		});
-	connect(m_copyFilePathAction, &QAction::triggered, [=]()
+	connect(m_copyFilePathAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy Path");
 		});
-	connect(m_copyFileNameAction, &QAction::triggered, [=]()
+	connect(m_copyFileNameAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy Name");
 		});
-	connect(m_copyFileDirAction, &QAction::triggered, [=]()
+	connect(m_copyFileDirAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy Directory");
 		});
-	connect(m_copyAllFileNameAction, &QAction::triggered, [=]()
+	connect(m_copyAllFileNameAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy All Names");
 		});
-	connect(m_copyAllFilePathAction, &QAction::triggered, [=]()
+	connect(m_copyAllFilePathAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy All Paths");
 		});
-	connect(m_insertLineIndentAction, &QAction::triggered, [=]()
+	connect(m_insertLineIndentAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Increase Line Indent");
 		});
-	connect(m_deleteLineIndentAction, &QAction::triggered, [=]()
+	connect(m_deleteLineIndentAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Decrease Line Indent");
 		});
-	connect(m_UPPERCASEAction, &QAction::triggered, [=]()
+	connect(m_UPPERCASEAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("UPPERCASE");
 		});
-	connect(m_lowercaseAction, &QAction::triggered, [=]()
+	connect(m_lowercaseAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("lowercase");
 		});
-	connect(m_ProperCaseAction, &QAction::triggered, [=]()
+	connect(m_ProperCaseAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Proper Case");
 		});
-	connect(m_ProperCaseBlendAction, &QAction::triggered, [=]()
+	connect(m_ProperCaseBlendAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Proper Case(blend)");
 		});
-	connect(m_SentencecaseAction, &QAction::triggered, [=]()
+	connect(m_SentencecaseAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Sentence case");
 		});
-	connect(m_SentencecaseBlendAction, &QAction::triggered, [=]()
+	connect(m_SentencecaseBlendAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Sentence case(blend)");
 		});
-	connect(m_iNVERTcASEAction, &QAction::triggered, [=]()
+	connect(m_iNVERTcASEAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("iNVERT cASE");
 		});
-	connect(m_ranDOmCasEAction, &QAction::triggered, [=]()
+	connect(m_ranDOmCasEAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("ranDOm CasE");
 		});
-	connect(m_toggleSingleLineCommentAction, &QAction::triggered, [=]()
+	connect(m_toggleSingleLineCommentAction, &QAction::triggered, [this]()
 		{
 			// TODO:添加/删除单行注释
 		});
-	connect(m_singleLineCommentAction, &QAction::triggered, [=]()
+	connect(m_singleLineCommentAction, &QAction::triggered, [this]()
 		{
 			// TODO:设置行注释
 		});
-	connect(m_singleLineUncommentAction, &QAction::triggered, [=]()
+	connect(m_singleLineUncommentAction, &QAction::triggered, [this]()
 		{
 			// TODO:取消行注释
 		});
-	connect(m_blockCommentAction, &QAction::triggered, [=]()
+	connect(m_blockCommentAction, &QAction::triggered, [this]()
 		{
 			// TODO:设置区块注释
 		});
-	connect(m_blockUncommentAction, &QAction::triggered, [=]()
+	connect(m_blockUncommentAction, &QAction::triggered, [this]()
 		{
 			// TODO:取消区块注释
 		});
-	connect(m_functionCompletionAction, &QAction::triggered, [=]()
+	connect(m_functionCompletionAction, &QAction::triggered, [this]()
 		{
 			// TODO:函数补全
 		});
-	connect(m_wordCompletionAction, &QAction::triggered, [=]()
+	connect(m_wordCompletionAction, &QAction::triggered, [this]()
 		{
 			// TODO:单词补全
 		});
-	connect(m_functionParametersHintAction, &QAction::triggered, [=]()
+	connect(m_functionParametersHintAction, &QAction::triggered, [this]()
 		{
 			// TODO:函数参数提示
 		});
-	connect(m_functionParametersPreviousHintAction, &QAction::triggered, [=]()
+	connect(m_functionParametersPreviousHintAction, &QAction::triggered, [this]()
 		{
 			// TODO:函数参数上一个提示
 		});
-	connect(m_functionParametersNextHintAction, &QAction::triggered, [=]()
+	connect(m_functionParametersNextHintAction, &QAction::triggered, [this]()
 		{
 			// TODO:函数参数下一个提示
 		});
-	connect(m_pathCompletion, &QAction::triggered, [=]()
+	connect(m_pathCompletion, &QAction::triggered, [this]()
 		{
 			// TODO:路径补全
 		});
-	connect(m_duplicateCurrentLineAction, &QAction::triggered, [=]()
+	connect(m_duplicateCurrentLineAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Duplicate Current Line");
 		});
-	connect(m_removeDuplicateLinesAction, &QAction::triggered, [=]()
+	connect(m_removeDuplicateLinesAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Remove Duplicate Line");
 		});
-	connect(m_removeConsecutiveDuplicateLinesAction, &QAction::triggered, [=]()
+	connect(m_removeConsecutiveDuplicateLinesAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Remove Consecutive Duplicate Lines");
 		});
-	connect(m_splitLinesAction, &QAction::triggered, [=]()
+	connect(m_splitLinesAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Split Lines");
 		});
-	connect(m_joinLinesAction, &QAction::triggered, [=]()
+	connect(m_joinLinesAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Join Lines");
 		});
-	connect(m_moveUpCurrentLineAction, &QAction::triggered, [=]()
+	connect(m_moveUpCurrentLineAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Move Up Current Line");
 		});
-	connect(m_moveDownCurrentLineAction, &QAction::triggered, [=]()
+	connect(m_moveDownCurrentLineAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Move Down Current Line");
 		});
-	connect(m_removeEmptyLinesAction, &QAction::triggered, [=]()
+	connect(m_removeEmptyLinesAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Remove Empty Lines");
 		});
-	connect(m_removeEmptyLinesBlankAction, &QAction::triggered, [=]()
+	connect(m_removeEmptyLinesBlankAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Remove Empty Lines Blank");
 		});
-	connect(m_insertBlankLineAboveCurrentAction, &QAction::triggered, [=]()
+	connect(m_insertBlankLineAboveCurrentAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Insert Blank Line Above Current");
 		});
-	connect(m_insertBlankLineBelowCurrentAction, &QAction::triggered, [=]()
+	connect(m_insertBlankLineBelowCurrentAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Insert Blank Line Below Current");
 		});
-	connect(m_reverseLineOrderAction, &QAction::triggered, [=]()
+	connect(m_reverseLineOrderAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Reverse Line Order");
 		});
-	connect(m_randomizeLineOrderAction, &QAction::triggered, [=]()
+	connect(m_randomizeLineOrderAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Randomize Line Order");
 		});
-	connect(m_sortLinesLexicographicallyAscendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesLexicographicallyAscendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:升序排列文本行
 		});
-	connect(m_sortLinesLexAscendingIgnoringCaseAction, &QAction::triggered, [=]()
+	connect(m_sortLinesLexAscendingIgnoringCaseAction, &QAction::triggered, [this]()
 		{
 			// TODO:升序排列行（不分大小写）
 		});
-	connect(m_sortLinesAsIntegersAscendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesAsIntegersAscendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:升序排列整数
 		});
-	connect(m_sortLinesAsDecimalsCommaAscendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesAsDecimalsCommaAscendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:升序排列小数（逗号作为小数点）
 		});
-	connect(m_sortLinesAsDecimalsDotAscendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesAsDecimalsDotAscendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:升序排列小数（句号作为小数点）
 		});
-	connect(m_sortLinesLexicographicallyDescendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesLexicographicallyDescendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:降序排列文本行
 		});
-	connect(m_sortLinesLexDescendingIgnoringCaseAction, &QAction::triggered, [=]()
+	connect(m_sortLinesLexDescendingIgnoringCaseAction, &QAction::triggered, [this]()
 		{
 			// TODO:降序排列行（不分大小写）
 		});
-	connect(m_sortLinesAsIntegersDescendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesAsIntegersDescendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:降序排列整数
 		});
-	connect(m_sortLinesAsDecimalsCommaDescendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesAsDecimalsCommaDescendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:降序排列小数（逗号作为小数点）
 		});
-	connect(m_sortLinesAsDecimalsDotDescendingAction, &QAction::triggered, [=]()
+	connect(m_sortLinesAsDecimalsDotDescendingAction, &QAction::triggered, [this]()
 		{
 			// TODO:降序排列小数（句号作为小数点）
 		});
-	connect(m_eolWindowsAction, &QAction::triggered, [=]()
+	connect(m_eolWindowsAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("EOL Conversion", SC_EOL_CRLF);
 		});
-	connect(m_eolUnixAction, &QAction::triggered, [=]()
+	connect(m_eolUnixAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("EOL Conversion", SC_EOL_LF);
 		});
-	connect(m_eolMacintoshAction, &QAction::triggered, [=]()
+	connect(m_eolMacintoshAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("EOL Conversion", SC_EOL_CR);
 		});
 
 	connect(m_aboutQt, &QAction::triggered, &QApplication::aboutQt);
-	connect(m_aboutOneNotePad, &QAction::triggered, [=]()
+	connect(m_aboutOneNotePad, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("About OneNotePad");
 		});
-	connect(m_debugInfoAction, &QAction::triggered, [=]()
+	connect(m_debugInfoAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Debug Info");
 		});

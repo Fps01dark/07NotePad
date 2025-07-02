@@ -54,24 +54,24 @@ void DirWorkspaceTreeView::InitUi()
 void DirWorkspaceTreeView::InitValue() {}
 
 void DirWorkspaceTreeView::InitConnect() {
-	connect(m_openAction, &QAction::triggered, [=]() {
+	connect(m_openAction, &QAction::triggered, [this]() {
 		m_messageBus->Publish("Open File", m_fileSystemModel->filePath(currentIndex()));
 		});
-	connect(m_copyPathAction, &QAction::triggered, [=]() {
+	connect(m_copyPathAction, &QAction::triggered, [this]() {
 		m_messageBus->Publish("Copy Path", m_fileSystemModel->filePath(currentIndex()));
 		});
-	connect(m_copyNameAction, &QAction::triggered, [=]() {
+	connect(m_copyNameAction, &QAction::triggered, [this]() {
 		m_messageBus->Publish("Copy Name", m_fileSystemModel->fileName(currentIndex()));
 		});
-	connect(m_runBySystemAction, &QAction::triggered, [=]() {
+	connect(m_runBySystemAction, &QAction::triggered, [this]() {
 		m_messageBus->Publish("Open In Default Viewer",
 			m_fileSystemModel->filePath(currentIndex()));
 		});
-	connect(m_explorerHereAction, &QAction::triggered, [=]() {
+	connect(m_explorerHereAction, &QAction::triggered, [this]() {
 		m_messageBus->Publish("Open Explorer",
 			m_fileSystemModel->fileInfo(currentIndex()).absolutePath());
 		});
-	connect(m_cmdHereAction, &QAction::triggered, [=]() {
+	connect(m_cmdHereAction, &QAction::triggered, [this]() {
 		m_messageBus->Publish("Open Cmd",
 			m_fileSystemModel->fileInfo(currentIndex()).absolutePath());
 		});

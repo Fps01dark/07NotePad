@@ -52,7 +52,7 @@ void DirWorkspaceDock::InitValue()
 
 void DirWorkspaceDock::InitConnect()
 {
-	connect(m_treeView, &QTreeView::doubleClicked, this, [=](const QModelIndex& index)
+	connect(m_treeView, &QTreeView::doubleClicked, this, [this](const QModelIndex& index)
 		{
 			m_messageBus->Publish("Open File", m_fileSystemModel->filePath(index));
 		});

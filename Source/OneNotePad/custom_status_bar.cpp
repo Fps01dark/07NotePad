@@ -43,7 +43,7 @@ void CustomStatusBar::InitUi()
 
 void CustomStatusBar::InitValue()
 {
-	m_messageBus->Subscribe("Update Status Bar", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Status Bar", [this](CustomTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -56,12 +56,12 @@ void CustomStatusBar::InitValue()
 			m_messageBus->Publish("Update OverType", editor);
 		});
 
-	m_messageBus->Subscribe("Update Language", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Language", [this](CustomTextEdit* editor)
 		{
 			// TODO:暂时语言只有None
 			m_docType->setText("Normal Text File");
 		});
-	m_messageBus->Subscribe("Update Document Size", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Document Size", [this](CustomTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -69,7 +69,7 @@ void CustomStatusBar::InitValue()
 			QString size_text = tr("Length: %L1    Lines: %L2").arg(editor->length()).arg(editor->lineCount());
 			m_docSize->setText(size_text);
 		});
-	m_messageBus->Subscribe("Update Selection Info", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Selection Info", [this](CustomTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -106,7 +106,7 @@ void CustomStatusBar::InitValue()
 			QString position_text = tr("Ln: %L1    Col: %L2    ").arg(editor->lineFromPosition(pos) + 1).arg(editor->column(pos) + 1);
 			m_docPos->setText(position_text + selection_text);
 		});
-	m_messageBus->Subscribe("Update Eol", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Eol", [this](CustomTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -124,7 +124,7 @@ void CustomStatusBar::InitValue()
 				break;
 			}
 		});
-	m_messageBus->Subscribe("Update Encoding", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Encoding", [this](CustomTextEdit* editor)
 		{
 			switch (editor->codePage())
 			{
@@ -139,7 +139,7 @@ void CustomStatusBar::InitValue()
 				break;
 			}
 		});
-	m_messageBus->Subscribe("Update OverType", [=](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update OverType", [this](CustomTextEdit* editor)
 		{
 			bool overtype = editor->overtype();
 			if (overtype)

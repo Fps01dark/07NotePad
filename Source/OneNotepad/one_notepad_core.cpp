@@ -33,7 +33,7 @@ using tinyxml2::XMLAttribute;
 namespace
 {
 	const QString FILE_BACK_UP_DIR = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OneNotePad/BackUp";
-	const QString& APP_VERSION = "0.1";
+	const QString& APP_VERSION = "1.0.0";
 	const QString& APP_COPYRIGHT = "Copyright 2025-2025 Wang Shuaiwu";
 }
 
@@ -105,7 +105,7 @@ void OneNotepadCore::InitUi()
 void OneNotepadCore::InitValue()
 {
 	// File
-	m_messageBus->Subscribe("Update Window Title", [=]()
+	m_messageBus->Subscribe("Update Window Title", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index < 0)
@@ -126,7 +126,7 @@ void OneNotepadCore::InitValue()
 				m_mainWindow->setWindowTitle(win_title + " - OneNotePad");
 			}
 		});
-	m_messageBus->Subscribe("New File", [=]()
+	m_messageBus->Subscribe("New File", [this]()
 		{
 			static int count = 0;
 			while (true)
@@ -148,7 +148,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Open File", [=]()
+	m_messageBus->Subscribe("Open File", [this]()
 		{
 			QStringList&& file_paths = QFileDialog::getOpenFileNames(m_mainWindow, tr("Open"), "", "All types(*.*)");
 			for (const QString& file_path : file_paths)
@@ -156,11 +156,11 @@ void OneNotepadCore::InitValue()
 				OpenFile(file_path);
 			}
 		});
-	m_messageBus->Subscribe("Open File", [=](const QString& data)
+	m_messageBus->Subscribe("Open File", [this](const QString& data)
 		{
 			OpenFile(data);
 		});
-	m_messageBus->Subscribe("Open Explorer", [=]()
+	m_messageBus->Subscribe("Open Explorer", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -170,11 +170,11 @@ void OneNotepadCore::InitValue()
 				QDesktopServices::openUrl(QUrl::fromLocalFile(file_info.absolutePath()));
 			}
 		});
-	m_messageBus->Subscribe("Open Explorer", [=](const QString& data)
+	m_messageBus->Subscribe("Open Explorer", [this](const QString& data)
 		{
 			QDesktopServices::openUrl(QUrl::fromLocalFile(data));
 		});
-	m_messageBus->Subscribe("Open Cmd", [=]()
+	m_messageBus->Subscribe("Open Cmd", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -186,12 +186,12 @@ void OneNotepadCore::InitValue()
 				QProcess::startDetached("cmd.exe", QStringList() << "/K" << "cd" << file_dir);
 			}
 		});
-	m_messageBus->Subscribe("Open Cmd", [=](const QString& data)
+	m_messageBus->Subscribe("Open Cmd", [this](const QString& data)
 		{
 			// 启动命令行窗口并进入文件所在目录
 			QProcess::startDetached("cmd.exe", QStringList() << "/K" << "cd" << data);
 		});
-	m_messageBus->Subscribe("Open Directory Workspace", [=]()
+	m_messageBus->Subscribe("Open Directory Workspace", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -205,7 +205,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Open Directory As Workspace", [=]()
+	m_messageBus->Subscribe("Open Directory As Workspace", [this]()
 		{
 			QString file_dir = QFileDialog::getExistingDirectory(m_mainWindow, tr("Open Directory As Workspace"), qApp->applicationDirPath());
 			if (!file_dir.isEmpty()) {
@@ -213,7 +213,7 @@ void OneNotepadCore::InitValue()
 				m_dirWorkSpace->show();
 			}
 		});
-	m_messageBus->Subscribe("Open In Default Viewer", [=]()
+	m_messageBus->Subscribe("Open In Default Viewer", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -222,11 +222,11 @@ void OneNotepadCore::InitValue()
 				QDesktopServices::openUrl(QUrl::fromLocalFile(file_path));
 			}
 		});
-	m_messageBus->Subscribe("Open In Default Viewer", [=](const QString& data)
+	m_messageBus->Subscribe("Open In Default Viewer", [this](const QString& data)
 		{
 			QDesktopServices::openUrl(QUrl::fromLocalFile(data));
 		});
-	m_messageBus->Subscribe("Reload File", [=]()
+	m_messageBus->Subscribe("Reload File", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -249,7 +249,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Save File", [=]()
+	m_messageBus->Subscribe("Save File", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -272,7 +272,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Save As File", [=]()
+	m_messageBus->Subscribe("Save As File", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -286,7 +286,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Save All File", [=]()
+	m_messageBus->Subscribe("Save All File", [this]()
 		{
 			for (int index = 0; index < m_centralWidget->count(); ++index)
 			{
@@ -308,7 +308,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Save As Clipboard", [=]()
+	m_messageBus->Subscribe("Save As Clipboard", [this]()
 		{
 			QClipboard* clipboard = QApplication::clipboard();
 			QString     file_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save A Copy As..."),
@@ -327,7 +327,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close File", [=]()
+	m_messageBus->Subscribe("Close File", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -372,7 +372,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close File", [=](int index)
+	m_messageBus->Subscribe("Close File", [this](int index)
 		{
 			if (index >= 0 && index < m_centralWidget->count())
 			{
@@ -415,7 +415,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close All File", [=]()
+	m_messageBus->Subscribe("Close All File", [this]()
 		{
 			for (int index = m_centralWidget->count() - 1; index >= 0; --index)
 			{
@@ -456,7 +456,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close All But Current File", [=]()
+	m_messageBus->Subscribe("Close All But Current File", [this]()
 		{
 			for (int index = m_centralWidget->count() - 1; index >= 0; --index)
 			{
@@ -502,7 +502,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close Left File", [=]()
+	m_messageBus->Subscribe("Close Left File", [this]()
 		{
 			int current_index = m_centralWidget->currentIndex();
 			for (int index = current_index - 1; index >= 0; --index)
@@ -543,7 +543,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close Right File", [=]()
+	m_messageBus->Subscribe("Close Right File", [this]()
 		{
 			int current_index = m_centralWidget->currentIndex();
 			for (int index = m_centralWidget->count() - 1; index >= current_index + 1; --index)
@@ -589,7 +589,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Close All Unchanged File", [=]()
+	m_messageBus->Subscribe("Close All Unchanged File", [this]()
 		{
 			for (int index = m_centralWidget->count() - 1; index >= 0; --index)
 			{
@@ -599,7 +599,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Delete File", [=]()
+	m_messageBus->Subscribe("Delete File", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -619,7 +619,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Load Session", [=]()
+	m_messageBus->Subscribe("Load Session", [this]()
 		{
 			// 选择文件
 			QString&& file_path = QFileDialog::getOpenFileName(m_mainWindow, tr("Open Session"), "", "All types(*.*)");
@@ -628,15 +628,23 @@ void OneNotepadCore::InitValue()
 				return;
 			}
 			// 加载文件
-			QStringList file_paths;
 			XMLDocument doc;
 			doc.LoadFile(file_path.toLocal8Bit().constData());
 			if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
 			{
 				return;
 			}
+			XMLElement* session_element = doc.FirstChildElement("OneNotepad")->FirstChildElement("Session");
+			for (XMLElement* file_element = session_element->FirstChildElement("File"); file_element != nullptr; file_element = file_element->NextSiblingElement("File"))
+			{
+				QString file_path = file_element->GetText();
+				if (QFileInfo::exists(file_path))
+				{
+					OpenFile(file_path);
+				}
+			}
 		});
-	m_messageBus->Subscribe("Save Session", [=]()
+	m_messageBus->Subscribe("Save Session", [this]()
 		{
 			// 收集文件路径
 			QStringList file_paths;
@@ -646,23 +654,24 @@ void OneNotepadCore::InitValue()
 			}
 			// 保存文件路径
 			XMLDocument doc;
-			XMLNode* one_notepad = doc.InsertFirstChild(doc.NewElement("OneNotepad"));
-			XMLNode* session = one_notepad->InsertFirstChild(doc.NewElement("Session"));
+			doc.InsertEndChild(doc.NewDeclaration());
+			doc.SetBOM(true);
+			XMLNode* one_notepad = doc.InsertEndChild(doc.NewElement("OneNotepad"));
+			XMLNode* session = one_notepad->InsertEndChild(doc.NewElement("Session"));
 			for (const auto& it : file_paths)
 			{
 				XMLNode* file = session->InsertEndChild(doc.NewElement("File"));
-				file->InsertFirstChild(doc.NewText(it.toLocal8Bit().constData()));
+				file->InsertEndChild(doc.NewText(it.toLocal8Bit().constData()));
 			}
-			doc.Print();
 			// 选择保存路径
-			QString&& save_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save Session"), "", "All types(*.*)");
+			QString&& save_path = QFileDialog::getSaveFileName(m_mainWindow, tr("Save Session"), "", "All types(*)");
 			if (save_path.isEmpty())
 			{
 				return;
 			}
 			doc.SaveFile(save_path.toLocal8Bit().constData());
 		});
-	m_messageBus->Subscribe("Print", [=]()
+	m_messageBus->Subscribe("Print", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -691,16 +700,16 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Clear Recent Record", [=]()
+	m_messageBus->Subscribe("Clear Recent Record", [this]()
 		{
 			m_menuBar->SetRecentFiles(QStringList());
 		});
-	m_messageBus->Subscribe("Exit Software", [=]()
+	m_messageBus->Subscribe("Exit Software", [this]()
 		{
 			m_mainWindow->close();
 		});
 	// Edit
-	m_messageBus->Subscribe("Undo", [=]()
+	m_messageBus->Subscribe("Undo", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -708,7 +717,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->undo();
 			}
 		});
-	m_messageBus->Subscribe("Redo", [=]()
+	m_messageBus->Subscribe("Redo", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -716,7 +725,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->redo();
 			}
 		});
-	m_messageBus->Subscribe("Cut", [=]()
+	m_messageBus->Subscribe("Cut", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -724,7 +733,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->cut();
 			}
 		});
-	m_messageBus->Subscribe("Copy", [=]()
+	m_messageBus->Subscribe("Copy", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -732,7 +741,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->copyAllowLine();
 			}
 		});
-	m_messageBus->Subscribe("Paste", [=]()
+	m_messageBus->Subscribe("Paste", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -740,7 +749,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->paste();
 			}
 		});
-	m_messageBus->Subscribe("Delete", [=]()
+	m_messageBus->Subscribe("Delete", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -748,7 +757,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->clear();
 			}
 		});
-	m_messageBus->Subscribe("Select All", [=]()
+	m_messageBus->Subscribe("Select All", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -756,7 +765,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->selectAll();
 			}
 		});
-	m_messageBus->Subscribe("Begin/End Select", [=](int start)
+	m_messageBus->Subscribe("Begin/End Select", [this](int start)
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -776,7 +785,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Begin/End Select in Column Mode", [=](int start)
+	m_messageBus->Subscribe("Begin/End Select in Column Mode", [this](int start)
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -797,7 +806,7 @@ void OneNotepadCore::InitValue()
 				}
 			}
 		});
-	m_messageBus->Subscribe("Insert Short Time", [=]()
+	m_messageBus->Subscribe("Insert Short Time", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -808,7 +817,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->addText(date_string.toUtf8().length(), date_string.toUtf8().constData());
 			}
 		});
-	m_messageBus->Subscribe("Insert Long Time", [=]()
+	m_messageBus->Subscribe("Insert Long Time", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -819,7 +828,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->addText(date_string.toUtf8().length(), date_string.toUtf8().constData());
 			}
 		});
-	m_messageBus->Subscribe("Insert Custom Time", [=]()
+	m_messageBus->Subscribe("Insert Custom Time", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -830,7 +839,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->addText(date_string.toUtf8().length(), date_string.toUtf8().constData());
 			}
 		});
-	m_messageBus->Subscribe("Copy All Names", [=]()
+	m_messageBus->Subscribe("Copy All Names", [this]()
 		{
 			QClipboard* clipboard = QApplication::clipboard();
 			QString all_names;
@@ -840,7 +849,7 @@ void OneNotepadCore::InitValue()
 			}
 			clipboard->setText(all_names);
 		});
-	m_messageBus->Subscribe("Copy All Paths", [=]()
+	m_messageBus->Subscribe("Copy All Paths", [this]()
 		{
 			QClipboard* clipboard = QApplication::clipboard();
 			QString all_paths;
@@ -850,7 +859,7 @@ void OneNotepadCore::InitValue()
 			}
 			clipboard->setText(all_paths);
 		});
-	m_messageBus->Subscribe("Increase Line Indent", [=]()
+	m_messageBus->Subscribe("Increase Line Indent", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -858,7 +867,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->tab();
 			}
 		});
-	m_messageBus->Subscribe("Decrease Line Indent", [=]()
+	m_messageBus->Subscribe("Decrease Line Indent", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -866,7 +875,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->backTab();
 			}
 		});
-	m_messageBus->Subscribe("UPPERCASE", [=]()
+	m_messageBus->Subscribe("UPPERCASE", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -874,7 +883,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->upperCase();
 			}
 		});
-	m_messageBus->Subscribe("lowercase", [=]()
+	m_messageBus->Subscribe("lowercase", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -882,7 +891,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->lowerCase();
 			}
 		});
-	m_messageBus->Subscribe("Proper Case", [=]()
+	m_messageBus->Subscribe("Proper Case", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -917,7 +926,7 @@ void OneNotepadCore::InitValue()
 				editor->setSel(start_pos, end_pos);
 			}
 		});
-	m_messageBus->Subscribe("Proper Case(blend)", [=]()
+	m_messageBus->Subscribe("Proper Case(blend)", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -944,7 +953,7 @@ void OneNotepadCore::InitValue()
 				editor->setSel(start_pos, end_pos);
 			}
 		});
-	m_messageBus->Subscribe("Sentence case", [=]()
+	m_messageBus->Subscribe("Sentence case", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1020,7 +1029,7 @@ void OneNotepadCore::InitValue()
 				editor->setSel(start_pos, end_pos);
 			}
 		});
-	m_messageBus->Subscribe("Sentence case(blend)", [=]()
+	m_messageBus->Subscribe("Sentence case(blend)", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1092,7 +1101,7 @@ void OneNotepadCore::InitValue()
 				editor->setSel(start_pos, end_pos);
 			}
 		});
-	m_messageBus->Subscribe("iNVERT cASE", [=]()
+	m_messageBus->Subscribe("iNVERT cASE", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1120,7 +1129,7 @@ void OneNotepadCore::InitValue()
 				editor->setSel(start_pos, end_pos);
 			}
 		});
-	m_messageBus->Subscribe("ranDOm CasE", [=]()
+	m_messageBus->Subscribe("ranDOm CasE", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1151,7 +1160,7 @@ void OneNotepadCore::InitValue()
 				editor->setSel(start_pos, end_pos);
 			}
 		});
-	m_messageBus->Subscribe("Duplicate Current Line", [=]()
+	m_messageBus->Subscribe("Duplicate Current Line", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1159,7 +1168,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->lineDuplicate();
 			}
 		});
-	m_messageBus->Subscribe("Remove Duplicate Line", [=]()
+	m_messageBus->Subscribe("Remove Duplicate Line", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1167,7 +1176,7 @@ void OneNotepadCore::InitValue()
 				// TODO:通过搜索功能删除重复行
 			}
 		});
-	m_messageBus->Subscribe("Remove Consecutive Duplicate Lines", [=]()
+	m_messageBus->Subscribe("Remove Consecutive Duplicate Lines", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1175,7 +1184,7 @@ void OneNotepadCore::InitValue()
 				// TODO:通过搜索功能删除重复行
 			}
 		});
-	m_messageBus->Subscribe("Split Lines", [=]()
+	m_messageBus->Subscribe("Split Lines", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1184,7 +1193,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->linesSplit(0);
 			}
 		});
-	m_messageBus->Subscribe("Join Lines", [=]()
+	m_messageBus->Subscribe("Join Lines", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1193,7 +1202,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->linesJoin();
 			}
 		});
-	m_messageBus->Subscribe("Move Up Current Line", [=]()
+	m_messageBus->Subscribe("Move Up Current Line", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1201,7 +1210,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->moveSelectedLinesUp();
 			}
 		});
-	m_messageBus->Subscribe("Move Down Current Line", [=]()
+	m_messageBus->Subscribe("Move Down Current Line", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1209,7 +1218,7 @@ void OneNotepadCore::InitValue()
 				m_textWidget[index]->moveSelectedLinesDown();
 			}
 		});
-	m_messageBus->Subscribe("Remove Empty Lines", [=]()
+	m_messageBus->Subscribe("Remove Empty Lines", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1217,7 +1226,7 @@ void OneNotepadCore::InitValue()
 				// TODO:通过搜索功能删除空行
 			}
 		});
-	m_messageBus->Subscribe("Remove Empty Lines Blank", [=]()
+	m_messageBus->Subscribe("Remove Empty Lines Blank", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1225,7 +1234,7 @@ void OneNotepadCore::InitValue()
 				// TODO:通过搜索功能删除空行
 			}
 		});
-	m_messageBus->Subscribe("Insert Blank Line Above Current", [=]()
+	m_messageBus->Subscribe("Insert Blank Line Above Current", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1239,7 +1248,7 @@ void OneNotepadCore::InitValue()
 				text_edit->insertText(pos, "\r\n");
 			}
 		});
-	m_messageBus->Subscribe("Insert Blank Line Below Current", [=]()
+	m_messageBus->Subscribe("Insert Blank Line Below Current", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1253,7 +1262,7 @@ void OneNotepadCore::InitValue()
 				text_edit->insertText(pos, text_edit->GetEOLString().toUtf8().constData());
 			}
 		});
-	m_messageBus->Subscribe("Reverse Line Order", [=]()
+	m_messageBus->Subscribe("Reverse Line Order", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1328,7 +1337,7 @@ void OneNotepadCore::InitValue()
 				editor->replaceTarget(-1, joined_text.toUtf8().constData());
 			}
 		});
-	m_messageBus->Subscribe("Randomize Line Order", [=]()
+	m_messageBus->Subscribe("Randomize Line Order", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1404,7 +1413,7 @@ void OneNotepadCore::InitValue()
 				editor->replaceTarget(-1, joined_text.toUtf8().constData());
 			}
 		});
-	m_messageBus->Subscribe("EOL Conversion", [=](int eolMode)
+	m_messageBus->Subscribe("EOL Conversion", [this](int eolMode)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -1419,19 +1428,19 @@ void OneNotepadCore::InitValue()
 		});
 
 	// Directory
-	m_messageBus->Subscribe("Copy Path", [=](const QString& data)
+	m_messageBus->Subscribe("Copy Path", [this](const QString& data)
 		{
 			QClipboard* clipboard = QApplication::clipboard();
 			clipboard->setText(data);
 		});
-	m_messageBus->Subscribe("Copy Name", [=](const QString& data)
+	m_messageBus->Subscribe("Copy Name", [this](const QString& data)
 		{
 			QClipboard* clipboard = QApplication::clipboard();
 			clipboard->setText(data);
 		});
 
 	// QTabWidget
-	m_messageBus->Subscribe("Text Changed", [=]()
+	m_messageBus->Subscribe("Text Changed", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1440,7 +1449,7 @@ void OneNotepadCore::InitValue()
 				m_centralWidget->setTabIcon(index, QIcon(":/Icons/Icons/unsaved.png"));
 			}
 		});
-	m_messageBus->Subscribe("Copy Path", [=]()
+	m_messageBus->Subscribe("Copy Path", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1449,7 +1458,7 @@ void OneNotepadCore::InitValue()
 				clipboard->setText(m_textWidget[index]->GetFilePath());
 			}
 		});
-	m_messageBus->Subscribe("Copy Name", [=]()
+	m_messageBus->Subscribe("Copy Name", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1458,7 +1467,7 @@ void OneNotepadCore::InitValue()
 				clipboard->setText(m_textWidget[index]->GetFileName());
 			}
 		});
-	m_messageBus->Subscribe("Copy Directory", [=]()
+	m_messageBus->Subscribe("Copy Directory", [this]()
 		{
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
@@ -1468,7 +1477,7 @@ void OneNotepadCore::InitValue()
 				clipboard->setText(file_info.absolutePath());
 			}
 		});
-	m_messageBus->Subscribe("Change Zoom", [=](int data)
+	m_messageBus->Subscribe("Change Zoom", [this](int data)
 		{
 			m_fontSize = data;
 			for (int i = 0; i < m_textWidget.size(); ++i)
@@ -1480,7 +1489,7 @@ void OneNotepadCore::InitValue()
 		});
 
 	// MainWindow
-	m_messageBus->Subscribe("Exit Software", [=]()
+	m_messageBus->Subscribe("Exit Software", [this]()
 		{
 			// 保存主窗口大小
 			QSize main_window_size = m_mainWindow->size();
@@ -1492,7 +1501,7 @@ void OneNotepadCore::InitValue()
 		});
 
 	// Help
-	m_messageBus->Subscribe("About OneNotePad", [=]()
+	m_messageBus->Subscribe("About OneNotePad", [this]()
 		{
 			QMessageBox::about(m_mainWindow, tr("About OneNotePad"),
 				QStringLiteral("<h3>%1 v%2 </h3>"
@@ -1501,7 +1510,7 @@ void OneNotepadCore::InitValue()
 					R"(<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p> <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p> <p>You should have received a copy of the GNU General Public License along with this program. If not, see &lt;<a href="https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>&gt;.</p>)")
 				.arg(QApplication::applicationDisplayName(), APP_VERSION, APP_COPYRIGHT.toHtmlEscaped()));
 		});
-	m_messageBus->Subscribe("Debug Info", [=]()
+	m_messageBus->Subscribe("Debug Info", [this]()
 		{
 		});
 }
@@ -1518,7 +1527,7 @@ void OneNotepadCore::InitConnect()
 		m_messageBus->Publish("Update Window Title");
 		m_messageBus->Publish("Update Status Bar", editor);
 	}
-	connect(m_centralWidget, &CustomTabWidget::currentChanged, [=]()
+	connect(m_centralWidget, &CustomTabWidget::currentChanged, [this]()
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -1532,11 +1541,11 @@ void OneNotepadCore::InitConnect()
 				m_messageBus->Publish("Update Status Bar", editor);
 			}
 		});
-	connect(m_centralWidget, &CustomTabWidget::tabCloseRequested, [=](int index)
+	connect(m_centralWidget, &CustomTabWidget::tabCloseRequested, [this](int index)
 		{
 			m_messageBus->Publish("Close File", index);
 		});
-	connect(m_tabBar, &CustomTabBar::tabMoved, [=](int from, int to)
+	connect(m_tabBar, &CustomTabBar::tabMoved, [this](int from, int to)
 		{
 			m_textWidget.swapItemsAt(from, to);
 		});
@@ -1550,7 +1559,7 @@ bool OneNotepadCore::NewFile(const QString& new_file_name)
 	text_widget->SetSaveStatus(true);
 	text_widget->convertEOLs(SC_EOL_CRLF);
 	text_widget->setEOLMode(SC_EOL_CRLF);
-	connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
+	connect(text_widget, &CustomTextEdit::savePointChanged, [this]()
 		{
 			m_messageBus->Publish("Text Changed");
 		});
@@ -1613,7 +1622,7 @@ bool OneNotepadCore::OpenFile(const QString& file_path)
 			text_widget->SetSaveStatus(true);
 			text_widget->convertEOLs(SC_EOL_CRLF);
 			text_widget->setEOLMode(SC_EOL_CRLF);
-			connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
+			connect(text_widget, &CustomTextEdit::savePointChanged, [this]()
 				{
 					m_messageBus->Publish("Text Changed");
 				});
@@ -1719,7 +1728,7 @@ bool OneNotepadCore::LoadSettings()
 			text_widget->SetSaveStatus(saved_file[index]);
 			text_widget->convertEOLs(SC_EOL_CRLF);
 			text_widget->setEOLMode(SC_EOL_CRLF);
-			connect(text_widget, &CustomTextEdit::savePointChanged, [=]()
+			connect(text_widget, &CustomTextEdit::savePointChanged, [this]()
 				{
 					m_messageBus->Publish("Text Changed");
 				});

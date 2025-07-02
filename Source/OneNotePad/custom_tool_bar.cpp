@@ -51,27 +51,27 @@ void CustomToolBar::InitValue() {}
 
 void CustomToolBar::InitConnect()
 {
-	connect(m_newAction, &QAction::triggered, [=]()
+	connect(m_newAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("New File");
 		});
-	connect(m_openAction, &QAction::triggered, [=]()
+	connect(m_openAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open File");
 		});
-	connect(m_saveAction, &QAction::triggered, [=]()
+	connect(m_saveAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save File");
 		});
-	connect(m_saveAllAction, &QAction::triggered, [=]()
+	connect(m_saveAllAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save All File");
 		});
-	connect(m_closeAction, &QAction::triggered, [=]()
+	connect(m_closeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close File");
 		});
-	connect(m_closeAllAction, &QAction::triggered, [=]()
+	connect(m_closeAllAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close All File");
 		});

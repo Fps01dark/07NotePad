@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QSysInfo>
+#include <QFile>
 
 #include "one_notepad_main_window.h"
 #include "one_notepad_application.h"

@@ -1,0 +1,5 @@
+OneNotepad V1.0.0
+1.初步开发完成
+
+OneNotepad V1.0.1
+1.编写README.md文件，写上软件介绍，如何编译

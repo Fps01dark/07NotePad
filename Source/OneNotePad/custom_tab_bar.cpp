@@ -13,7 +13,9 @@ CustomTabBar::CustomTabBar(std::shared_ptr<MessageBus> message_bus, QWidget* par
 	InitConnect();
 }
 
-CustomTabBar::~CustomTabBar() {}
+CustomTabBar::~CustomTabBar()
+{
+}
 
 void CustomTabBar::contextMenuEvent(QContextMenuEvent* event)
 {
@@ -78,71 +80,71 @@ void CustomTabBar::InitValue()
 
 void CustomTabBar::InitConnect()
 {
-	connect(m_closeAction, &QAction::triggered, [=]()
+	connect(m_closeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close File");
 		});
-	connect(m_closeAllButCurrentAction, &QAction::triggered, [=]()
+	connect(m_closeAllButCurrentAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close All But Current File");
 		});
-	connect(m_closeLeftAction, &QAction::triggered, [=]()
+	connect(m_closeLeftAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close Left File");
 		});
-	connect(m_closeRightAction, &QAction::triggered, [=]()
+	connect(m_closeRightAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close Right File");
 		});
-	connect(m_closeAllUnchangeAction, &QAction::triggered, [=]()
+	connect(m_closeAllUnchangeAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Close All Unchanged File");
 		});
-	connect(m_saveAction, &QAction::triggered, [=]()
+	connect(m_saveAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save File");
 		});
-	connect(m_saveAsAction, &QAction::triggered, [=]()
+	connect(m_saveAsAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save As File");
 		});
-	connect(m_explorerAction, &QAction::triggered, [=]()
+	connect(m_explorerAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open Explorer");
 		});
-	connect(m_cmdAction, &QAction::triggered, [=]()
+	connect(m_cmdAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open Cmd");
 		});
-	connect(m_folderAsWorkspace, &QAction::triggered, [=]()
+	connect(m_folderAsWorkspace, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open Directory Workspace");
 		});
-	connect(m_defaultViewerAction, &QAction::triggered, [=]()
+	connect(m_defaultViewerAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Open In Default Viewer");
 		});
-	connect(m_renameAction, &QAction::triggered, [=]()
+	connect(m_renameAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Save As File");
 		});
-	connect(m_deleteAction, &QAction::triggered, [=]()
+	connect(m_deleteAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Delete File");
 		});
-	connect(m_reloadAction, &QAction::triggered, [=]()
+	connect(m_reloadAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Reload File");
 		});
-	connect(m_copyPathAction, &QAction::triggered, [=]()
+	connect(m_copyPathAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy Path");
 		});
-	connect(m_copyNameAction, &QAction::triggered, [=]()
+	connect(m_copyNameAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy Name");
 		});
-	connect(m_copyDirAction, &QAction::triggered, [=]()
+	connect(m_copyDirAction, &QAction::triggered, [this]()
 		{
 			m_messageBus->Publish("Copy Directory");
 		});
