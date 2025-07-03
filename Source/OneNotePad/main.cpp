@@ -5,8 +5,8 @@
 #include <QSysInfo>
 #include <QFile>
 
-#include "one_notepad_main_window.h"
-#include "one_notepad_application.h"
+#include "on_main_window.h"
+#include "on_application.h"
 
 int main(int argc, char* argv[])
 {
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	// Default settings format
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
-	OneNotepadApplication app(argc, argv);
+	OnApplication app(argc, argv);
 
 	// Log some debug info
 	qInfo("=============================");
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
 	if (app.isPrimary())
 	{
-		OneNotepadMainWindow w;
+		OnMainWindow w;
 		w.show();
 		return app.exec();
 	}

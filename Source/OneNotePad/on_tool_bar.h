@@ -4,11 +4,11 @@
 
 class MessageBus;
 
-class CustomToolBar : public QToolBar
+class OnToolBar : public QToolBar
 {
 public:
-	explicit CustomToolBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
-	~CustomToolBar();
+	explicit OnToolBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
+	~OnToolBar();
 
 private:
 	void InitUi();

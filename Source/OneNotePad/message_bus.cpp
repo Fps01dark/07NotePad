@@ -88,11 +88,11 @@ void MessageBus::Publish(const QString& messageType, const QStringList& data)
 }
 
 // 注册消息类型的订阅者
-void MessageBus::Subscribe(const QString& messageType, std::function<void(CustomTextEdit*)> handler)
+void MessageBus::Subscribe(const QString& messageType, std::function<void(OnTextEdit*)> handler)
 {
 	m_voidCustomTextEditSubscribers[messageType].push_back(handler);
 }
-void MessageBus::Publish(const QString& messageType, CustomTextEdit* data)
+void MessageBus::Publish(const QString& messageType, OnTextEdit* data)
 {
 	if (m_voidCustomTextEditSubscribers.find(messageType) != m_voidCustomTextEditSubscribers.end())
 	{

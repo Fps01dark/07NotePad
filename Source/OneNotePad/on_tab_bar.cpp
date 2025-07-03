@@ -1,11 +1,11 @@
-﻿#include "custom_tab_bar.h"
+﻿#include "on_tab_bar.h"
 
 #include <QMenu>
 #include <QContextMenuEvent>
 
 #include "message_bus.h"
 
-CustomTabBar::CustomTabBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+OnTabBar::OnTabBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	: m_messageBus(message_bus), QTabBar(parent)
 {
 	InitUi();
@@ -13,11 +13,11 @@ CustomTabBar::CustomTabBar(std::shared_ptr<MessageBus> message_bus, QWidget* par
 	InitConnect();
 }
 
-CustomTabBar::~CustomTabBar()
+OnTabBar::~OnTabBar()
 {
 }
 
-void CustomTabBar::contextMenuEvent(QContextMenuEvent* event)
+void OnTabBar::contextMenuEvent(QContextMenuEvent* event)
 {
 	int index = tabAt(event->pos());
 	if (index >= 0 && index < count())
@@ -28,7 +28,7 @@ void CustomTabBar::contextMenuEvent(QContextMenuEvent* event)
 	}
 }
 
-void CustomTabBar::InitUi()
+void OnTabBar::InitUi()
 {
 	m_itemMenu = new QMenu(this);
 	m_closeAction = m_itemMenu->addAction(tr("Close"));
@@ -74,11 +74,11 @@ void CustomTabBar::InitUi()
 	m_removeColorAction = m_colorTabMenu->addAction(tr("Remove Color"));
 }
 
-void CustomTabBar::InitValue()
+void OnTabBar::InitValue()
 {
 }
 
-void CustomTabBar::InitConnect()
+void OnTabBar::InitConnect()
 {
 	connect(m_closeAction, &QAction::triggered, [this]()
 		{

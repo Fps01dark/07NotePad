@@ -1,4 +1,4 @@
-﻿#include "one_notepad_core.h"
+﻿#include "on_core.h"
 
 #include <random>
 
@@ -9,21 +9,22 @@
 #include <QWheelEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QApplication>
 #include <QPrintDialog>
 #include <QStandardPaths>
 #include <QDesktopServices>
 
 #include "tinyxml2/tinyxml2.h"
-#include "custom_menu_bar.h"
-#include "custom_settings.h"
-#include "custom_tab_bar.h"
-#include "custom_tab_widget.h"
-#include "custom_text_edit.h"
-#include "custom_tool_bar.h"
+#include "on_menu_bar.h"
+#include "on_settings.h"
+#include "on_tab_bar.h"
+#include "on_tab_widget.h"
+#include "on_text_edit.h"
+#include "on_tool_bar.h"
 #include "dir_workspace_dock.h"
-#include "one_notepad_main_window.h"
+#include "on_main_window.h"
 #include "message_bus.h"
-#include "custom_status_bar.h"
+#include "on_status_bar.h"
 
 using tinyxml2::XMLDocument;
 using tinyxml2::XMLNode;
@@ -37,16 +38,16 @@ namespace
 	const QString& APP_COPYRIGHT = "Copyright 2025-2025 Wang Shuaiwu";
 }
 
-OneNotepadCore::OneNotepadCore(OneNotepadMainWindow* main_window)
+OnCore::OnCore(OnMainWindow* main_window)
 	: m_mainWindow(main_window), QObject(main_window)
 {
 	m_messageBus = std::make_shared<MessageBus>();
-	m_settings = new CustomSettings(m_mainWindow);
-	m_menuBar = new CustomMenuBar(m_messageBus, m_mainWindow);
-	m_toolBar = new CustomToolBar(m_messageBus, m_mainWindow);
-	m_centralWidget = new CustomTabWidget(m_messageBus, m_mainWindow);
-	m_tabBar = new CustomTabBar(m_messageBus, m_mainWindow);
-	m_statusBar = new CustomStatusBar(m_messageBus, m_mainWindow);
+	m_settings = new OnSettings(m_mainWindow);
+	m_menuBar = new OnMenuBar(m_messageBus, m_mainWindow);
+	m_toolBar = new OnToolBar(m_messageBus, m_mainWindow);
+	m_centralWidget = new OnTabWidget(m_messageBus, m_mainWindow);
+	m_tabBar = new OnTabBar(m_messageBus, m_mainWindow);
+	m_statusBar = new OnStatusBar(m_messageBus, m_mainWindow);
 	m_dirWorkSpace = new DirWorkspaceDock(m_messageBus, m_mainWindow);
 
 	InitUi();
@@ -54,16 +55,16 @@ OneNotepadCore::OneNotepadCore(OneNotepadMainWindow* main_window)
 	InitConnect();
 }
 
-OneNotepadCore::~OneNotepadCore()
+OnCore::~OnCore()
 {
 }
 
-void OneNotepadCore::ExitSoftware()
+void OnCore::ExitSoftware()
 {
 	m_messageBus->Publish("Exit Software");
 }
 
-void OneNotepadCore::InitUi()
+void OnCore::InitUi()
 {
 	// 工具栏
 	m_toolBar->setMovable(false);
@@ -85,8 +86,8 @@ void OneNotepadCore::InitUi()
 	m_dirWorkSpace->hide();
 
 	// 主界面
-	int width = m_settings->value("OneNotepadMainWindow/Width", 1920).toInt();
-	int height = m_settings->value("OneNotepadMainWindow/Height", 1080).toInt();
+	int width = m_settings->value("OnMainWindow/Width", 1920).toInt();
+	int height = m_settings->value("OnMainWindow/Height", 1080).toInt();
 	m_mainWindow->resize(width, height);
 	m_mainWindow->setWindowTitle("OneNotePad");
 	m_mainWindow->setMenuBar(m_menuBar);
@@ -96,36 +97,15 @@ void OneNotepadCore::InitUi()
 	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, m_dirWorkSpace);
 
 	// 加载最近文件记录
-	QStringList&& recent_paths = m_settings->value("OneNotepadCore/RecentFilePaths").toStringList();
+	QStringList&& recent_paths = m_settings->value("OnCore/RecentFilePaths").toStringList();
 	m_menuBar->SetRecentFiles(recent_paths);
 	// 加载上次打开的文件
 	LoadSettings();
 }
 
-void OneNotepadCore::InitValue()
+void OnCore::InitValue()
 {
 	// File
-	m_messageBus->Subscribe("Update Window Title", [this]()
-		{
-			int index = m_centralWidget->currentIndex();
-			if (index < 0)
-			{
-				m_mainWindow->setWindowTitle("OneNotePad");
-			}
-			else
-			{
-				QString win_title;
-				if (index < m_textWidget.size())
-				{
-					win_title = m_textWidget[index]->GetFilePath();
-				}
-				if (win_title.isEmpty() && index < m_textWidget.size())
-				{
-					win_title = m_textWidget[index]->GetFileName();
-				}
-				m_mainWindow->setWindowTitle(win_title + " - OneNotePad");
-			}
-		});
 	m_messageBus->Subscribe("New File", [this]()
 		{
 			static int count = 0;
@@ -683,7 +663,7 @@ void OneNotepadCore::InitValue()
 				// 打开打印对话框
 				if (printDialog.exec() == QDialog::Accepted)
 				{
-					CustomTextEdit* text_edit = m_textWidget[index];
+					OnTextEdit* text_edit = m_textWidget[index];
 					// 创建QPainter对象用于绘制内容
 					QPainter painter;
 					if (painter.begin(&printer))
@@ -770,7 +750,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				if (start != 0)
 				{
 					// 开始
@@ -791,7 +771,7 @@ void OneNotepadCore::InitValue()
 			if (index >= 0)
 			{
 				// TODO:不知道为什么不起作用
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				if (start != 0)
 				{
 					// 开始
@@ -896,7 +876,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				// 获取位置
 				sptr_t start_pos = editor->selectionStart();
 				sptr_t end_pos = editor->selectionEnd();
@@ -931,7 +911,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				// 获取位置
 				sptr_t start_pos = editor->selectionStart();
 				sptr_t end_pos = editor->selectionEnd();
@@ -958,7 +938,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				// 获取位置
 				sptr_t start_pos = editor->selectionStart();
 				sptr_t end_pos = editor->selectionEnd();
@@ -1034,7 +1014,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				// 获取位置
 				sptr_t start_pos = editor->selectionStart();
 				sptr_t end_pos = editor->selectionEnd();
@@ -1106,7 +1086,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				// 获取位置
 				sptr_t start_pos = editor->selectionStart();
 				sptr_t end_pos = editor->selectionEnd();
@@ -1134,7 +1114,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				// 获取位置
 				sptr_t start_pos = editor->selectionStart();
 				sptr_t end_pos = editor->selectionEnd();
@@ -1239,7 +1219,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* text_edit = m_textWidget[index];
+				OnTextEdit* text_edit = m_textWidget[index];
 				// 获取当前行号
 				intptr_t current_line_index = text_edit->lineFromPosition(text_edit->currentPos());
 				// 获取当前行开始的位置
@@ -1253,7 +1233,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* text_edit = m_textWidget[index];
+				OnTextEdit* text_edit = m_textWidget[index];
 				// 获取当前行号
 				intptr_t current_line_index = text_edit->lineFromPosition(text_edit->currentPos());
 				// 获取下一行开始的位置
@@ -1267,7 +1247,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				sptr_t from_line = 0;
 				sptr_t to_line = 0;
 				if (editor->selections() > 1)
@@ -1342,7 +1322,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				sptr_t from_line = 0;
 				sptr_t to_line = 0;
 				if (editor->selections() > 1)
@@ -1421,7 +1401,7 @@ void OneNotepadCore::InitValue()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
+				OnTextEdit* editor = m_textWidget[index];
 				editor->convertEOLs(SC_EOL_CRLF);
 				editor->setEOLMode(SC_EOL_CRLF);
 			}
@@ -1493,10 +1473,10 @@ void OneNotepadCore::InitValue()
 		{
 			// 保存主窗口大小
 			QSize main_window_size = m_mainWindow->size();
-			m_settings->setValue("OneNotepadMainWindow/Width", main_window_size.width());
-			m_settings->setValue("OneNotepadMainWindow/Height", main_window_size.height());
+			m_settings->setValue("OnMainWindow/Width", main_window_size.width());
+			m_settings->setValue("OnMainWindow/Height", main_window_size.height());
 			// 保存上次打开文件
-			m_settings->setValue("OneNotepadCore/RecentFilePaths", m_menuBar->GetRecentFiles());
+			m_settings->setValue("OnCore/RecentFilePaths", m_menuBar->GetRecentFiles());
 			SaveSettings();
 		});
 
@@ -1515,7 +1495,7 @@ void OneNotepadCore::InitValue()
 		});
 }
 
-void OneNotepadCore::InitConnect()
+void OnCore::InitConnect()
 {
 	qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 	qDebug(Q_FUNC_INFO);
@@ -1523,11 +1503,11 @@ void OneNotepadCore::InitConnect()
 	int index = m_centralWidget->currentIndex();
 	if (index >= 0)
 	{
-		CustomTextEdit* editor = m_textWidget[index];
-		m_messageBus->Publish("Update Window Title");
+		OnTextEdit* editor = m_textWidget[index];
+		UpdateWindowTitle();
 		m_messageBus->Publish("Update Status Bar", editor);
 	}
-	connect(m_centralWidget, &CustomTabWidget::currentChanged, [this]()
+	connect(m_centralWidget, &OnTabWidget::currentChanged, [this]()
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -1535,40 +1515,62 @@ void OneNotepadCore::InitConnect()
 			int index = m_centralWidget->currentIndex();
 			if (index >= 0)
 			{
-				CustomTextEdit* editor = m_textWidget[index];
-				m_messageBus->Publish("Update Window Title");
+				OnTextEdit* editor = m_textWidget[index];
+				UpdateWindowTitle();
 				m_messageBus->Publish("Update Menu Bar", editor);
 				m_messageBus->Publish("Update Status Bar", editor);
 			}
 		});
-	connect(m_centralWidget, &CustomTabWidget::tabCloseRequested, [this](int index)
+	connect(m_centralWidget, &OnTabWidget::tabCloseRequested, [this](int index)
 		{
 			m_messageBus->Publish("Close File", index);
 		});
-	connect(m_tabBar, &CustomTabBar::tabMoved, [this](int from, int to)
+	connect(m_tabBar, &OnTabBar::tabMoved, [this](int from, int to)
 		{
 			m_textWidget.swapItemsAt(from, to);
 		});
 }
 
-bool OneNotepadCore::NewFile(const QString& new_file_name)
+void OnCore::UpdateWindowTitle()
 {
-	CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
+	int index = m_centralWidget->currentIndex();
+	if (index < 0)
+	{
+		m_mainWindow->setWindowTitle("OneNotePad");
+	}
+	else
+	{
+		QString win_title;
+		if (index < m_textWidget.size())
+		{
+			win_title = m_textWidget[index]->GetFilePath();
+		}
+		if (win_title.isEmpty() && index < m_textWidget.size())
+		{
+			win_title = m_textWidget[index]->GetFileName();
+		}
+		m_mainWindow->setWindowTitle(win_title + " - OneNotePad");
+	}
+}
+
+bool OnCore::NewFile(const QString& new_file_name)
+{
+	OnTextEdit* text_widget = new OnTextEdit(m_messageBus, m_centralWidget);
 	text_widget->SetFileName(new_file_name);
 	text_widget->SetFilePath("");
 	text_widget->SetSaveStatus(true);
 	text_widget->convertEOLs(SC_EOL_CRLF);
 	text_widget->setEOLMode(SC_EOL_CRLF);
-	connect(text_widget, &CustomTextEdit::savePointChanged, [this]()
+	connect(text_widget, &OnTextEdit::savePointChanged, [this]()
 		{
 			m_messageBus->Publish("Text Changed");
 		});
-	connect(text_widget, &CustomTextEdit::updateUi, [=](Scintilla::Update updated)
+	connect(text_widget, &OnTextEdit::updateUi, [=](Scintilla::Update updated)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
 
-			CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
+			OnTextEdit* editor = qobject_cast<OnTextEdit*>(sender());
 			if (Scintilla::FlagSet(updated, Scintilla::Update::Content))
 			{
 				m_messageBus->Publish("Update Document Size", text_widget);
@@ -1584,7 +1586,7 @@ bool OneNotepadCore::NewFile(const QString& new_file_name)
 	return true;
 }
 
-bool OneNotepadCore::OpenFile(const QString& file_path)
+bool OnCore::OpenFile(const QString& file_path)
 {
 	QFileInfo file_info(file_path);
 	if (file_path.isEmpty() || !file_info.exists())
@@ -1614,7 +1616,7 @@ bool OneNotepadCore::OpenFile(const QString& file_path)
 		{
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
-			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
+			OnTextEdit* text_widget = new OnTextEdit(m_messageBus, m_centralWidget);
 			text_widget->setText(in.readAll().toUtf8().constData());
 			file.close();
 			text_widget->SetFileName(file_info.fileName());
@@ -1622,16 +1624,16 @@ bool OneNotepadCore::OpenFile(const QString& file_path)
 			text_widget->SetSaveStatus(true);
 			text_widget->convertEOLs(SC_EOL_CRLF);
 			text_widget->setEOLMode(SC_EOL_CRLF);
-			connect(text_widget, &CustomTextEdit::savePointChanged, [this]()
+			connect(text_widget, &OnTextEdit::savePointChanged, [this]()
 				{
 					m_messageBus->Publish("Text Changed");
 				});
-			connect(text_widget, &CustomTextEdit::updateUi, [=](Scintilla::Update updated)
+			connect(text_widget, &OnTextEdit::updateUi, [=](Scintilla::Update updated)
 				{
 					qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 					qDebug(Q_FUNC_INFO);
 
-					CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
+					OnTextEdit* editor = qobject_cast<OnTextEdit*>(sender());
 					if (Scintilla::FlagSet(updated, Scintilla::Update::Content))
 					{
 						m_messageBus->Publish("Update Document Size", text_widget);
@@ -1649,7 +1651,7 @@ bool OneNotepadCore::OpenFile(const QString& file_path)
 	return true;
 }
 
-bool OneNotepadCore::SaveFile(int index, const QString& file_path)
+bool OnCore::SaveFile(int index, const QString& file_path)
 {
 	if (index < 0 || index >= m_centralWidget->count())
 	{
@@ -1667,7 +1669,7 @@ bool OneNotepadCore::SaveFile(int index, const QString& file_path)
 		// 保存
 		QTextStream in(&file);
 		in.setEncoding(QStringConverter::Utf8);
-		CustomTextEdit* text_edit = m_textWidget[index];
+		OnTextEdit* text_edit = m_textWidget[index];
 		in << text_edit->getText(m_textWidget[index]->length());
 		file.close();
 
@@ -1677,12 +1679,12 @@ bool OneNotepadCore::SaveFile(int index, const QString& file_path)
 		text_edit->SetSaveStatus(true);
 		m_centralWidget->setTabIcon(index, QIcon(":/Icons/Icons/saved.png"));
 		m_centralWidget->setTabText(index, file_info.fileName());
-		m_messageBus->Publish("Update Window Title");
+		UpdateWindowTitle();
 	}
 	return true;
 }
 
-bool OneNotepadCore::CloseFile(int index)
+bool OnCore::CloseFile(int index)
 {
 	if (index < 0 || index >= m_centralWidget->count())
 	{
@@ -1700,13 +1702,13 @@ bool OneNotepadCore::CloseFile(int index)
 	return true;
 }
 
-bool OneNotepadCore::LoadSettings()
+bool OnCore::LoadSettings()
 {
-	QStringList&& opened_file_name = m_settings->value("OneNotepadCore/OpenedFileNames").toStringList();
-	QStringList&& opened_file_path = m_settings->value("OneNotepadCore/OpenedFilePaths").toStringList();
-	QList<bool>&& saved_file = m_settings->BoolList("OneNotepadCore/SavedFile");
-	int current_index = m_settings->value("OneNotepadCore/CurrentIndex").toInt();
-	m_fontSize = m_settings->value("CustomTextEdit/FontSize").toInt();
+	QStringList&& opened_file_name = m_settings->value("OnCore/OpenedFileNames").toStringList();
+	QStringList&& opened_file_path = m_settings->value("OnCore/OpenedFilePaths").toStringList();
+	QList<bool>&& saved_file = m_settings->BoolList("OnCore/SavedFile");
+	int current_index = m_settings->value("OnCore/CurrentIndex").toInt();
+	m_fontSize = m_settings->value("OnTextEdit/FontSize").toInt();
 	for (int index = 0; index < opened_file_path.size(); ++index)
 	{
 		QString file_path = opened_file_path[index];
@@ -1720,7 +1722,7 @@ bool OneNotepadCore::LoadSettings()
 		{
 			QTextStream in(&file);
 			in.setEncoding(QStringConverter::Utf8);
-			CustomTextEdit* text_widget = new CustomTextEdit(m_messageBus, m_centralWidget);
+			OnTextEdit* text_widget = new OnTextEdit(m_messageBus, m_centralWidget);
 			text_widget->setText(in.readAll().toUtf8().constData());
 			file.close();
 			text_widget->SetFileName(opened_file_name[index]);
@@ -1728,16 +1730,16 @@ bool OneNotepadCore::LoadSettings()
 			text_widget->SetSaveStatus(saved_file[index]);
 			text_widget->convertEOLs(SC_EOL_CRLF);
 			text_widget->setEOLMode(SC_EOL_CRLF);
-			connect(text_widget, &CustomTextEdit::savePointChanged, [this]()
+			connect(text_widget, &OnTextEdit::savePointChanged, [this]()
 				{
 					m_messageBus->Publish("Text Changed");
 				});
-			connect(text_widget, &CustomTextEdit::updateUi, [=](Scintilla::Update updated)
+			connect(text_widget, &OnTextEdit::updateUi, [=](Scintilla::Update updated)
 				{
 					qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 					qDebug(Q_FUNC_INFO);
 
-					CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
+					OnTextEdit* editor = qobject_cast<OnTextEdit*>(sender());
 					if (Scintilla::FlagSet(updated, Scintilla::Update::Content))
 					{
 						m_messageBus->Publish("Update Document Size", text_widget);
@@ -1775,7 +1777,7 @@ bool OneNotepadCore::LoadSettings()
 	return true;
 }
 
-bool OneNotepadCore::SaveSettings()
+bool OnCore::SaveSettings()
 {
 	QList<QString> m_openedFilePath;
 	QList<QString> m_openedFileName;
@@ -1787,10 +1789,10 @@ bool OneNotepadCore::SaveSettings()
 		m_savedFile.append(m_textWidget[i]->GetSaveStatus());
 	}
 	// 保存上次打开文件
-	m_settings->setValue("OneNotepadCore/OpenedFilePaths", m_openedFilePath);
-	m_settings->setValue("OneNotepadCore/OpenedFileNames", m_openedFileName);
-	m_settings->SetBoolList("OneNotepadCore/SavedFile", m_savedFile);
-	m_settings->setValue("OneNotepadCore/CurrentIndex", m_centralWidget->currentIndex());
+	m_settings->setValue("OnCore/OpenedFilePaths", m_openedFilePath);
+	m_settings->setValue("OnCore/OpenedFileNames", m_openedFileName);
+	m_settings->SetBoolList("OnCore/SavedFile", m_savedFile);
+	m_settings->setValue("OnCore/CurrentIndex", m_centralWidget->currentIndex());
 
 	// 保存无路径文件
 	for (int index = 0; index < m_centralWidget->count(); ++index)
@@ -1815,6 +1817,6 @@ bool OneNotepadCore::SaveSettings()
 	}
 
 	// 保存字体大小
-	m_settings->setValue("CustomTextEdit/FontSize", m_fontSize);
+	m_settings->setValue("OnTextEdit/FontSize", m_fontSize);
 	return true;
 }

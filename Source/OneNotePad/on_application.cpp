@@ -1,4 +1,4 @@
-﻿#include "one_notepad_application.h"
+﻿#include "on_application.h"
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QIcon>
 
-OneNotepadApplication::OneNotepadApplication(int& argc, char** argv)
+OnApplication::OnApplication(int& argc, char** argv)
 	:SingleApplication(argc, argv)
 {
 #ifdef Q_OS_WIN
@@ -19,19 +19,19 @@ OneNotepadApplication::OneNotepadApplication(int& argc, char** argv)
 	InitConnect();
 }
 
-OneNotepadApplication::~OneNotepadApplication()
+OnApplication::~OnApplication()
 {
 }
 
-void OneNotepadApplication::InitUi()
+void OnApplication::InitUi()
 {
 	setWindowIcon(QIcon(":/Icons/Icons/one_notepad.ico"));
 }
 
-void OneNotepadApplication::InitValue()
+void OnApplication::InitValue()
 {
 }
 
-void OneNotepadApplication::InitConnect()
+void OnApplication::InitConnect()
 {
 }

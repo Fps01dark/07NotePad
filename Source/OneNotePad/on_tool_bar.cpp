@@ -1,17 +1,17 @@
-﻿#include "custom_tool_bar.h"
+﻿#include "on_tool_bar.h"
 
 #include "message_bus.h"
 
-CustomToolBar::CustomToolBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+OnToolBar::OnToolBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	: m_messageBus(message_bus), QToolBar(parent) {
 	InitUi();
 	InitValue();
 	InitConnect();
 }
 
-CustomToolBar::~CustomToolBar() {}
+OnToolBar::~OnToolBar() {}
 
-void CustomToolBar::InitUi()
+void OnToolBar::InitUi()
 {
 	m_newAction = addAction(QIcon(":/Icons/Icons/newfile.png"), tr("New"));
 	m_openAction = addAction(QIcon(":/Icons/Icons/openFile.png"), tr("Open"));
@@ -47,9 +47,9 @@ void CustomToolBar::InitUi()
 	m_saveCurrentRecordedMacroAction = addAction(QIcon(":/Icons/Icons/saveRecord.png"), tr("Save Current Recorded Macro"));
 }
 
-void CustomToolBar::InitValue() {}
+void OnToolBar::InitValue() {}
 
-void CustomToolBar::InitConnect()
+void OnToolBar::InitConnect()
 {
 	connect(m_newAction, &QAction::triggered, [this]()
 		{

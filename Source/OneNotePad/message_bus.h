@@ -6,7 +6,7 @@
 #include <functional>
 #include <memory>
 
-class CustomTextEdit;
+class OnTextEdit;
 
 class MessageBus
 {
@@ -32,16 +32,16 @@ public:
 	void Publish(const QString& messageType, const QStringList& data);
 
 	// 注册消息类型的订阅者
-	void Subscribe(const QString& messageType, std::function<void(CustomTextEdit*)> handler);
-	void Publish(const QString& messageType, CustomTextEdit* data);
+	void Subscribe(const QString& messageType, std::function<void(OnTextEdit*)> handler);
+	void Publish(const QString& messageType, OnTextEdit* data);
 
 private:
 	// 存储每种消息类型对应的所有订阅者回调
-	QMap<QString, QList<std::function<void()>>> m_voidVoidsubscribers;
-	QMap<QString, QList<std::function<void(bool)>>> m_voidBoolsubscribers;
-	QMap<QString, QList<std::function<void(int)>>> m_voidIntsubscribers;
-	QMap<QString, QList<std::function<void(int, int)>>> m_voidIntIntsubscribers;
-	QMap<QString, QList<std::function<void(const QString&)>>> m_voidQStringSubscribers;
-	QMap<QString, QList<std::function<void(const QStringList&)>>> m_voidQStringListSubscribers;
-	QMap<QString, QList<std::function<void(CustomTextEdit*)>>> m_voidCustomTextEditSubscribers;
+	QMultiMap<uint32_t, QList<std::function<void()>>> m_voidVoidsubscribers;
+	QMultiMap<uint32_t, QList<std::function<void(bool)>>> m_voidBoolsubscribers;
+	QMultiMap<uint32_t, QList<std::function<void(int)>>> m_voidIntsubscribers;
+	QMultiMap<uint32_t, QList<std::function<void(int, int)>>> m_voidIntIntsubscribers;
+	QMultiMap<uint32_t, QList<std::function<void(const QString&)>>> m_voidQStringSubscribers;
+	QMultiMap<uint32_t, QList<std::function<void(const QStringList&)>>> m_voidQStringListSubscribers;
+	QMultiMap<uint32_t, QList<std::function<void(OnTextEdit*)>>> m_voidCustomTextEditSubscribers;
 };

@@ -5,14 +5,14 @@
 class QMenu;
 class QAction;
 class MessageBus;
-class CustomTextEdit;
+class OnTextEdit;
 
-class CustomMenuBar : public QMenuBar
+class OnMenuBar : public QMenuBar
 {
 	Q_OBJECT
 public:
-	explicit CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
-	~CustomMenuBar();
+	explicit OnMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
+	~OnMenuBar();
 	void SetRecentFiles(const QStringList& recent_list);
 	QStringList GetRecentFiles() const;
 

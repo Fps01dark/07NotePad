@@ -6,28 +6,29 @@
 class QString;
 
 class MessageBus;
-class CustomSettings;
-class OneNotepadMainWindow;
-class CustomMenuBar;
-class CustomToolBar;
-class CustomTabBar;
-class CustomTextEdit;
-class CustomTabWidget;
-class CustomStatusBar;
+class OnSettings;
+class OnMainWindow;
+class OnMenuBar;
+class OnToolBar;
+class OnTabBar;
+class OnTextEdit;
+class OnTabWidget;
+class OnStatusBar;
 class DirWorkspaceDock;
 
-class OneNotepadCore : public QObject
+class OnCore : public QObject
 {
 	Q_OBJECT
 public:
-	explicit OneNotepadCore(OneNotepadMainWindow* main_window);
-	~OneNotepadCore();
+	explicit OnCore(OnMainWindow* main_window);
+	~OnCore();
 	void ExitSoftware();
 
 private:
 	void InitUi();
 	void InitValue();
 	void InitConnect();
+	void UpdateWindowTitle();
 	// 文件
 	bool NewFile(const QString& new_file_name);
 	bool OpenFile(const QString& file_path);
@@ -39,15 +40,15 @@ private:
 
 private:
 	std::shared_ptr<MessageBus> m_messageBus = nullptr;
-	CustomSettings* m_settings = nullptr;
-	OneNotepadMainWindow* m_mainWindow = nullptr;
-	CustomMenuBar* m_menuBar = nullptr;
-	CustomToolBar* m_toolBar = nullptr;
-	CustomTabBar* m_tabBar = nullptr;
-	CustomTabWidget* m_centralWidget = nullptr;
-	CustomStatusBar* m_statusBar = nullptr;
+	OnSettings* m_settings = nullptr;
+	OnMainWindow* m_mainWindow = nullptr;
+	OnMenuBar* m_menuBar = nullptr;
+	OnToolBar* m_toolBar = nullptr;
+	OnTabBar* m_tabBar = nullptr;
+	OnTabWidget* m_centralWidget = nullptr;
+	OnStatusBar* m_statusBar = nullptr;
 	DirWorkspaceDock* m_dirWorkSpace = nullptr;
 	int m_fontSize = 9;
 	// 下标为 m_centralWidget Tab下标
-	QList<CustomTextEdit*> m_textWidget;
+	QList<OnTextEdit*> m_textWidget;
 };

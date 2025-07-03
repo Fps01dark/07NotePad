@@ -6,12 +6,12 @@ class QWidget;
 class QWheelEvent;
 class MessageBus;
 
-class CustomTextEdit : public ScintillaEdit
+class OnTextEdit : public ScintillaEdit
 {
 	Q_OBJECT
 public:
-	explicit CustomTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
-	~CustomTextEdit();
+	explicit OnTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
+	~OnTextEdit();
 	QString GetFileName() const;
 	void SetFileName(const QString& file_name);
 	QString GetFilePath() const;

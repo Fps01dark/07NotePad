@@ -4,14 +4,14 @@
 
 class QLabel;
 class MessageBus;
-class CustomTextEdit;
+class OnTextEdit;
 
-class CustomStatusBar : public QStatusBar
+class OnStatusBar : public QStatusBar
 {
 public:
-	explicit CustomStatusBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
-	~CustomStatusBar();
-	void Refresh(CustomTextEdit* editor);
+	explicit OnStatusBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent = nullptr);
+	~OnStatusBar();
+	void Refresh(OnTextEdit* editor);
 
 private:
 	void InitUi();

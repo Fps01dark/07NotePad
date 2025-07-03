@@ -32,28 +32,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="one_notepad_core.cpp">
+    <ClCompile Include="on_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="message_bus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="custom_menu_bar.cpp">
+    <ClCompile Include="on_menu_bar.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="custom_status_bar.cpp">
+    <ClCompile Include="on_status_bar.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="custom_tab_bar.cpp">
+    <ClCompile Include="on_tab_bar.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="custom_tab_widget.cpp">
+    <ClCompile Include="on_tab_widget.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="custom_text_edit.cpp">
+    <ClCompile Include="on_text_edit.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="custom_tool_bar.cpp">
+    <ClCompile Include="on_tool_bar.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
     <ClCompile Include="dir_workspace_dock.cpp">
@@ -62,16 +62,16 @@
     <ClCompile Include="dir_workspace_tree_view.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="one_notepad_main_window.cpp">
+    <ClCompile Include="on_main_window.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
     <ClCompile Include="status_label.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="one_notepad_application.cpp">
+    <ClCompile Include="on_application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="custom_settings.cpp">
+    <ClCompile Include="on_settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SingleApplication\singleapplication.cpp">
@@ -88,22 +88,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="custom_settings.h">
+    <QtMoc Include="on_settings.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="one_notepad_core.h">
+    <QtMoc Include="on_core.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="custom_menu_bar.h">
+    <QtMoc Include="on_menu_bar.h">
       <Filter>Ui</Filter>
     </QtMoc>
-    <QtMoc Include="custom_tab_bar.h">
+    <QtMoc Include="on_tab_bar.h">
       <Filter>Ui</Filter>
     </QtMoc>
-    <QtMoc Include="custom_tab_widget.h">
+    <QtMoc Include="on_tab_widget.h">
       <Filter>Ui</Filter>
     </QtMoc>
-    <QtMoc Include="custom_text_edit.h">
+    <QtMoc Include="on_text_edit.h">
       <Filter>Ui</Filter>
     </QtMoc>
     <QtMoc Include="dir_workspace_dock.h">
@@ -112,13 +112,13 @@
     <QtMoc Include="dir_workspace_tree_view.h">
       <Filter>Ui</Filter>
     </QtMoc>
-    <QtMoc Include="one_notepad_main_window.h">
+    <QtMoc Include="on_main_window.h">
       <Filter>Ui</Filter>
     </QtMoc>
     <QtMoc Include="status_label.h">
       <Filter>Ui</Filter>
     </QtMoc>
-    <QtMoc Include="one_notepad_application.h">
+    <QtMoc Include="on_application.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="SingleApplication\singleapplication.h">
@@ -135,10 +135,10 @@
     <ClInclude Include="message_bus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="custom_status_bar.h">
+    <ClInclude Include="on_status_bar.h">
       <Filter>Ui</Filter>
     </ClInclude>
-    <ClInclude Include="custom_tool_bar.h">
+    <ClInclude Include="on_tool_bar.h">
       <Filter>Ui</Filter>
     </ClInclude>
     <ClInclude Include="tinyxml2\tinyxml2.h">
@@ -147,11 +147,6 @@
     <ClInclude Include="one_notepad_global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <QtUic Include="one_notepad_main_window.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="..\..\Resources\one_notepad.qrc">

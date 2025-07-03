@@ -1,4 +1,4 @@
-﻿#include "custom_text_edit.h"
+﻿#include "on_text_edit.h"
 
 #include <QWheelEvent>
 
@@ -11,7 +11,7 @@ namespace
 	const int MARK_HIDELINESUNDERLINE = 21;
 }
 
-CustomTextEdit::CustomTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+OnTextEdit::OnTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	: m_messageBus(message_bus), ScintillaEdit(parent)
 {
 	InitUi();
@@ -19,61 +19,61 @@ CustomTextEdit::CustomTextEdit(std::shared_ptr<MessageBus> message_bus, QWidget*
 	InitConnect();
 }
 
-CustomTextEdit::~CustomTextEdit()
+OnTextEdit::~OnTextEdit()
 {
 }
 
-QString CustomTextEdit::GetFileName() const
+QString OnTextEdit::GetFileName() const
 {
 	return m_fileName;
 }
 
-void CustomTextEdit::SetFileName(const QString& file_name)
+void OnTextEdit::SetFileName(const QString& file_name)
 {
 	m_fileName = file_name;
 }
 
-QString CustomTextEdit::GetFilePath() const
+QString OnTextEdit::GetFilePath() const
 {
 	return m_filePath;
 }
 
-void CustomTextEdit::SetFilePath(const QString& file_path)
+void OnTextEdit::SetFilePath(const QString& file_path)
 {
 	m_filePath = file_path;
 }
 
-bool CustomTextEdit::GetSaveStatus() const
+bool OnTextEdit::GetSaveStatus() const
 {
 	return m_savedStatus;
 }
 
-void CustomTextEdit::SetSaveStatus(bool save_status)
+void OnTextEdit::SetSaveStatus(bool save_status)
 {
 	m_savedStatus = save_status;
 }
 
-sptr_t CustomTextEdit::GetBeginSelectPosition() const
+sptr_t OnTextEdit::GetBeginSelectPosition() const
 {
 	return m_beginSelectPosition;
 }
 
-void CustomTextEdit::SetBeginSelectPosition(sptr_t position)
+void OnTextEdit::SetBeginSelectPosition(sptr_t position)
 {
 	m_beginSelectPosition = position;
 }
 
-sptr_t CustomTextEdit::GetBeginColumnSelectPosition() const
+sptr_t OnTextEdit::GetBeginColumnSelectPosition() const
 {
 	return m_beginColumnSelectPosition;
 }
 
-void CustomTextEdit::SetBeginColumnSelectPosition(sptr_t position)
+void OnTextEdit::SetBeginColumnSelectPosition(sptr_t position)
 {
 	m_beginColumnSelectPosition = position;
 }
 
-void CustomTextEdit::Cut()
+void OnTextEdit::Cut()
 {
 	if (selectionEmpty())
 	{
@@ -85,7 +85,7 @@ void CustomTextEdit::Cut()
 	}
 }
 
-QString CustomTextEdit::GetEOLString() const
+QString OnTextEdit::GetEOLString() const
 {
 	sptr_t eol_mode = eOLMode();
 	if (eol_mode == SC_EOL_CRLF)
@@ -102,7 +102,7 @@ QString CustomTextEdit::GetEOLString() const
 	}
 }
 
-void CustomTextEdit::wheelEvent(QWheelEvent* event)
+void OnTextEdit::wheelEvent(QWheelEvent* event)
 {
 	if (event->modifiers() & Qt::ControlModifier)
 	{
@@ -123,20 +123,20 @@ void CustomTextEdit::wheelEvent(QWheelEvent* event)
 	}
 }
 
-void CustomTextEdit::InitUi()
+void OnTextEdit::InitUi()
 {
 	SetupEditor();
 }
 
-void CustomTextEdit::InitValue()
+void OnTextEdit::InitValue()
 {
 }
 
-void CustomTextEdit::InitConnect()
+void OnTextEdit::InitConnect()
 {
 }
 
-void CustomTextEdit::SetupEditor()
+void OnTextEdit::SetupEditor()
 {
 	// 禁用Insert按键的功能
 	this->clearCmdKey(SCK_INSERT);

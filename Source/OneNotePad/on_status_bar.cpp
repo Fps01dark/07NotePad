@@ -1,10 +1,10 @@
-﻿#include "custom_status_bar.h"
+﻿#include "on_status_bar.h"
 
 #include "message_bus.h"
-#include "custom_text_edit.h"
+#include "on_text_edit.h"
 #include "status_label.h"
 
-CustomStatusBar::CustomStatusBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+OnStatusBar::OnStatusBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	:m_messageBus(message_bus), QStatusBar(parent)
 {
 	InitUi();
@@ -12,15 +12,15 @@ CustomStatusBar::CustomStatusBar(std::shared_ptr<MessageBus> message_bus, QWidge
 	InitConnect();
 }
 
-CustomStatusBar::~CustomStatusBar()
+OnStatusBar::~OnStatusBar()
 {
 }
 
-void CustomStatusBar::Refresh(CustomTextEdit* editor)
+void OnStatusBar::Refresh(OnTextEdit* editor)
 {
 }
 
-void CustomStatusBar::InitUi()
+void OnStatusBar::InitUi()
 {
 	m_docType = new StatusLabel();
 	addWidget(m_docType, 1);
@@ -41,9 +41,9 @@ void CustomStatusBar::InitUi()
 	addPermanentWidget(m_overType, 0);
 }
 
-void CustomStatusBar::InitValue()
+void OnStatusBar::InitValue()
 {
-	m_messageBus->Subscribe("Update Status Bar", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Status Bar", [this](OnTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -56,12 +56,12 @@ void CustomStatusBar::InitValue()
 			m_messageBus->Publish("Update OverType", editor);
 		});
 
-	m_messageBus->Subscribe("Update Language", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Language", [this](OnTextEdit* editor)
 		{
 			// TODO:暂时语言只有None
 			m_docType->setText("Normal Text File");
 		});
-	m_messageBus->Subscribe("Update Document Size", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Document Size", [this](OnTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -69,7 +69,7 @@ void CustomStatusBar::InitValue()
 			QString size_text = tr("Length: %L1    Lines: %L2").arg(editor->length()).arg(editor->lineCount());
 			m_docSize->setText(size_text);
 		});
-	m_messageBus->Subscribe("Update Selection Info", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Selection Info", [this](OnTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -106,7 +106,7 @@ void CustomStatusBar::InitValue()
 			QString position_text = tr("Ln: %L1    Col: %L2    ").arg(editor->lineFromPosition(pos) + 1).arg(editor->column(pos) + 1);
 			m_docPos->setText(position_text + selection_text);
 		});
-	m_messageBus->Subscribe("Update Eol", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Eol", [this](OnTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -124,7 +124,7 @@ void CustomStatusBar::InitValue()
 				break;
 			}
 		});
-	m_messageBus->Subscribe("Update Encoding", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Encoding", [this](OnTextEdit* editor)
 		{
 			switch (editor->codePage())
 			{
@@ -139,7 +139,7 @@ void CustomStatusBar::InitValue()
 				break;
 			}
 		});
-	m_messageBus->Subscribe("Update OverType", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update OverType", [this](OnTextEdit* editor)
 		{
 			bool overtype = editor->overtype();
 			if (overtype)
@@ -153,6 +153,6 @@ void CustomStatusBar::InitValue()
 		});
 }
 
-void CustomStatusBar::InitConnect()
+void OnStatusBar::InitConnect()
 {
 }

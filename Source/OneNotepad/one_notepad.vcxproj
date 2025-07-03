@@ -105,52 +105,49 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="custom_menu_bar.cpp" />
-    <ClCompile Include="custom_settings.cpp" />
-    <ClCompile Include="custom_status_bar.cpp" />
-    <ClCompile Include="custom_tab_bar.cpp" />
-    <ClCompile Include="custom_tab_widget.cpp" />
-    <ClCompile Include="custom_text_edit.cpp" />
-    <ClCompile Include="custom_tool_bar.cpp" />
+    <ClCompile Include="on_menu_bar.cpp" />
+    <ClCompile Include="on_settings.cpp" />
+    <ClCompile Include="on_status_bar.cpp" />
+    <ClCompile Include="on_tab_bar.cpp" />
+    <ClCompile Include="on_tab_widget.cpp" />
+    <ClCompile Include="on_text_edit.cpp" />
+    <ClCompile Include="on_tool_bar.cpp" />
     <ClCompile Include="dir_workspace_dock.cpp" />
     <ClCompile Include="dir_workspace_tree_view.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="one_notepad_core.cpp" />
-    <ClCompile Include="one_notepad_main_window.cpp" />
+    <ClCompile Include="on_core.cpp" />
+    <ClCompile Include="on_main_window.cpp" />
     <ClCompile Include="message_bus.cpp" />
-    <ClCompile Include="one_notepad_application.cpp" />
+    <ClCompile Include="on_application.cpp" />
     <ClCompile Include="SingleApplication\singleapplication.cpp" />
     <ClCompile Include="SingleApplication\singleapplication_p.cpp" />
     <ClCompile Include="status_label.cpp" />
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="custom_menu_bar.h" />
+    <QtMoc Include="on_menu_bar.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="custom_settings.h" />
+    <QtMoc Include="on_settings.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="custom_status_bar.h" />
-    <ClInclude Include="custom_tool_bar.h" />
+    <ClInclude Include="on_status_bar.h" />
+    <ClInclude Include="on_tool_bar.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="message_bus.h" />
     <ClInclude Include="one_notepad_global.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="SingleApplication\singleapplication_p.h" />
     <QtMoc Include="SingleApplication\singleapplication.h" />
-    <QtMoc Include="one_notepad_application.h" />
+    <QtMoc Include="on_application.h" />
     <QtMoc Include="status_label.h" />
-    <QtMoc Include="one_notepad_main_window.h" />
-    <QtMoc Include="one_notepad_core.h" />
+    <QtMoc Include="on_main_window.h" />
+    <QtMoc Include="on_core.h" />
     <QtMoc Include="dir_workspace_tree_view.h" />
     <QtMoc Include="dir_workspace_dock.h" />
-    <QtMoc Include="custom_text_edit.h" />
-    <QtMoc Include="custom_tab_widget.h" />
-    <QtMoc Include="custom_tab_bar.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtUic Include="one_notepad_main_window.ui" />
+    <QtMoc Include="on_text_edit.h" />
+    <QtMoc Include="on_tab_widget.h" />
+    <QtMoc Include="on_tab_bar.h" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="..\..\Resources\one_notepad.qrc" />

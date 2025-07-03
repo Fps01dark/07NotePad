@@ -1,17 +1,17 @@
-﻿#include "custom_settings.h"
+﻿#include "on_settings.h"
 
 #include <QBitArray>
 
-CustomSettings::CustomSettings(QObject* parent)
+OnSettings::OnSettings(QObject* parent)
 	:QSettings(parent)
 {
 }
 
-CustomSettings::~CustomSettings()
+OnSettings::~OnSettings()
 {
 }
 
-void CustomSettings::SetBoolList(const QString& key, const QList<bool>& boolList)
+void OnSettings::SetBoolList(const QString& key, const QList<bool>& boolList)
 {
 	// 使用 QBitArray 来表示布尔列表
 	QBitArray bitArray(boolList.size());
@@ -23,7 +23,7 @@ void CustomSettings::SetBoolList(const QString& key, const QList<bool>& boolList
 	setValue(key, bitArray);
 }
 
-QList<bool> CustomSettings::BoolList(const QString& key)
+QList<bool> OnSettings::BoolList(const QString& key)
 {
 	// 从 QSettings 中加载 QBitArray
 	QBitArray   bitArray = value(key).value<QBitArray>();

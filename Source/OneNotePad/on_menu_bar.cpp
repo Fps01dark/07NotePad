@@ -1,4 +1,4 @@
-﻿#include "custom_menu_bar.h"
+﻿#include "on_menu_bar.h"
 
 #include <QFileInfo>
 #include <QMessageBox>
@@ -6,14 +6,14 @@
 #include <QApplication>
 
 #include "message_bus.h"
-#include "custom_text_edit.h"
+#include "on_text_edit.h"
 
 namespace
 {
 	const int MAX_HISTORY_FILE_SIZE = 10;
 }
 
-CustomMenuBar::CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
+OnMenuBar::OnMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* parent)
 	: m_messageBus(message_bus), QMenuBar(parent)
 {
 	InitUi();
@@ -21,11 +21,11 @@ CustomMenuBar::CustomMenuBar(std::shared_ptr<MessageBus> message_bus, QWidget* p
 	InitConnect();
 }
 
-CustomMenuBar::~CustomMenuBar()
+OnMenuBar::~OnMenuBar()
 {
 }
 
-void CustomMenuBar::SetRecentFiles(const QStringList& recent_list)
+void OnMenuBar::SetRecentFiles(const QStringList& recent_list)
 {
 	m_recentFileMenu->clear();
 	for (int i = 0; i < recent_list.size(); ++i)
@@ -46,7 +46,7 @@ void CustomMenuBar::SetRecentFiles(const QStringList& recent_list)
 	}
 }
 
-QStringList CustomMenuBar::GetRecentFiles() const
+QStringList OnMenuBar::GetRecentFiles() const
 {
 	QStringList recent_files;
 	const QList<QAction*>& actions = m_recentFileMenu->actions();
@@ -57,7 +57,7 @@ QStringList CustomMenuBar::GetRecentFiles() const
 	return recent_files;
 }
 
-void CustomMenuBar::InitUi()
+void OnMenuBar::InitUi()
 {
 	// 菜单栏-文件
 	QMenu* file_menu = this->addMenu(tr("File"));
@@ -225,7 +225,7 @@ void CustomMenuBar::InitUi()
 	m_debugInfoAction = help_menu->addAction(tr("Debug Info"));
 }
 
-void CustomMenuBar::InitValue()
+void OnMenuBar::InitValue()
 {
 	m_messageBus->Subscribe("Add Recent File", [this](const QString& file_path)
 		{
@@ -239,7 +239,7 @@ void CustomMenuBar::InitValue()
 			// UI
 			SetRecentFiles(m_recentFiles);
 		});
-	m_messageBus->Subscribe("Update Menu Bar", [this](CustomTextEdit* editor)
+	m_messageBus->Subscribe("Update Menu Bar", [this](OnTextEdit* editor)
 		{
 			qDebug() << "This file is " << __FILE__ << " on line " << __LINE__;
 			qDebug(Q_FUNC_INFO);
@@ -268,7 +268,7 @@ void CustomMenuBar::InitValue()
 		});
 }
 
-void CustomMenuBar::InitConnect()
+void OnMenuBar::InitConnect()
 {
 	// 文件
 	connect(m_newAction, &QAction::triggered, [this]()

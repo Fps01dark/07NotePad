@@ -1,1 +1,5 @@
-#include "framework.h"
+#pragma once
+
+enum Message
+{
+};
